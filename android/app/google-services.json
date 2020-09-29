@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1057369272629",
+    "firebase_url": "https://cuitt-a4d22.firebaseio.com",
+    "project_id": "cuitt-a4d22",
+    "storage_bucket": "cuitt-a4d22.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1057369272629:android:4694699454ae9580859c7c",
+        "android_client_info": {
+          "package_name": "com.cuitt.cuittIOS"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1057369272629-tb4u3o960bd2dqct4uv16jlkpshp5u3c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5giETkjengqGRVSTBqwhaZW2rcfs0RQg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1057369272629-tb4u3o960bd2dqct4uv16jlkpshp5u3c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
