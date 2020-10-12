@@ -171,7 +171,7 @@ class _CreateAccountState extends State<CreateAccount>
                         behavior: HitTestBehavior.translucent,
                         onTap: () {},
                         child: Container(
-                          margin: spacer.all.xs,
+                          margin: spacer.y.xs + spacer.left.xs,
                           child: RichText(
                             text: TextSpan(
                               style: primaryListGreen,

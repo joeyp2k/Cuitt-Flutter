@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:cuitt/presentation/design_system/dimensions.dart';
+import 'package:cuitt/presentation/pages/dashboard.dart';
 import 'package:cuitt/presentation/pages/introduction.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +27,7 @@ import 'package:flutter/services.dart';
 import 'package:cuitt/presentation/pages/scratch.dart';
 import 'package:cuitt/presentation/pages/create_account.dart';
 import 'package:cuitt/presentation/pages/sign_in.dart';
+import 'package:cuitt/presentation/pages/dashboard.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -5574,7 +5576,7 @@ class DeviceScreen extends StatelessWidget {
   }
 }
 
-void main() => runApp(Login());
+void main() => runApp(Dashboardb());
 
 //the static Method that can convert from unix timestamp to DateTime: DateTime.fromMillisecondsSinceEpoch(unixstamp);
 //DS3231Time + 946684800 = UnixTime

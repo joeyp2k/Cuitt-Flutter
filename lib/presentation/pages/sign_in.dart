@@ -112,7 +112,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                         behavior: HitTestBehavior.translucent,
                         onTap: () {},
                         child: Container(
-                          margin: spacer.all.xs,
+                          margin: spacer.y.xs + spacer.left.xs,
                           child: RichText(
                             text: TextSpan(
                               style: primaryListGreen,
