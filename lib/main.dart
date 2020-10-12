@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:cuitt/presentation/design_system/dimensions.dart';
+import 'package:cuitt/presentation/pages/introduction.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
@@ -21,6 +23,9 @@ import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:provider/provider.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter/services.dart';
+import 'package:cuitt/presentation/pages/scratch.dart';
+import 'package:cuitt/presentation/pages/create_account.dart';
+import 'package:cuitt/presentation/pages/sign_in.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -62,36 +67,6 @@ var selection;
 var returnVal = 0;
 var nextAction = 0;
 var backButton = 0;
-
-class ContinueButton extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.greenAccent,
-      borderRadius: BorderRadius.all(Radius.circular(10)),
-      child: InkWell(
-        onTap: (() {}),
-        child: Container(
-          height: 40,
-          width: 170,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(10)),
-          ),
-          child: Center(
-            child: RichText(
-              text: TextSpan(
-                text: 'Continue',
-                style: TextStyle(
-                  fontSize: 20,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 class AutoSugLockButton extends StatefulWidget {
   @override
@@ -1786,6 +1761,8 @@ class _LoginPageState extends State<LoginPage> {
   bool _success;
   String _userEmail;
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -2269,9 +2246,9 @@ class _PartnerHomeState extends State<PartnerHome> {
             child: InkWell(
               borderRadius: BorderRadius.all(Radius.circular(15)),
               onTap: () {
-                appState.partnerIndex = 5;
-                appState.actionIndex = 1;
-                appState.update();
+                //appState.partnerIndex = 5;
+                //appState.actionIndex = 1;
+                //appState.update();
               },
               child: Container(
                 padding: EdgeInsets.all(20),
@@ -2312,9 +2289,9 @@ class _PartnerHomeState extends State<PartnerHome> {
             child: InkWell(
               borderRadius: BorderRadius.all(Radius.circular(15)),
               onTap: () {
-                appState.partnerIndex = 8;
-                appState.actionIndex = 1;
-                appState.update();
+                //appState.partnerIndex = 8;
+                //appState.actionIndex = 1;
+                //appState.update();
               },
               child: Container(
                 padding: EdgeInsets.all(20),
@@ -2355,8 +2332,8 @@ class _PartnerHomeState extends State<PartnerHome> {
             child: InkWell(
               borderRadius: BorderRadius.all(Radius.circular(15)),
               onTap: () {
-                appState.actionIndex = 1;
-                appState.groups();
+                //appState.actionIndex = 1;
+                //appState.groups();
               },
               child: Container(
                 padding: EdgeInsets.all(20),
@@ -3297,17 +3274,17 @@ class UserData extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var data = [
-      new TData('Over', over, Colors.red),
-      new TData('Fill', fill, Colors.green),
-      new TData('Unfilled', unfilled, Colors.grey),
+      new DialData('Over', over, Colors.red),
+      new DialData('Fill', fill, Colors.green),
+      new DialData('Unfilled', unfilled, Colors.grey),
     ];
 
     var series = [
       new charts.Series(
         id: 'Today',
-        domainFn: (TData tData, _) => tData.type,
-        measureFn: (TData tData, _) => tData.seconds,
-        colorFn: (TData tData, _) => tData.color,
+        domainFn: (DialData tData, _) => tData.type,
+        measureFn: (DialData tData, _) => tData.seconds,
+        colorFn: (DialData tData, _) => tData.color,
         data: data,
       ),
     ];
@@ -5597,399 +5574,7 @@ class DeviceScreen extends StatelessWidget {
   }
 }
 
-void main() => runApp(ScratchBoard());
-
-double padValue = 0;
-bool selected = false;
-
-class TData {
-  final String type;
-  final int seconds;
-  final charts.Color color;
-
-  TData(this.type, this.seconds, Color color)
-      : this.color = new charts.Color(
-            r: color.red, g: color.green, b: color.blue, a: color.alpha);
-}
-
-class OData {
-  final DateTime time;
-  final int seconds;
-
-  OData(this.time, this.seconds);
-}
-
-class ScratchBoard extends StatefulWidget {
-  @override
-  _ScratchBoardState createState() => _ScratchBoardState();
-}
-
-final DateTime start = DateTime.now();
-DateTime viewport = DateTime.now();
-DateTime timeData;
-DateTime viewportVal = DateTime(viewport.year, viewport.month, viewport.day, viewport.hour).toLocal();
-
-var fill = 1;
-var over = 1;
-var unfilled = 1;
-var time = [];
-var sec = [];
-var i = 0;
-var overviewData = [
-  OData(viewportVal, 0),
-  OData(viewportVal.add(Duration(hours: 1)), 0),//try with n incrementing by 1 instead of 2+.  Multiple values per bar is why bars aren't loading
-  OData(viewportVal.add(Duration(hours: 2)), 0),
-  OData(viewportVal.add(Duration(hours: 3)), 0),
-  OData(viewportVal.add(Duration(hours: 4)), 0),
-  OData(viewportVal.add(Duration(hours: 5)), 0),
-  OData(viewportVal.add(Duration(hours: 6)), 0),
-  OData(viewportVal.add(Duration(hours: 7)), 0),
-  OData(viewportVal.add(Duration(hours: 8)), 0),
-  OData(viewportVal.add(Duration(hours: 9)), 0),
-  OData(viewportVal.add(Duration(hours: 10)), 0),
-  OData(viewportVal.add(Duration(hours: 11)), 0),
-];
-int n = 1;
-
-class _ScratchBoardState extends State<ScratchBoard> {
-  @override
-  Widget build(BuildContext context) {
-    var data = [
-      new TData('Over', over, Colors.red),
-      new TData('Fill', fill, Colors.greenAccent),
-      new TData('Unfilled', unfilled, Colors.white),
-    ];
-
-    var loopSeries = [
-      new charts.Series(
-        id: 'Today',
-        domainFn: (TData tData, _) => tData.type,
-        measureFn: (TData tData, _) => tData.seconds,
-        colorFn: (TData tData, _) => tData.color,
-        data: data,
-      ),
-    ];
-
-    var loopChart = new charts.PieChart(
-      loopSeries,
-      defaultRenderer: new charts.ArcRendererConfig(arcWidth: 25),
-      animate: true,
-      animationDuration: Duration(milliseconds: 750),
-    );
-
-    var loopChartWidget = SizedBox(
-      height: 300.0,
-      child: loopChart,
-    );
-
-    var overviewSeries = [
-      new charts.Series(
-        id: 'Overview',
-        domainFn: (OData oData, _) => oData.time,
-        measureFn: (OData oData, _) => oData.seconds,
-        colorFn: (OData oData, _) {
-          return charts.ColorUtil.fromDartColor(Colors.greenAccent);
-        },
-        data: overviewData,
-      ),
-    ];
-
-    var overviewChart = new charts.TimeSeriesChart(
-      overviewSeries,
-      animate: true,
-      animationDuration: Duration(milliseconds: 500),
-      behaviors: [
-        // Add the sliding viewport behavior to have the viewport center on the
-        // domain that is currently selected.
-        new charts.SlidingViewport(
-        ),
-        // A pan and zoom behavior helps demonstrate the sliding viewport
-        // behavior by allowing the data visible in the viewport to be adjusted
-        // dynamically.
-      ],
-      defaultRenderer: new charts.BarRendererConfig<DateTime>(),
-      domainAxis: new charts.DateTimeAxisSpec(
-        showAxisLine: true,
-          tickFormatterSpec: new charts.AutoDateTimeTickFormatterSpec(
-              day: new charts.TimeFormatterSpec(
-                  format: 'HH', transitionFormat: 'HH')),
-          viewport: new charts.DateTimeExtents(
-              start: viewportVal.subtract(Duration(hours: 23)), end: viewportVal.add(Duration(hours: 1))),
-          renderSpec: new charts.NoneRenderSpec()),
-
-      /// Assign a custom style for the measure axis.
-      primaryMeasureAxis: new charts.NumericAxisSpec(
-          renderSpec: new charts.NoneRenderSpec()),
-    );
-
-    var dayViewChart = new charts.TimeSeriesChart(
-      overviewSeries,
-      animate: false,
-      animationDuration: Duration(milliseconds: 250),
-      behaviors: [
-        // Add the sliding viewport behavior to have the viewport center on the
-        // domain that is currently selected.
-        new charts.SlidingViewport(
-          charts.SelectionModelType.action
-        ),
-        // A pan and zoom behavior helps demonstrate the sliding viewport
-        // behavior by allowing the data visible in the viewport to be adjusted
-        // dynamically.
-        new charts.PanAndZoomBehavior(),
-        new charts.SelectNearest(),
-        new charts.DomainHighlighter(),
-      ],
-      defaultRenderer: new charts.BarRendererConfig<DateTime>(),
-      domainAxis: new charts.DateTimeAxisSpec(
-          tickFormatterSpec: new charts.AutoDateTimeTickFormatterSpec(
-              day: new charts.TimeFormatterSpec(
-                  format: 'HH', transitionFormat: 'HH')),
-          viewport: new charts.DateTimeExtents(
-              start: viewportVal.subtract(Duration(hours: 11)), end: viewportVal.add(Duration(hours: 1))),
-          renderSpec: new charts.SmallTickRendererSpec(
-              // Tick and Label styling here.
-              labelStyle: new charts.TextStyleSpec(
-                  fontSize: 12, // size in Pts.
-                  color: charts.MaterialPalette.white),
-
-              // Change the line colors to match text color.
-              lineStyle: new charts.LineStyleSpec(
-                  color: charts.MaterialPalette.white))),
-
-      /// Assign a custom style for the measure axis.
-      primaryMeasureAxis: new charts.NumericAxisSpec(
-          tickProviderSpec:
-              new charts.BasicNumericTickProviderSpec(desiredTickCount: 4),
-          renderSpec: new charts.GridlineRendererSpec(
-
-              // Tick and Label styling here.
-              labelStyle: new charts.TextStyleSpec(
-                  fontSize: 18, // size in Pts.
-                  color: charts.MaterialPalette.white),
-
-              // Change the line colors to match text color.
-              lineStyle: new charts.LineStyleSpec(
-                  color: charts.MaterialPalette.white))),
-    );
-
-    var dayViewChartWidget = Container(
-      height: 200,
-      child: dayViewChart,
-    );
-
-    var overviewChartWidget =
-    Container(
-      height: 200,
-      child: AbsorbPointer(
-          absorbing: true,
-          child: overviewChart),
-    );
-
-    return MaterialApp(
-      home: Scaffold(
-        backgroundColor: Colors.blueGrey,
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              Container(
-                margin: EdgeInsets.only(top: 35),
-                decoration: BoxDecoration(
-                  color: Colors.white12,
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                ),
-                height: 35,
-                width: 350,
-                child: Stack(
-                  children: [
-                    Container(
-                      child: Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            GestureDetector(
-                              behavior: HitTestBehavior.translucent,
-                              child: Container(
-                                height: 35,
-                                width: 350 / 4,
-                                child: Center(
-                                  child: RichText(
-                                    text: TextSpan(
-                                      text: 'D',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              onTap: () {
-                                setState(() {
-                                  padValue = 0;
-                                });
-                              },
-                            ),
-                            GestureDetector(
-                              behavior: HitTestBehavior.translucent,
-                              child: Container(
-                                height: 35,
-                                width: 350 / 4,
-                                child: Center(
-                                  child: RichText(
-                                    text: TextSpan(
-                                      text: 'W',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              onTap: () {
-                                setState(() {
-                                  padValue = 350 / 4;
-                                });
-                              },
-                            ),
-                            GestureDetector(
-                              behavior: HitTestBehavior.translucent,
-                              child: Container(
-                                height: 35,
-                                width: 350 / 4,
-                                child: Center(
-                                  child: RichText(
-                                    text: TextSpan(
-                                      text: 'M',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              onTap: () {
-                                setState(() {
-                                  padValue = 350 / 2;
-                                });
-                              },
-                            ),
-                            GestureDetector(
-                              behavior: HitTestBehavior.translucent,
-                              child: Container(
-                                height: 35,
-                                width: 350 / 4,
-                                child: Center(
-                                  child: RichText(
-                                    text: TextSpan(
-                                      text: 'Y',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              onTap: () {
-                                setState(() {
-                                  padValue = 350 - 350 / 4;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        AnimatedPadding(
-                          curve: Curves.easeOut,
-                          duration: const Duration(milliseconds: 300),
-                          padding: EdgeInsets.only(left: padValue),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white12,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
-                            ),
-                            height: 35,
-                            width: 350 / 4,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              Container(child: loopChartWidget),
-              overviewChartWidget,
-            ],
-          ),
-        ),
-        floatingActionButton: Row(
-          children: [
-            FloatingActionButton(
-              onPressed: () {
-                if(timeData == null){
-                  timeData = DateTime.now();
-                }
-                timeData = DateTime(
-                    timeData.year, timeData.month, timeData.day, timeData.hour).toLocal();
-                print('Time Data: ' + timeData.toString());
-                if (time.isEmpty) {
-                  time.add(
-                      DateTime(timeData.year, timeData.month, timeData.day, timeData.hour).toLocal());
-                }
-                if (sec.isEmpty) {
-                  sec.add(0);
-                }
-                if (timeData == time[i]) {
-                  sec[i] += 1;
-                  print('Data Length: ' + overviewData.length.toString());
-                  print('Current Time: ' + time[i].toString());
-                  print('Sec: ' + sec[i].toString());
-                  overviewData[i] = OData(time[i], sec[i]);
-                } else {
-                  i++;
-                  if(overviewData.length <= i){
-                    sec.add(1);
-                    time.add(timeData);
-                    print('ADD');
-                    print('Current Time: ' + time[i].toString());
-                    print('Sec: ' + sec[i].toString());
-                    overviewData.add(OData(time[i], sec[i]));
-                  }else{
-                    sec.add(1);
-                    time.add(timeData);
-                    print('REPLACE');
-                    print('Current Time: ' + time[i].toString());
-                    print('Sec: ' + sec[i].toString());
-                    overviewData[i] = OData(time[i], sec[i]);
-                  }
-                }
-                print('Viewport Start: ' + viewportVal.toString());
-                print('Viewport Start: ' + viewportVal.add(Duration(hours: 12)).toString());
-                setState(() {});
-              },
-            ),
-            FloatingActionButton(
-              backgroundColor: Colors.white,
-              onPressed: (){
-                  viewportVal = DateTime(timeData.year, timeData.month, timeData.day, timeData.hour).add(Duration(hours: n)).toLocal();
-                  timeData = timeData.add(Duration(hours: n));
-                  print('Time Data: ' + timeData.toString());
-                  print('Viewport Start: ' + viewportVal.toString());
-                  print('Viewport End: ' + viewportVal.add(Duration(hours: 12)).toString());
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+void main() => runApp(Login());
 
 //the static Method that can convert from unix timestamp to DateTime: DateTime.fromMillisecondsSinceEpoch(unixstamp);
 //DS3231Time + 946684800 = UnixTime

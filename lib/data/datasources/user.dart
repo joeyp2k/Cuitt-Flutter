@@ -1,0 +1,11 @@
+class User {
+  String id;
+  String firstName;
+  String lastName;
+  String numSec;
+  String seconds = "seconds";
+  String today = "today";
+  String change;
+}
+
+var userList = [];
