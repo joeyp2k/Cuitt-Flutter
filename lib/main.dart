@@ -28,6 +28,7 @@ import 'package:cuitt/presentation/pages/scratch.dart';
 import 'package:cuitt/presentation/pages/create_account.dart';
 import 'package:cuitt/presentation/pages/sign_in.dart';
 import 'package:cuitt/presentation/pages/dashboard.dart';
+import 'package:cuitt/presentation/pages/partner_mode_dashboard.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -5576,7 +5577,7 @@ class DeviceScreen extends StatelessWidget {
   }
 }
 
-void main() => runApp(Dashboardb());
+void main() => runApp(Welcome());
 
 //the static Method that can convert from unix timestamp to DateTime: DateTime.fromMillisecondsSinceEpoch(unixstamp);
 //DS3231Time + 946684800 = UnixTime
