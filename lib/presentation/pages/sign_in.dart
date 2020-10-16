@@ -2,11 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cuitt/presentation/design_system/colors.dart';
 import 'package:cuitt/presentation/design_system/dimensions.dart';
 import 'package:cuitt/presentation/design_system/texts.dart';
+import 'package:cuitt/presentation/pages/dashboard.dart';
 import 'package:cuitt/presentation/widgets/button.dart';
 import 'package:cuitt/presentation/widgets/text_entry_box.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import 'introduction.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -53,26 +56,26 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
       if (user != null) {
         _success = true;
         _userEmail = user.email;
-        //appState.partnerIndex = 4;
-        //appState.update();
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+          return Dashboardb();
+        }));
       } else {
         _success = false;
       }
     }
 
-    return MaterialApp(
-      home: Scaffold(
-        backgroundColor: Background,
-        body: SafeArea(
-          child: Center(
-            child: Column(
-              children: [
-                Padding(
-                  padding: spacer.x.xxl + spacer.top.xxl,
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      children: <Widget>[
+    return Scaffold(
+      backgroundColor: Background,
+      body: SafeArea(
+        child: Center(
+          child: Column(
+            children: [
+              Padding(
+                padding: spacer.x.xxl + spacer.top.xxl,
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: <Widget>[
                         TextEntryBox(
                           text: "Email",
                           obscureText: false,
@@ -110,7 +113,12 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                       ),
                       GestureDetector(
                         behavior: HitTestBehavior.translucent,
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.of(context).push(
+                              MaterialPageRoute(builder: (context) {
+                                return introPagesC;
+                              }));
+                        },
                         child: Container(
                           margin: spacer.y.xs + spacer.left.xs,
                           child: RichText(
@@ -124,8 +132,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                     ],
                   ),
                 ),
-              ],
-            ),
+            ],
           ),
         ),
       ),

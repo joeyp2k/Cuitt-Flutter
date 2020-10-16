@@ -1,13 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cuitt/data/datasources/keys.dart';
-import 'package:cuitt/data/datasources/user.dart';
 import 'package:cuitt/presentation/design_system/colors.dart';
 import 'package:cuitt/presentation/design_system/dimensions.dart';
 import 'package:cuitt/presentation/design_system/texts.dart';
-import 'package:cuitt/presentation/pages/group_list.dart';
-import 'package:cuitt/presentation/pages/group_list_empty.dart';
 import 'package:cuitt/presentation/widgets/button.dart';
-import 'package:cuitt/presentation/widgets/group_id_box.dart';
 import 'package:cuitt/presentation/widgets/text_entry_box.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -17,54 +12,25 @@ final FirebaseAuth _auth = FirebaseAuth.instance;
 final firestoreInstance = Firestore.instance;
 var firebaseUser;
 
-class CreateAdminPage extends StatefulWidget {
+class JoinGroupPage extends StatefulWidget {
   @override
-  _CreateAdminPageState createState() => _CreateAdminPageState();
+  _JoinGroupPageState createState() => _JoinGroupPageState();
 }
 
-class _CreateAdminPageState extends State<CreateAdminPage> {
-  final TextEditingController _groupNameController = TextEditingController();
+class _JoinGroupPageState extends State<JoinGroupPage> {
+  final TextEditingController _groupIDController = TextEditingController();
   final TextEditingController _groupPasswordController =
-      TextEditingController();
-  final TextEditingController _verifyGroupPasswordController =
       TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-  void _createAdminGroup() async {
+  void _joinGroup() async {
     firebaseUser = (await FirebaseAuth.instance.currentUser());
-    firestoreInstance.collection("groups").document(randID).setData({
-      "administrative group": true,
-      "group name": _groupNameController.text,
-      "group password": _groupPasswordController.text,
-      "admins": FieldValue.arrayUnion([firebaseUser.uid]),
+    firestoreInstance
+        .collection("groups")
+        .document(_groupIDController.text)
+        .updateData({
       "members": FieldValue.arrayUnion([firebaseUser.uid]),
     });
-  }
-
-  void groups() async {
-    int arrayindex = 0;
-    var firebaseUser = await FirebaseAuth.instance.currentUser();
-    var value = await firestoreInstance
-        .collection("groups")
-        .where("members", arrayContains: firebaseUser.uid)
-        .getDocuments();
-
-    groupNameList.clear();
-    groupIDList.clear();
-    value.documents.forEach((element) {
-      groupNameList.insert(arrayindex, element.data["group name"]);
-      groupIDList.insert(arrayindex, element.documentID);
-      arrayindex++;
-    });
-    if (groupNameList.isEmpty) {
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-        return GroupListEmpty();
-      }));
-    } else {
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-        return GroupsList();
-      }));
-    }
   }
 
   @override
@@ -83,7 +49,7 @@ class _CreateAdminPageState extends State<CreateAdminPage> {
                 padding: spacer.x.sm + spacer.bottom.xs,
                 child: RichText(
                   text: TextSpan(
-                    text: "Create Administrative Group",
+                    text: "Join Group",
                     style: TileData,
                   ),
                 ),
@@ -94,13 +60,9 @@ class _CreateAdminPageState extends State<CreateAdminPage> {
                 color: Background,
                 child: Center(
                   child: Padding(
-                    padding: spacer.x.xs,
+                    padding: spacer.x.xs + spacer.top.xxl,
                     child: Column(
                       children: [
-                        Padding(
-                          padding: spacer.top.sm + spacer.bottom.md,
-                          child: GroupIDBox(),
-                        ),
                         Form(
                           key: _formKey,
                           child: Padding(
@@ -108,35 +70,32 @@ class _CreateAdminPageState extends State<CreateAdminPage> {
                             child: Column(
                               children: [
                                 TextEntryBox(
-                                  text: "Group Name",
+                                  text: "Group ID",
                                   obscureText: false,
-                                  textController: _groupNameController,
+                                  textController: _groupIDController,
                                 ),
                                 Padding(
-                                  padding: spacer.y.xs,
+                                  padding: spacer.top.xs,
                                   child: TextEntryBox(
                                     text: "Group Password",
                                     obscureText: true,
                                     textController: _groupPasswordController,
                                   ),
                                 ),
-                                TextEntryBox(
-                                  text: "Verify Password",
-                                  obscureText: true,
-                                  textController:
-                                      _verifyGroupPasswordController,
-                                ),
                               ],
                             ),
                           ),
                         ),
                         Padding(
-                          padding: spacer.x.md + spacer.top.lg,
+                          padding: spacer.x.xxl * 1.3 + spacer.top.xl,
                           child: Button(
-                            text: "Create Administrative Group",
+                            text: "Join Group",
                             function: () async {
-                              _createAdminGroup();
-                              groups();
+                              _joinGroup();
+                              Navigator.of(context)
+                                  .push(MaterialPageRoute(builder: (context) {
+                                return null;
+                              }));
                             },
                           ),
                         ),

@@ -5577,7 +5577,21 @@ class DeviceScreen extends StatelessWidget {
   }
 }
 
-void main() => runApp(Welcome());
+void main() => runApp(Cuitt());
+
+class Cuitt extends StatefulWidget {
+  @override
+  _CuittState createState() => _CuittState();
+}
+
+class _CuittState extends State<Cuitt> {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: introPages,
+    );
+  }
+}
 
 //the static Method that can convert from unix timestamp to DateTime: DateTime.fromMillisecondsSinceEpoch(unixstamp);
 //DS3231Time + 946684800 = UnixTime

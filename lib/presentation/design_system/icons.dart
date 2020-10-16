@@ -1,3 +1,4 @@
+import 'package:cuitt/presentation/design_system/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -27,6 +28,7 @@ final Widget location = SvgPicture.asset(
 
 final Widget partnerMode = SvgPicture.asset(
   'lib/presentation/graphics/partner_mode.svg',
+  color: White,
   height: 200,
   width: 200,
 );

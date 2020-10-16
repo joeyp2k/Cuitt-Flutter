@@ -1,8 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cuitt/data/datasources/buttons.dart';
 import 'package:cuitt/data/datasources/dash_tiles.dart';
+import 'package:cuitt/data/datasources/user.dart';
 import 'package:cuitt/presentation/design_system/colors.dart';
 import 'package:cuitt/presentation/design_system/dimensions.dart';
 import 'package:cuitt/presentation/design_system/texts.dart';
+import 'package:cuitt/presentation/pages/create_group.dart';
+import 'package:cuitt/presentation/pages/group_list.dart';
+import 'package:cuitt/presentation/pages/group_list_empty.dart';
+import 'package:cuitt/presentation/pages/join_group.dart';
 import 'package:cuitt/presentation/widgets/dashboard_button.dart';
 import 'package:cuitt/presentation/widgets/dashboard_tile_large.dart';
 import 'package:cuitt/presentation/widgets/dashboard_tile_square.dart';
@@ -10,8 +16,13 @@ import 'package:cuitt/presentation/widgets/dmwy_bar.dart';
 import 'package:cuitt/presentation/widgets/list_button.dart';
 import 'package:cuitt/presentation/widgets/usage_dial.dart';
 import 'package:cuitt/presentation/widgets/usage_graph.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+final FirebaseAuth _auth = FirebaseAuth.instance;
+final firestoreInstance = Firestore.instance;
+var firebaseUser;
 
 class Dashboardb extends StatefulWidget {
   @override
@@ -19,6 +30,32 @@ class Dashboardb extends StatefulWidget {
 }
 
 class _DashboardbState extends State<Dashboardb> {
+  void groups() async {
+    int arrayindex = 0;
+    var firebaseUser = await FirebaseAuth.instance.currentUser();
+    var value = await firestoreInstance
+        .collection("groups")
+        .where("members", arrayContains: firebaseUser.uid)
+        .getDocuments();
+
+    groupNameList.clear();
+    groupIDList.clear();
+    value.documents.forEach((element) {
+      groupNameList.insert(arrayindex, element.data["group name"]);
+      groupIDList.insert(arrayindex, element.documentID);
+      arrayindex++;
+    });
+    if (groupNameList.isEmpty) {
+      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+        return GroupListEmpty();
+      }));
+    } else {
+      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+        return GroupsList();
+      }));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -124,6 +161,12 @@ class _DashboardbState extends State<Dashboardb> {
                               text: createTile.header,
                               icon: Icons.add,
                               iconColor: White,
+                              function: () async {
+                                Navigator.of(context).push(
+                                    MaterialPageRoute(builder: (context) {
+                                      return CreateGroupPage();
+                                    }));
+                              },
                             ),
                           ),
                           Padding(
@@ -135,6 +178,12 @@ class _DashboardbState extends State<Dashboardb> {
                               text: joinTile.header,
                               icon: joinTile.icon,
                               iconColor: White,
+                              function: () async {
+                                Navigator.of(context).push(
+                                    MaterialPageRoute(builder: (context) {
+                                      return JoinGroupPage();
+                                    }));
+                              },
                             ),
                           ),
                         ],
@@ -150,10 +199,16 @@ class _DashboardbState extends State<Dashboardb> {
                         children: [
                           Expanded(
                             child: DashboardButton(
-                              color: settingsTile.color,
-                              text: settingsTile.header,
-                              icon: settingsTile.icon,
-                              iconColor: White,
+                                color: settingsTile.color,
+                                text: settingsTile.header,
+                                icon: settingsTile.icon,
+                                iconColor: White,
+                                function: () async {
+                                  Navigator.of(context).push(
+                                      MaterialPageRoute(builder: (context) {
+                                        return null;
+                                      }));
+                                }
                             ),
                           ),
                           Padding(
@@ -165,6 +220,9 @@ class _DashboardbState extends State<Dashboardb> {
                               text: groupsTile.header,
                               icon: groupsTile.icon,
                               iconColor: White,
+                              function: () {
+                                groups();
+                              },
                             ),
                           ),
                         ],

@@ -8,8 +8,15 @@ class DashboardButton extends StatelessWidget {
   final Color color;
   final Color iconColor;
   final IconData icon;
+  final VoidCallback function;
 
-  DashboardButton({Key key, this.text, this.color, this.icon, this.iconColor})
+  DashboardButton(
+      {Key key,
+      this.text,
+      this.color,
+      this.icon,
+      this.iconColor,
+      this.function})
       : super(key: key);
 
   @override
@@ -22,7 +29,7 @@ class DashboardButton extends StatelessWidget {
         splashColor: Colors.transparent,
         highlightColor: DarkBlue,
         onTap: (() {
-          print("Tap");
+          function();
         }),
         child: Container(
           padding: spacer.all.sm,

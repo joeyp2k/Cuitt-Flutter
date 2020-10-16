@@ -8,3 +8,4 @@ const DarkBlue = const Color(0xFF4F80E2);
 const White = const Color(0xFFFFFFFF);
 
 const TransWhite = const Color.fromRGBO(255, 255, 255, 223);
+const TransWhitePlus = const Color.fromRGBO(255, 255, 255, 193);

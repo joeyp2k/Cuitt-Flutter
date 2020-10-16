@@ -2,11 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cuitt/presentation/design_system/colors.dart';
 import 'package:cuitt/presentation/design_system/dimensions.dart';
 import 'package:cuitt/presentation/design_system/texts.dart';
+import 'package:cuitt/presentation/pages/dashboard.dart';
 import 'package:cuitt/presentation/widgets/button.dart';
 import 'package:cuitt/presentation/widgets/text_entry_box.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import 'introduction.dart';
 
 class CreateAccount extends StatefulWidget {
   @override
@@ -71,26 +74,26 @@ class _CreateAccountState extends State<CreateAccount>
         });
         _success = true;
         _userEmail = user.email;
-        //appState.partnerIndex = 4;
-        //appState.update();
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+          return Dashboardb();
+        }));
       } else {
         _success = false;
       }
     }
 
-    return MaterialApp(
-      home: Scaffold(
-        backgroundColor: Background,
-        body: SafeArea(
-          child: Center(
-            child: Column(
-              children: [
-                Column(
-                  children: [
-                    Form(
-                      key: _formKey,
-                      child: Padding(
-                        padding: spacer.x.xxl,
+    return Scaffold(
+      backgroundColor: Background,
+      body: SafeArea(
+        child: Center(
+          child: Column(
+            children: [
+              Column(
+                children: [
+                  Form(
+                    key: _formKey,
+                    child: Padding(
+                      padding: spacer.x.xxl,
                         child: Column(
                           children: [
                             Padding(
@@ -169,7 +172,12 @@ class _CreateAccountState extends State<CreateAccount>
                       ),
                       GestureDetector(
                         behavior: HitTestBehavior.translucent,
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.of(context).push(
+                              MaterialPageRoute(builder: (context) {
+                                return introPagesB;
+                              }));
+                        },
                         child: Container(
                           margin: spacer.y.xs + spacer.left.xs,
                           child: RichText(
@@ -183,8 +191,7 @@ class _CreateAccountState extends State<CreateAccount>
                     ],
                   ),
                 ),
-              ],
-            ),
+            ],
           ),
         ),
       ),
