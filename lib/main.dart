@@ -2,33 +2,27 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:cuitt/presentation/design_system/dimensions.dart';
-import 'package:cuitt/presentation/pages/dashboard.dart';
-import 'package:cuitt/presentation/pages/introduction.dart';
+import 'dart:async';
+import 'dart:math';
+
+import 'package:bloc/bloc.dart';
+import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:convert/convert.dart';
+import 'package:cuitt/presentation/design_system/colors.dart';
+import 'package:cuitt/presentation/pages/scratch.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
-import 'package:flutter_blue/flutter_blue.dart';
-import 'widgets.dart';
-import 'dart:async';
-import 'dart:math';
-import 'package:secure_random/secure_random.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart';
-import 'package:charts_flutter/flutter.dart' as charts;
-import 'package:provider/provider.dart';
-import 'package:convert/convert.dart';
 import 'package:flutter/services.dart';
-import 'package:cuitt/presentation/pages/scratch.dart';
-import 'package:cuitt/presentation/pages/create_account.dart';
-import 'package:cuitt/presentation/pages/sign_in.dart';
-import 'package:cuitt/presentation/pages/dashboard.dart';
-import 'package:cuitt/presentation/pages/partner_mode_dashboard.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_blue/flutter_blue.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:secure_random/secure_random.dart';
+
+import 'widgets.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -5577,8 +5571,311 @@ class DeviceScreen extends StatelessWidget {
   }
 }
 
-void main() => runApp(Cuitt());
+void main() => runApp(BlueDash());
 
+abstract class CounterBlocEvent {}
+
+class DecreaseCounterEvent extends CounterBlocEvent {
+  //overide this method when class extends equatable
+
+  @override
+  // TODO: implement props
+  List<Object> get props => [];
+}
+
+class IncreaseCounterEvent extends CounterBlocEvent {
+//overide this method when class extends equatable
+
+  @override
+  // TODO: implement props
+  List<Object> get props => [];
+}
+
+abstract class CounterBlocState {}
+
+class LatestCounterState extends CounterBlocState {
+  final int newCounterValue;
+
+  LatestCounterState({this.newCounterValue});
+
+  //overide this method as base class extends equatable and pass property inside props list
+  @override
+  // TODO: implement props
+  List<Object> get props => [newCounterValue];
+}
+
+class CounterBloc extends Bloc<CounterBlocEvent, CounterBlocState> {
+  //Set Initial State of Counter Bloc by return the LatestCounterState Object with newCounterValue = 0
+  @override
+  // TODO: implement initialState
+  CounterBloc() : super(LatestCounterState(newCounterValue: 0));
+
+  @override
+  Stream<CounterBlocState> mapEventToState(CounterBlocEvent event) async* {
+    // TODO: implement mapEventToState
+    if (event is IncreaseCounterEvent) {
+      //Fetching Current Counter Value From Current State
+      int currentCounterValue = (state as LatestCounterState).newCounterValue;
+
+      //Applying business Logic
+      int newCounterValue = currentCounterValue + 1;
+
+      //Adding new state to the Stream, yield is used to add state to the stream
+      yield LatestCounterState(newCounterValue: newCounterValue);
+    } else if (event is DecreaseCounterEvent) {
+      //Fetching Current Counter Value From Current State
+      int currentCounterValue = (state as LatestCounterState).newCounterValue;
+
+      //Applying business Logic
+      int newCounterValue = currentCounterValue - 1;
+
+      //Adding new state to the Stream, yield is used to add state to the stream
+      yield LatestCounterState(newCounterValue: newCounterValue);
+    }
+  }
+}
+
+class CounterScreen extends StatefulWidget {
+  @override
+  _CounterScreenState createState() => _CounterScreenState();
+}
+
+class _CounterScreenState extends State<CounterScreen> {
+  //Used to add events in to Bloc
+  CounterBloc _counterBlocSink;
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+
+    //Close the Stream Sink when the widget is disposed
+    _counterBlocSink?.close();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    //Initializing Bloc Sink by using BlocProvider
+    _counterBlocSink = BlocProvider.of<CounterBloc>(context);
+
+    return Scaffold(
+        appBar: AppBar(
+          title: Text("Counter App"),
+        ),
+        body: Container(
+            width: double.infinity,
+            child: BlocBuilder<CounterBloc, CounterBlocState>(
+              builder: (context, state) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
+                        "You have clicked ${(state as LatestCounterState).newCounterValue} Times"),
+                    SizedBox(
+                      height: 16,
+                    ),
+                    FlatButton(
+                      child: Text("Increase Counter"),
+                      onPressed: () {
+                        //Send Decrease Counter EVent to the Bloc
+                        _counterBlocSink.add(IncreaseCounterEvent());
+                      },
+                      color: Colors.redAccent,
+                      textColor: Colors.white,
+                    ),
+                    SizedBox(
+                      height: 16,
+                    ),
+                    FlatButton(
+                      child: Text("Decrease Counter"),
+                      onPressed: () {
+                        //Send Decrease Counter EVent to the Bloc
+                        _counterBlocSink.add(DecreaseCounterEvent());
+                      },
+                      color: Colors.blue,
+                      textColor: Colors.white,
+                    ),
+                  ],
+                );
+              },
+            )));
+  }
+}
+
+class BlocTest extends StatefulWidget {
+  @override
+  _BlocTestState createState() => _BlocTestState();
+}
+
+class _BlocTestState extends State<BlocTest> {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: BlocProvider<CounterBloc>(
+        create: (context) => CounterBloc(),
+        child: Scaffold(
+          backgroundColor: Background,
+          body: CounterScreen(),
+        ),
+      ),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  MyHomePage({Key key, this.title}) : super(key: key);
+  final String title;
+
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  CounterBloc _counterBlocSink;
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+
+    //Close the Stream Sink when the widget is disposed
+    _counterBlocSink?.close();
+  }
+
+  final FlutterBlue flutterBlue = FlutterBlue.instance;
+  BluetoothCharacteristic _ledChar;
+  var _myService = "00001523-1212-efde-1523-785feabcd123";
+  var _myChar = "00001524-1212-efde-1523-785feabcd123";
+  var _readval;
+
+  bool _getLEDChar(List<BluetoothService> services) {
+    print('Getting Characteristic...');
+    for (BluetoothService s in services) {
+      if (s.uuid.toString() == _myService) {
+        var characteristics = s.characteristics;
+        for (BluetoothCharacteristic c in characteristics) {
+          if (c.uuid.toString() == _myChar) {
+            print('SAVED CHARACTERISTIC');
+            _ledChar = c;
+            _listener();
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  void _connectDevice(BluetoothDevice device) async {
+    await print('Connecting...');
+    flutterBlue.stopScan();
+    try {
+      await device.connect();
+    } catch (e) {
+      if (e.code != 'already_connected') {
+        throw e;
+      }
+    } finally {
+      List<BluetoothService> services = await device.discoverServices();
+      _getLEDChar(services);
+    }
+  }
+
+  void _listener() {
+    _ledChar.setNotifyValue(true);
+    _ledChar.value.listen((event) async {
+      _readval = await _ledChar.read();
+      _counterBlocSink.add(IncreaseCounterEvent());
+      print('READ VALUE = ' + _readval.toString());
+    });
+  }
+
+  void _onread() async {
+    _readval = await _ledChar.read();
+    print('READ VALUE = ' + _readval.toString());
+  }
+
+  void _scanForDevice() {
+    print('Scanning...');
+    flutterBlue.scanResults.listen((List<ScanResult> results) {
+      for (ScanResult result in results) {
+        if (result.device.name == "Cuitt") {
+          _connectDevice(result.device);
+        }
+      }
+    });
+
+    flutterBlue.startScan();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider<CounterBloc>(
+      create: (context) => CounterBloc(),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(widget.title),
+        ),
+        body: Container(
+          width: double.infinity,
+          child: BlocBuilder<CounterBloc, CounterBlocState>(
+              builder: (context, state) {
+            _counterBlocSink = BlocProvider.of<CounterBloc>(context);
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                      "You have updated the state ${(state as LatestCounterState).newCounterValue} Times"),
+                  FloatingActionButton(
+                    onPressed: () {
+                      _ledChar.write([0xff, 0xff, 0xff, 0x10]);
+                    },
+                    tooltip: 'Increment',
+                    child: Icon(Icons.add_circle),
+                  ),
+                  FloatingActionButton(
+                    onPressed: () {
+                      _onread();
+                    },
+                    tooltip: 'Listen',
+                    child: Icon(Icons.add_circle),
+                  ),
+                ],
+              ),
+            );
+          }),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: _scanForDevice,
+          tooltip: 'Increment',
+          child: Icon(Icons.bluetooth_searching),
+        ),
+      ),
+    );
+  }
+}
+
+class BlueDash extends StatefulWidget {
+  @override
+  _BlueDashState createState() => _BlueDashState();
+}
+
+class _BlueDashState extends State<BlueDash> {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        backgroundColor: Background,
+        body: MyHomePage(
+          title: 'Test',
+        ),
+      ),
+    );
+  }
+}
+
+/*
 class Cuitt extends StatefulWidget {
   @override
   _CuittState createState() => _CuittState();
@@ -5588,11 +5885,11 @@ class _CuittState extends State<Cuitt> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: introPages,
+      home: ConnectDevice(),
     );
   }
 }
-
+*/
 //the static Method that can convert from unix timestamp to DateTime: DateTime.fromMillisecondsSinceEpoch(unixstamp);
 //DS3231Time + 946684800 = UnixTime
 //int unixTime;

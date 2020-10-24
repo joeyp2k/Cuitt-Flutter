@@ -1,48 +1,66 @@
 import 'package:cuitt/data/datasources/user.dart';
+import 'package:cuitt/presentation/design_system/colors.dart';
+import 'package:cuitt/presentation/design_system/texts.dart';
+import 'package:cuitt/presentation/design_system/dimensions.dart';
 import 'package:flutter/material.dart';
+import 'package:cuitt/presentation/pages/user.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+final FirebaseAuth _auth = FirebaseAuth.instance;
+final firestoreInstance = Firestore.instance;
+var firebaseUser;
 
 class UserList extends StatelessWidget {
-  void user() {}
+  void user() {
+    //get user data
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: ListView.builder(
-          shrinkWrap: true,
-          physics: BouncingScrollPhysics(),
-          padding: const EdgeInsets.all(10),
-          itemCount: userNameList.length,
-          itemBuilder: (BuildContext context, int index) {
-            return Container(
-              margin: EdgeInsets.symmetric(vertical: 5),
-              child: InkWell(
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-                onTap: () {
-                  username = '${userNameList[index]}';
-                },
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.white12,
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                  ),
-                  height: 100,
-                  child: Row(
-                    children: [
-                      RichText(
-                        text: TextSpan(
-                          text: '${userNameList[index]}',
-                          style: TextStyle(
-                            color: Colors.white,
+    return Scaffold(
+      backgroundColor: Background,
+      body: SafeArea(
+        child: ListView.builder(
+            shrinkWrap: true,
+            physics: BouncingScrollPhysics(),
+            padding: spacer.x.xs,
+            itemCount: userNameList.length,
+            itemBuilder: (BuildContext context, int index) {
+              return Container(
+                margin: spacer.y.xxs,
+                child: InkWell(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  onTap: () {
+                    username = '${userNameList[index]}';
+                    user();
+                    Navigator.of(context)
+                        .push(MaterialPageRoute(builder: (context) {
+                      return UserDashboard();
+                    }));
+                  },
+                  child: Container(
+                    padding: spacer.x.xs,
+                    decoration: BoxDecoration(
+                      color: TransWhite,
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
+                    height: gridSpacer * 10,
+                    child: Row(
+                      children: [
+                        RichText(
+                          text: TextSpan(
+                            text: '${userNameList[index]}',
+                            style: primaryList,
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          }),
+              );
+            }),
+      ),
     );
   }
 }

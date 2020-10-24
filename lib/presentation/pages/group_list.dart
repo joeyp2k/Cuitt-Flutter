@@ -51,7 +51,7 @@ class _GroupsListState extends State<GroupsList> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Background,
-      body: Container(
+      body: SafeArea(
         child: ListView.builder(
           shrinkWrap: true,
           physics: BouncingScrollPhysics(),
@@ -70,10 +70,10 @@ class _GroupsListState extends State<GroupsList> {
                 child: Container(
                   padding: spacer.x.xs,
                   decoration: BoxDecoration(
-                    color: Colors.white12,
+                    color: TransWhite,
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                   ),
-                  height: 50,
+                  height: gridSpacer * 5,
                   child: Row(
                     children: [
                       RichText(
