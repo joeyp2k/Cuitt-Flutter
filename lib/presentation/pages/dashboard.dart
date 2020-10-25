@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:convert/convert.dart';
+import 'package:cuitt/bloc/dashboard_bloc.dart';
 import 'package:cuitt/data/datasources/buttons.dart';
 import 'package:cuitt/data/datasources/dash_tiles.dart';
+import 'package:cuitt/data/datasources/dial_data.dart';
 import 'package:cuitt/data/datasources/user.dart';
 import 'package:cuitt/presentation/design_system/colors.dart';
 import 'package:cuitt/presentation/design_system/dimensions.dart';
@@ -19,12 +22,8 @@ import 'package:cuitt/presentation/widgets/usage_graph.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:cuitt/bloc/dashboard_bloc.dart';
-import 'package:flutter_blue/flutter_blue.dart';
-import 'package:convert/convert.dart';
-import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:cuitt/data/datasources/dial_data.dart';
+import 'package:flutter_blue/flutter_blue.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 final firestoreInstance = Firestore.instance;
@@ -90,10 +89,6 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  //READ VALUE B DOES NOT RUN, LISTENER ONLY RUNS UNTIL READ VALUE A.
-  //DATA IN CALCULATIONS CALLS UPON NULL VALUES
-  //IF CALCULATIONS FUNCTION IS REMOVED THEN READ VALUE A AND B RUN
-  //IF AWAIT USED FOR CALCULATIONS AND PRINT STATEMENTS THEN
   void _listener() {
     _ledChar.setNotifyValue(true);
     _ledChar.value.listen((event) async {
@@ -111,25 +106,30 @@ class _MyHomePageState extends State<MyHomePage> {
               'DRAW LENGTH TOTAL = ' + drawLengthTotal.toStringAsPrecision(1));
         } else {
           print('READ VALUE A = ' + _readval.toString());
-          currentTime = int.parse(hex.encode(_readval.sublist(0, 4)).toString(),
+          currentTime = int.parse(
+              hex.encode(_readval.sublist(0, 4)).toString(),
               radix: 16);
-          drawLength = int.parse(hex.encode(_readval.sublist(4, 6)).toString(),
-                  radix: 16) /
+          drawLength = int.parse(
+              hex.encode(_readval.sublist(4, 6)).toString(),
+              radix: 16) /
               1000;
-          drawCount = int.parse(hex.encode(_readval.sublist(6, 8)).toString(),
+          drawCount = int.parse(
+              hex.encode(_readval.sublist(6, 8)).toString(),
               radix: 16);
-          seshCount = int.parse(hex.encode(_readval.sublist(8, 10)).toString(),
+          seshCount = int.parse(
+              hex.encode(_readval.sublist(8, 10)).toString(),
               radix: 16);
 
           drawLengthTotal += drawLength;
           drawLengthAverage = drawLengthTotal / drawCount;
           drawLengthTotalAverage = drawLengthTotal /
               dayNum; //CHANGE TO CALCULATION ARRAY FOR DLT BY DAY
-          drawCountAverage =
-              drawCount / dayNum; //CHANGE TO CALCULATION ARRAY FOR DCT BY DAY
-          seshCountAverage =
-              seshCount / dayNum; //CHANGE TO CALCULATION ARRAY FOR DCT BY DAY
-          suggestion = drawLengthTotalAverage / drawCountAverage * decay;
+          drawCountAverage = drawCount /
+              dayNum; //CHANGE TO CALCULATION ARRAY FOR DCT BY DAY
+          seshCountAverage = seshCount /
+              dayNum; //CHANGE TO CALCULATION ARRAY FOR DCT BY DAY
+          suggestion =
+              drawLengthTotalAverage / drawCountAverage * decay;
           if (hitTimeNow == null) {
             hitTimeNow = currentTime;
           } else {
@@ -141,13 +141,6 @@ class _MyHomePageState extends State<MyHomePage> {
           timeUntilNext = waitPeriod - timeBetween;
           hitLengthArray.add(drawLength);
           timestampArray.add(currentTime);
-          /*
-          for (drawCountIndex; drawCountIndex > 0; drawCountIndex--) {
-            hitLengthArray[drawCountIndex] = drawLength;
-            timestampArray[drawCountIndex] = currentTime;
-          }
-           */
-          drawCountIndex++;
           fill = drawLengthTotal.truncate();
           over = drawLengthTotal.truncate() - drawLengthTotalAverage.truncate();
           _counterBlocSink.add(UpdateDataEvent());
@@ -158,6 +151,7 @@ class _MyHomePageState extends State<MyHomePage> {
           print('DRAW LENGTH TOTAL = ' + drawLengthTotal.truncate().toString());
           _lastval = _readval;
         }
+
       }
     });
   }
@@ -182,8 +176,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<CounterBloc>(
-      create: (context) => CounterBloc(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<CounterBloc>(
+          create: (context) => CounterBloc(),
+        ),
+      ],
       child: Scaffold(
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         backgroundColor: Background,
@@ -191,23 +189,24 @@ class _MyHomePageState extends State<MyHomePage> {
           width: double.infinity,
           child: BlocBuilder<CounterBloc, CounterBlocState>(
               builder: (context, state) {
-            _counterBlocSink = BlocProvider.of<CounterBloc>(context);
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text("Draws: ${(state as DataState).newDrawCountValue}"),
-                ],
-              ),
-            );
-          }),
+                _counterBlocSink = BlocProvider.of<CounterBloc>(context);
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                          "Draws: ${(state as DataState).newDrawCountValue}"),
+                    ],
+                  ),
+                );
+              }),
         ),
         floatingActionButton: FloatingActionButton(
           backgroundColor: Green,
           onPressed: () {
             _scanForDevice();
             Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-              return Dashboardb(_counterBlocSink);
+              return Dashboardb();
             }));
           },
           tooltip: 'Increment',
@@ -238,10 +237,6 @@ class _BlueDashbState extends State<BlueDashb> {
 }
 
 class Dashboardb extends StatefulWidget {
-  CounterBloc bloc;
-
-  Dashboardb(this.bloc);
-
   @override
   _DashboardbState createState() => _DashboardbState();
 }
@@ -282,7 +277,6 @@ class _DashboardbState extends State<Dashboardb> {
         backgroundColor: Background,
         body: BlocBuilder<CounterBloc, CounterBlocState>(
           builder: (context, state) {
-            widget.bloc = BlocProvider.of<CounterBloc>(context);
             return SingleChildScrollView(
               child: SafeArea(
                 child: Center(
