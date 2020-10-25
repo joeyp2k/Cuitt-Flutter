@@ -29,86 +29,7 @@ final FirebaseAuth _auth = FirebaseAuth.instance;
 final firestoreInstance = Firestore.instance;
 var firebaseUser;
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<CounterBloc>(
-          create: (BuildContext context) => CounterBloc(),
-        ),
-      ],
-      child: MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: FirstScreen(),
-      ),
-    );
-  }
-}
-
-class BlocSample extends Bloc<EventSample, String> {
-  @override
-  BlocSample() : super('initial state');
-
-  @override
-  Stream<String> mapEventToState(
-    EventSample event,
-  ) async* {
-    yield 'changed state';
-  }
-}
-
-class EventSample {}
-
-class FirstScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<BlocSample, String>(
-      builder: (context, state) {
-        return Scaffold(
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(state),
-                RaisedButton(
-                  child: Text('change status'),
-                  onPressed: () => BlocProvider.of<BlocSample>(context).add(
-                    EventSample(),
-                  ),
-                ),
-                RaisedButton(
-                  child: Text('change route'),
-                  onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => SecondScreen(),
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class SecondScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<BlocSample, String>(
-      builder: (context, state) {
-        return Scaffold(
-          body: Center(child: Text(state)),
-        );
-      },
-    );
-  }
-}
+CounterBloc _counterBlocSink;
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
@@ -119,8 +40,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  CounterBloc _counterBlocSink;
-
   @override
   void dispose() {
     // TODO: implement dispose
@@ -217,8 +136,31 @@ class _MyHomePageState extends State<MyHomePage> {
           timeUntilNext = waitPeriod - timeBetween;
           hitLengthArray.add(drawLength);
           timestampArray.add(currentTime);
-          fill = drawLengthTotal.truncate();
-          over = drawLengthTotal.truncate() - drawLengthTotalAverage.truncate();
+          if (dayNum == 1) {
+            over = 0;
+            if (fill == 0) {
+              unfilled = 1;
+            } else {
+              unfilled = 0;
+            }
+          } else {
+            over = drawLengthTotal.truncate() - drawLengthTotalAverage
+                .truncate(); //change to drawLengthTotalAverage for yesterday using new variable or array corresponding to dayNum drawlengthtotalaverages
+          }
+          if (drawLengthTotal.truncate() >=
+              drawLengthTotalAverage /*yesterday*/) {
+
+          } else {
+            fill = drawLengthTotal.truncate();
+          }
+          if (drawLengthTotalAverage.truncate() /*yesterday*/ <=
+              drawLengthTotal.truncate()) {
+            unfilled = 0;
+          }
+          {
+            unfilled = drawLengthTotalAverage.truncate() - drawLengthTotal
+                .truncate(); //yesterday's draw length total average
+          }
           _counterBlocSink.add(UpdateDataEvent());
           print('DRAW COUNT = ' + drawCount.toString());
           print('SESH COUNT = ' + seshCount.toString());
@@ -348,6 +290,7 @@ class _DashboardbState extends State<Dashboardb> {
   Widget build(BuildContext context) {
     return BlocBuilder<CounterBloc, CounterBlocState>(
       builder: (context, state) {
+        _counterBlocSink = BlocProvider.of<CounterBloc>(context);
         return Scaffold(
           backgroundColor: Background,
           body: SingleChildScrollView(
@@ -417,7 +360,9 @@ class _DashboardbState extends State<Dashboardb> {
                                 RichText(
                                   text: TextSpan(
                                     style: TileHeader,
-                                    text: "Current: 32s",
+                                    text: "Current: " + (state as DataState)
+                                        .newDrawLengthTotalValue
+                                        .toString(),
                                   ),
                                 ),
                               ],
@@ -431,7 +376,7 @@ class _DashboardbState extends State<Dashboardb> {
                             header: avgDrawTile.header,
                             textData: (state as DataState)
                                 .newAverageDrawLengthValue
-                                .toString(),
+                                .toString() + ' seconds',
                           ),
                         ],
                       ),
