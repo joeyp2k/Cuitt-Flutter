@@ -29,6 +29,87 @@ final FirebaseAuth _auth = FirebaseAuth.instance;
 final firestoreInstance = Firestore.instance;
 var firebaseUser;
 
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<CounterBloc>(
+          create: (BuildContext context) => CounterBloc(),
+        ),
+      ],
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: FirstScreen(),
+      ),
+    );
+  }
+}
+
+class BlocSample extends Bloc<EventSample, String> {
+  @override
+  BlocSample() : super('initial state');
+
+  @override
+  Stream<String> mapEventToState(
+    EventSample event,
+  ) async* {
+    yield 'changed state';
+  }
+}
+
+class EventSample {}
+
+class FirstScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<BlocSample, String>(
+      builder: (context, state) {
+        return Scaffold(
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(state),
+                RaisedButton(
+                  child: Text('change status'),
+                  onPressed: () => BlocProvider.of<BlocSample>(context).add(
+                    EventSample(),
+                  ),
+                ),
+                RaisedButton(
+                  child: Text('change route'),
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => SecondScreen(),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class SecondScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<BlocSample, String>(
+      builder: (context, state) {
+        return Scaffold(
+          body: Center(child: Text(state)),
+        );
+      },
+    );
+  }
+}
+
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
   final String title;
@@ -106,30 +187,25 @@ class _MyHomePageState extends State<MyHomePage> {
               'DRAW LENGTH TOTAL = ' + drawLengthTotal.toStringAsPrecision(1));
         } else {
           print('READ VALUE A = ' + _readval.toString());
-          currentTime = int.parse(
-              hex.encode(_readval.sublist(0, 4)).toString(),
+          currentTime = int.parse(hex.encode(_readval.sublist(0, 4)).toString(),
               radix: 16);
-          drawLength = int.parse(
-              hex.encode(_readval.sublist(4, 6)).toString(),
+          drawLength = int.parse(hex.encode(_readval.sublist(4, 6)).toString(),
               radix: 16) /
               1000;
-          drawCount = int.parse(
-              hex.encode(_readval.sublist(6, 8)).toString(),
+          drawCount = int.parse(hex.encode(_readval.sublist(6, 8)).toString(),
               radix: 16);
-          seshCount = int.parse(
-              hex.encode(_readval.sublist(8, 10)).toString(),
+          seshCount = int.parse(hex.encode(_readval.sublist(8, 10)).toString(),
               radix: 16);
 
           drawLengthTotal += drawLength;
           drawLengthAverage = drawLengthTotal / drawCount;
           drawLengthTotalAverage = drawLengthTotal /
               dayNum; //CHANGE TO CALCULATION ARRAY FOR DLT BY DAY
-          drawCountAverage = drawCount /
-              dayNum; //CHANGE TO CALCULATION ARRAY FOR DCT BY DAY
-          seshCountAverage = seshCount /
-              dayNum; //CHANGE TO CALCULATION ARRAY FOR DCT BY DAY
-          suggestion =
-              drawLengthTotalAverage / drawCountAverage * decay;
+          drawCountAverage =
+              drawCount / dayNum; //CHANGE TO CALCULATION ARRAY FOR DCT BY DAY
+          seshCountAverage =
+              seshCount / dayNum; //CHANGE TO CALCULATION ARRAY FOR DCT BY DAY
+          suggestion = drawLengthTotalAverage / drawCountAverage * decay;
           if (hitTimeNow == null) {
             hitTimeNow = currentTime;
           } else {
@@ -151,7 +227,6 @@ class _MyHomePageState extends State<MyHomePage> {
           print('DRAW LENGTH TOTAL = ' + drawLengthTotal.truncate().toString());
           _lastval = _readval;
         }
-
       }
     });
   }
@@ -176,43 +251,37 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<CounterBloc>(
-          create: (context) => CounterBloc(),
-        ),
-      ],
-      child: Scaffold(
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        backgroundColor: Background,
-        body: Container(
-          width: double.infinity,
-          child: BlocBuilder<CounterBloc, CounterBlocState>(
-              builder: (context, state) {
-                _counterBlocSink = BlocProvider.of<CounterBloc>(context);
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                          "Draws: ${(state as DataState).newDrawCountValue}"),
-                    ],
-                  ),
-                );
-              }),
-        ),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: Green,
-          onPressed: () {
-            _scanForDevice();
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-              return Dashboardb();
-            }));
-          },
-          tooltip: 'Increment',
-          child: Icon(Icons.bluetooth_searching),
-        ),
-      ),
+    return BlocBuilder<CounterBloc, CounterBlocState>(
+      builder: (context, state) {
+        _counterBlocSink = BlocProvider.of<CounterBloc>(context);
+        return Scaffold(
+          floatingActionButtonLocation:
+          FloatingActionButtonLocation.centerFloat,
+          backgroundColor: Background,
+          body: Container(
+            width: double.infinity,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text("Draws: ${(state as DataState).newDrawCountValue}"),
+                ],
+              ),
+            ),
+          ),
+          floatingActionButton: FloatingActionButton(
+            backgroundColor: Green,
+            onPressed: () {
+              _scanForDevice();
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                return Dashboardb();
+              }));
+            },
+            tooltip: 'Increment',
+            child: Icon(Icons.bluetooth_searching),
+          ),
+        );
+      },
     );
   }
 }
@@ -225,11 +294,18 @@ class BlueDashb extends StatefulWidget {
 class _BlueDashbState extends State<BlueDashb> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        backgroundColor: Background,
-        body: MyHomePage(
-          title: 'Test',
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<CounterBloc>(
+          create: (BuildContext context) => CounterBloc(),
+        ),
+      ],
+      child: MaterialApp(
+        home: Scaffold(
+          backgroundColor: Background,
+          body: MyHomePage(
+            title: 'Test',
+          ),
         ),
       ),
     );
@@ -242,7 +318,6 @@ class Dashboardb extends StatefulWidget {
 }
 
 class _DashboardbState extends State<Dashboardb> {
-
   void groups() async {
     int arrayindex = 0;
     var firebaseUser = await FirebaseAuth.instance.currentUser();
@@ -271,192 +346,192 @@ class _DashboardbState extends State<Dashboardb> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<CounterBloc>(
-      create: (context) => CounterBloc(),
-      child: Scaffold(
-        backgroundColor: Background,
-        body: BlocBuilder<CounterBloc, CounterBlocState>(
-          builder: (context, state) {
-            return SingleChildScrollView(
-              child: SafeArea(
-                child: Center(
-                  child: Padding(
-                    padding: spacer.x.xs,
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: spacer.y.xs,
-                          child: DMWYBar(),
-                        ),
-                        Padding(
-                          padding: spacer.bottom.xs,
-                          child: dayViewChartWidget,
-                        ),
-                        Row(
-                          children: [
-                            DashboardTile(
-                              header: drawTile.header,
-                              data: (state as DataState).newDrawCountValue
-                                  .toString(),
-                            ),
-                            Padding(
-                              padding: spacer.left.sm,
-                            ),
-                            DashboardTile(
-                              header: seshTile.header,
-                              data: (state as DataState).newSeshCountValue
-                                  .toString(),
-                            ),
-                          ],
-                        ),
-                        Padding(
-                          padding: spacer.top.xs,
-                          child: Row(
-                            children: [
-                              DashboardTileLarge(
-                                header: timeUntilTile.header,
-                                textData: timeUntilTile.textData,
-                              ),
-                            ],
+    return BlocBuilder<CounterBloc, CounterBlocState>(
+      builder: (context, state) {
+        return Scaffold(
+          backgroundColor: Background,
+          body: SingleChildScrollView(
+            child: SafeArea(
+              child: Center(
+                child: Padding(
+                  padding: spacer.x.xs,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: spacer.y.xs,
+                        child: DMWYBar(),
+                      ),
+                      Padding(
+                        padding: spacer.bottom.xs,
+                        child: dayViewChartWidget,
+                      ),
+                      Row(
+                        children: [
+                          DashboardTile(
+                            header: drawTile.header,
+                            data: (state as DataState)
+                                .newDrawCountValue
+                                .toString(),
                           ),
-                        ),
-                        Stack(children: [
-                          loopChartWidget,
-                          Center(
-                            child: Padding(
-                              padding: spacer.top.xxl * 1.5,
-                              child: Column(
-                                children: [
-                                  RichText(
-                                    text: TextSpan(
-                                      style: TileHeader,
-                                      text: "Week Goal",
-                                    ),
-                                  ),
-                                  RichText(
-                                    text: TextSpan(
-                                      style: TileDataLarge,
-                                      text: "50s",
-                                    ),
-                                  ),
-                                  RichText(
-                                    text: TextSpan(
-                                      style: TileHeader,
-                                      text: "Current: 32s",
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                          Padding(
+                            padding: spacer.left.sm,
                           ),
-                        ]),
-                        Row(
+                          DashboardTile(
+                            header: seshTile.header,
+                            data: (state as DataState)
+                                .newSeshCountValue
+                                .toString(),
+                          ),
+                        ],
+                      ),
+                      Padding(
+                        padding: spacer.top.xs,
+                        child: Row(
                           children: [
                             DashboardTileLarge(
-                              header: avgDrawTile.header,
-                              textData: (state as DataState)
-                                  .newAverageDrawLengthValue.toString(),
+                              header: timeUntilTile.header,
+                              textData: timeUntilTile.textData,
                             ),
                           ],
                         ),
-                        Padding(
-                          padding: spacer.y.xs,
-                          child: Row(
-                            children: [
-                              DashboardTileLarge(
-                                header: avgWaitTile.header,
-                                textData: (state as DataState)
-                                    .newAverageWaitPeriodValue.toString(),
-                              ),
-                            ],
+                      ),
+                      Stack(children: [
+                        loopChartWidget,
+                        Center(
+                          child: Padding(
+                            padding: spacer.top.xxl * 1.5,
+                            child: Column(
+                              children: [
+                                RichText(
+                                  text: TextSpan(
+                                    style: TileHeader,
+                                    text: "Week Goal",
+                                  ),
+                                ),
+                                RichText(
+                                  text: TextSpan(
+                                    style: TileDataLarge,
+                                    text: "50s",
+                                  ),
+                                ),
+                                RichText(
+                                  text: TextSpan(
+                                    style: TileHeader,
+                                    text: "Current: 32s",
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                        Padding(
-                          padding: spacer.bottom.xs,
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: DashboardButton(
-                                  color: createTile.color,
-                                  text: createTile.header,
-                                  icon: Icons.add,
+                      ]),
+                      Row(
+                        children: [
+                          DashboardTileLarge(
+                            header: avgDrawTile.header,
+                            textData: (state as DataState)
+                                .newAverageDrawLengthValue
+                                .toString(),
+                          ),
+                        ],
+                      ),
+                      Padding(
+                        padding: spacer.y.xs,
+                        child: Row(
+                          children: [
+                            DashboardTileLarge(
+                              header: avgWaitTile.header,
+                              textData: (state as DataState)
+                                  .newAverageWaitPeriodValue
+                                  .toString(),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: spacer.bottom.xs,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: DashboardButton(
+                                color: createTile.color,
+                                text: createTile.header,
+                                icon: Icons.add,
+                                iconColor: White,
+                                function: () async {
+                                  Navigator.of(context).push(
+                                      MaterialPageRoute(builder: (context) {
+                                        return CreateGroupPage();
+                                      }));
+                                },
+                              ),
+                            ),
+                            Padding(
+                              padding: spacer.all.xxs,
+                            ),
+                            Expanded(
+                              child: DashboardButton(
+                                color: joinTile.color,
+                                text: joinTile.header,
+                                icon: joinTile.icon,
+                                iconColor: White,
+                                function: () async {
+                                  Navigator.of(context).push(
+                                      MaterialPageRoute(builder: (context) {
+                                        return JoinGroupPage();
+                                      }));
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      ListButton(
+                        color: TransWhite,
+                        text: "List Button",
+                      ),
+                      Padding(
+                        padding: spacer.y.xs,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: DashboardButton(
+                                  color: settingsTile.color,
+                                  text: settingsTile.header,
+                                  icon: settingsTile.icon,
                                   iconColor: White,
                                   function: () async {
                                     Navigator.of(context).push(
                                         MaterialPageRoute(builder: (context) {
-                                          return CreateGroupPage();
+                                          return null;
                                         }));
-                                  },
-                                ),
+                                  }),
+                            ),
+                            Padding(
+                              padding: spacer.left.xs,
+                            ),
+                            Expanded(
+                              child: DashboardButton(
+                                color: groupsTile.color,
+                                text: groupsTile.header,
+                                icon: groupsTile.icon,
+                                iconColor: White,
+                                function: () {
+                                  groups();
+                                },
                               ),
-                              Padding(
-                                padding: spacer.all.xxs,
-                              ),
-                              Expanded(
-                                child: DashboardButton(
-                                  color: joinTile.color,
-                                  text: joinTile.header,
-                                  icon: joinTile.icon,
-                                  iconColor: White,
-                                  function: () async {
-                                    Navigator.of(context).push(
-                                        MaterialPageRoute(builder: (context) {
-                                          return JoinGroupPage();
-                                        }));
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                        ListButton(
-                          color: TransWhite,
-                          text: "List Button",
-                        ),
-                        Padding(
-                          padding: spacer.y.xs,
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: DashboardButton(
-                                    color: settingsTile.color,
-                                    text: settingsTile.header,
-                                    icon: settingsTile.icon,
-                                    iconColor: White,
-                                    function: () async {
-                                      Navigator.of(context).push(
-                                          MaterialPageRoute(builder: (context) {
-                                            return null;
-                                          }));
-                                    }
-                                ),
-                              ),
-                              Padding(
-                                padding: spacer.left.xs,
-                              ),
-                              Expanded(
-                                child: DashboardButton(
-                                  color: groupsTile.color,
-                                  text: groupsTile.header,
-                                  icon: groupsTile.icon,
-                                  iconColor: White,
-                                  function: () {
-                                    groups();
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            );
-          },
-        ),
-      ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
