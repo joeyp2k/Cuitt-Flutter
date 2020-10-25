@@ -1,3 +1,5 @@
+import 'package:cuitt/bloc/dashboard_bloc.dart';
+
 class DashData {
   String header;
   String textData;

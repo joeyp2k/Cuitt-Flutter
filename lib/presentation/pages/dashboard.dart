@@ -19,17 +19,235 @@ import 'package:cuitt/presentation/widgets/usage_graph.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:cuitt/bloc/dashboard_bloc.dart';
+import 'package:flutter_blue/flutter_blue.dart';
+import 'package:convert/convert.dart';
+import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:cuitt/data/datasources/dial_data.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 final firestoreInstance = Firestore.instance;
 var firebaseUser;
 
+class MyHomePage extends StatefulWidget {
+  MyHomePage({Key key, this.title}) : super(key: key);
+  final String title;
+
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  CounterBloc _counterBlocSink;
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+
+    //Close the Stream Sink when the widget is disposed
+    _counterBlocSink?.close();
+  }
+
+  final FlutterBlue flutterBlue = FlutterBlue.instance;
+  BluetoothCharacteristic _ledChar;
+  var _myService = "00001523-1212-efde-1523-785feabcd123";
+  var _myChar = "00001524-1212-efde-1523-785feabcd123";
+  var _readval;
+  var _lastval;
+
+  bool _getLEDChar(List<BluetoothService> services) {
+    print('Getting Characteristic...');
+    for (BluetoothService s in services) {
+      if (s.uuid.toString() == _myService) {
+        var characteristics = s.characteristics;
+        for (BluetoothCharacteristic c in characteristics) {
+          if (c.uuid.toString() == _myChar) {
+            print('SAVED CHARACTERISTIC');
+            _ledChar = c;
+            _listener();
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  void _connectDevice(BluetoothDevice device) async {
+    await print('Connecting...');
+    flutterBlue.stopScan();
+    try {
+      await device.connect();
+    } catch (e) {
+      if (e.code != 'already_connected') {
+        throw e;
+      }
+    } finally {
+      List<BluetoothService> services = await device.discoverServices();
+      _getLEDChar(services);
+    }
+  }
+
+  //READ VALUE B DOES NOT RUN, LISTENER ONLY RUNS UNTIL READ VALUE A.
+  //DATA IN CALCULATIONS CALLS UPON NULL VALUES
+  //IF CALCULATIONS FUNCTION IS REMOVED THEN READ VALUE A AND B RUN
+  //IF AWAIT USED FOR CALCULATIONS AND PRINT STATEMENTS THEN
+  void _listener() {
+    _ledChar.setNotifyValue(true);
+    _ledChar.value.listen((event) async {
+      if (_ledChar == null) {
+        print('READ VALUE IS NULL');
+      } else {
+        _readval = await _ledChar.read();
+        if (_readval.toString() == _lastval.toString()) {
+          print('READ VALUE A = ' + _readval.toString());
+          print('DRAW COUNT = ' + drawCount.toString());
+          print('SESH COUNT = ' + seshCount.toString());
+          print('CURRENT TIME = ' + currentTime.toString());
+          print('DRAW LENGTH = ' + drawLength.toString());
+          print(
+              'DRAW LENGTH TOTAL = ' + drawLengthTotal.toStringAsPrecision(1));
+        } else {
+          print('READ VALUE A = ' + _readval.toString());
+          currentTime = int.parse(hex.encode(_readval.sublist(0, 4)).toString(),
+              radix: 16);
+          drawLength = int.parse(hex.encode(_readval.sublist(4, 6)).toString(),
+                  radix: 16) /
+              1000;
+          drawCount = int.parse(hex.encode(_readval.sublist(6, 8)).toString(),
+              radix: 16);
+          seshCount = int.parse(hex.encode(_readval.sublist(8, 10)).toString(),
+              radix: 16);
+
+          drawLengthTotal += drawLength;
+          drawLengthAverage = drawLengthTotal / drawCount;
+          drawLengthTotalAverage = drawLengthTotal /
+              dayNum; //CHANGE TO CALCULATION ARRAY FOR DLT BY DAY
+          drawCountAverage =
+              drawCount / dayNum; //CHANGE TO CALCULATION ARRAY FOR DCT BY DAY
+          seshCountAverage =
+              seshCount / dayNum; //CHANGE TO CALCULATION ARRAY FOR DCT BY DAY
+          suggestion = drawLengthTotalAverage / drawCountAverage * decay;
+          if (hitTimeNow == null) {
+            hitTimeNow = currentTime;
+          } else {
+            hitTimeThen = hitTimeNow;
+            hitTimeNow = currentTime;
+          }
+          waitPeriod = 16 / seshCountAverage * 60 * 60;
+          timeBetween = hitTimeNow - hitTimeThen;
+          timeUntilNext = waitPeriod - timeBetween;
+          hitLengthArray.add(drawLength);
+          timestampArray.add(currentTime);
+          /*
+          for (drawCountIndex; drawCountIndex > 0; drawCountIndex--) {
+            hitLengthArray[drawCountIndex] = drawLength;
+            timestampArray[drawCountIndex] = currentTime;
+          }
+           */
+          drawCountIndex++;
+          fill = drawLengthTotal.truncate();
+          over = drawLengthTotal.truncate() - drawLengthTotalAverage.truncate();
+          _counterBlocSink.add(UpdateDataEvent());
+          print('DRAW COUNT = ' + drawCount.toString());
+          print('SESH COUNT = ' + seshCount.toString());
+          print('CURRENT TIME = ' + currentTime.toString());
+          print('DRAW LENGTH = ' + drawLength.toString());
+          print('DRAW LENGTH TOTAL = ' + drawLengthTotal.truncate().toString());
+          _lastval = _readval;
+        }
+      }
+    });
+  }
+
+  void _onread() async {
+    _readval = await _ledChar.read();
+    print('READ VALUE = ' + _readval.toString());
+  }
+
+  void _scanForDevice() {
+    print('Scanning...');
+    flutterBlue.scanResults.listen((List<ScanResult> results) {
+      for (ScanResult result in results) {
+        if (result.device.name == "Cuitt") {
+          _connectDevice(result.device);
+        }
+      }
+    });
+
+    flutterBlue.startScan();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider<CounterBloc>(
+      create: (context) => CounterBloc(),
+      child: Scaffold(
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        backgroundColor: Background,
+        body: Container(
+          width: double.infinity,
+          child: BlocBuilder<CounterBloc, CounterBlocState>(
+              builder: (context, state) {
+            _counterBlocSink = BlocProvider.of<CounterBloc>(context);
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text("Draws: ${(state as DataState).newDrawCountValue}"),
+                ],
+              ),
+            );
+          }),
+        ),
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: Green,
+          onPressed: () {
+            _scanForDevice();
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+              return Dashboardb(_counterBlocSink);
+            }));
+          },
+          tooltip: 'Increment',
+          child: Icon(Icons.bluetooth_searching),
+        ),
+      ),
+    );
+  }
+}
+
+class BlueDashb extends StatefulWidget {
+  @override
+  _BlueDashbState createState() => _BlueDashbState();
+}
+
+class _BlueDashbState extends State<BlueDashb> {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        backgroundColor: Background,
+        body: MyHomePage(
+          title: 'Test',
+        ),
+      ),
+    );
+  }
+}
+
 class Dashboardb extends StatefulWidget {
+  CounterBloc bloc;
+
+  Dashboardb(this.bloc);
+
   @override
   _DashboardbState createState() => _DashboardbState();
 }
 
 class _DashboardbState extends State<Dashboardb> {
+
   void groups() async {
     int arrayindex = 0;
     var firebaseUser = await FirebaseAuth.instance.currentUser();
@@ -58,181 +276,191 @@ class _DashboardbState extends State<Dashboardb> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
+    return BlocProvider<CounterBloc>(
+      create: (context) => CounterBloc(),
+      child: Scaffold(
         backgroundColor: Background,
-        body: SingleChildScrollView(
-          child: SafeArea(
-            child: Center(
-              child: Padding(
-                padding: spacer.x.xs,
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: spacer.y.xs,
-                      child: DMWYBar(),
-                    ),
-                    Padding(
-                      padding: spacer.bottom.xs,
-                      child: dayViewChartWidget,
-                    ),
-                    Row(
+        body: BlocBuilder<CounterBloc, CounterBlocState>(
+          builder: (context, state) {
+            widget.bloc = BlocProvider.of<CounterBloc>(context);
+            return SingleChildScrollView(
+              child: SafeArea(
+                child: Center(
+                  child: Padding(
+                    padding: spacer.x.xs,
+                    child: Column(
                       children: [
-                        DashboardTile(
-                          header: drawTile.header,
-                          data: drawTile.textData,
+                        Padding(
+                          padding: spacer.y.xs,
+                          child: DMWYBar(),
                         ),
                         Padding(
-                          padding: spacer.left.sm,
+                          padding: spacer.bottom.xs,
+                          child: dayViewChartWidget,
                         ),
-                        DashboardTile(
-                          header: seshTile.header,
-                          data: drawTile.textData,
+                        Row(
+                          children: [
+                            DashboardTile(
+                              header: drawTile.header,
+                              data: (state as DataState).newDrawCountValue
+                                  .toString(),
+                            ),
+                            Padding(
+                              padding: spacer.left.sm,
+                            ),
+                            DashboardTile(
+                              header: seshTile.header,
+                              data: (state as DataState).newSeshCountValue
+                                  .toString(),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    Padding(
-                      padding: spacer.top.xs,
-                      child: Row(
-                        children: [
-                          DashboardTileLarge(
-                            header: timeUntilTile.header,
-                            textData: timeUntilTile.textData,
-                          ),
-                        ],
-                      ),
-                    ),
-                    Stack(children: [
-                      loopChartWidget,
-                      Center(
-                        child: Padding(
-                          padding: spacer.top.xxl * 1.5,
-                          child: Column(
+                        Padding(
+                          padding: spacer.top.xs,
+                          child: Row(
                             children: [
-                              RichText(
-                                text: TextSpan(
-                                  style: TileHeader,
-                                  text: "Week Goal",
+                              DashboardTileLarge(
+                                header: timeUntilTile.header,
+                                textData: timeUntilTile.textData,
+                              ),
+                            ],
+                          ),
+                        ),
+                        Stack(children: [
+                          loopChartWidget,
+                          Center(
+                            child: Padding(
+                              padding: spacer.top.xxl * 1.5,
+                              child: Column(
+                                children: [
+                                  RichText(
+                                    text: TextSpan(
+                                      style: TileHeader,
+                                      text: "Week Goal",
+                                    ),
+                                  ),
+                                  RichText(
+                                    text: TextSpan(
+                                      style: TileDataLarge,
+                                      text: "50s",
+                                    ),
+                                  ),
+                                  RichText(
+                                    text: TextSpan(
+                                      style: TileHeader,
+                                      text: "Current: 32s",
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ]),
+                        Row(
+                          children: [
+                            DashboardTileLarge(
+                              header: avgDrawTile.header,
+                              textData: (state as DataState)
+                                  .newAverageDrawLengthValue.toString(),
+                            ),
+                          ],
+                        ),
+                        Padding(
+                          padding: spacer.y.xs,
+                          child: Row(
+                            children: [
+                              DashboardTileLarge(
+                                header: avgWaitTile.header,
+                                textData: (state as DataState)
+                                    .newAverageWaitPeriodValue.toString(),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: spacer.bottom.xs,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: DashboardButton(
+                                  color: createTile.color,
+                                  text: createTile.header,
+                                  icon: Icons.add,
+                                  iconColor: White,
+                                  function: () async {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(builder: (context) {
+                                          return CreateGroupPage();
+                                        }));
+                                  },
                                 ),
                               ),
-                              RichText(
-                                text: TextSpan(
-                                  style: TileDataLarge,
-                                  text: "50s",
-                                ),
+                              Padding(
+                                padding: spacer.all.xxs,
                               ),
-                              RichText(
-                                text: TextSpan(
-                                  style: TileHeader,
-                                  text: "Current: 32s",
+                              Expanded(
+                                child: DashboardButton(
+                                  color: joinTile.color,
+                                  text: joinTile.header,
+                                  icon: joinTile.icon,
+                                  iconColor: White,
+                                  function: () async {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(builder: (context) {
+                                          return JoinGroupPage();
+                                        }));
+                                  },
                                 ),
                               ),
                             ],
                           ),
                         ),
-                      ),
-                    ]),
-                    Row(
-                      children: [
-                        DashboardTileLarge(
-                          header: avgDrawTile.header,
-                          textData: avgDrawTile.textData,
+                        ListButton(
+                          color: TransWhite,
+                          text: "List Button",
+                        ),
+                        Padding(
+                          padding: spacer.y.xs,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: DashboardButton(
+                                    color: settingsTile.color,
+                                    text: settingsTile.header,
+                                    icon: settingsTile.icon,
+                                    iconColor: White,
+                                    function: () async {
+                                      Navigator.of(context).push(
+                                          MaterialPageRoute(builder: (context) {
+                                            return null;
+                                          }));
+                                    }
+                                ),
+                              ),
+                              Padding(
+                                padding: spacer.left.xs,
+                              ),
+                              Expanded(
+                                child: DashboardButton(
+                                  color: groupsTile.color,
+                                  text: groupsTile.header,
+                                  icon: groupsTile.icon,
+                                  iconColor: White,
+                                  function: () {
+                                    groups();
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                    Padding(
-                      padding: spacer.y.xs,
-                      child: Row(
-                        children: [
-                          DashboardTileLarge(
-                            header: avgWaitTile.header,
-                            textData: avgWaitTile.textData,
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: spacer.bottom.xs,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: DashboardButton(
-                              color: createTile.color,
-                              text: createTile.header,
-                              icon: Icons.add,
-                              iconColor: White,
-                              function: () async {
-                                Navigator.of(context).push(
-                                    MaterialPageRoute(builder: (context) {
-                                      return CreateGroupPage();
-                                    }));
-                              },
-                            ),
-                          ),
-                          Padding(
-                            padding: spacer.all.xxs,
-                          ),
-                          Expanded(
-                            child: DashboardButton(
-                              color: joinTile.color,
-                              text: joinTile.header,
-                              icon: joinTile.icon,
-                              iconColor: White,
-                              function: () async {
-                                Navigator.of(context).push(
-                                    MaterialPageRoute(builder: (context) {
-                                      return JoinGroupPage();
-                                    }));
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    ListButton(
-                      color: TransWhite,
-                      text: "List Button",
-                    ),
-                    Padding(
-                      padding: spacer.y.xs,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: DashboardButton(
-                                color: settingsTile.color,
-                                text: settingsTile.header,
-                                icon: settingsTile.icon,
-                                iconColor: White,
-                                function: () async {
-                                  Navigator.of(context).push(
-                                      MaterialPageRoute(builder: (context) {
-                                        return null;
-                                      }));
-                                }
-                            ),
-                          ),
-                          Padding(
-                            padding: spacer.left.xs,
-                          ),
-                          Expanded(
-                            child: DashboardButton(
-                              color: groupsTile.color,
-                              text: groupsTile.header,
-                              icon: groupsTile.icon,
-                              iconColor: White,
-                              function: () {
-                                groups();
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ),
+            );
+          },
         ),
       ),
     );

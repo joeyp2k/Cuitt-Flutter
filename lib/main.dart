@@ -21,7 +21,7 @@ import 'package:flutter_blue/flutter_blue.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:secure_random/secure_random.dart';
-
+import 'package:cuitt/presentation/pages/dashboard.dart';
 import 'widgets.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -5236,8 +5236,8 @@ class FindDevicesScreen extends StatelessWidget {
   }
 }
 
-List<double> hitLengthArray;
-List<int> timestampArray;
+List<double> hitLengthArray = [];
+List<int> timestampArray = [];
 var drawCountIndex = 0;
 var hitTimeNow;
 var hitTimeThen;
@@ -5250,10 +5250,10 @@ var waitPeriod;
 var timeBetween;
 var timeBetweenAverage;
 var drawCountAverage;
-var drawLengthTotal;
+double drawLengthTotal = 0;
 var drawLengthTotalYest;
-var drawLengthTotalAverage;
-var drawLengthAverage;
+double drawLengthTotalAverage;
+double drawLengthAverage = 0;
 var drawLengthAverageYest;
 var drawCount = 0;
 var seshCount = 0;
@@ -5530,17 +5530,22 @@ class DeviceScreen extends StatelessWidget {
                     waitPeriod = 16 / seshCountAverage * 60 * 60;
                     timeBetween = hitTimeNow - hitTimeThen;
                     timeUntilNext = waitPeriod - timeBetween;
+                    hitLengthArray.add(drawLength);
+                    timestampArray.add(currentTime);
+                    /*
                     for (drawCountIndex; drawCountIndex > 0; drawCountIndex--) {
-                      hitLengthArray[drawCountIndex] = drawLength;
-                      timestampArray[drawCountIndex] = currentTime;
+                      hitLengthArray.insert(drawCountIndex, drawLength);
+                      timestampArray.insert(drawCountIndex, currentTime);
                     }
+                    */
                     drawCountIndex++;
-                    fill = drawLengthTotal;
-                    over = drawLengthTotal - drawLengthTotalAverage;
+                    fill = drawLengthTotal.truncate();
+                    over = drawLengthTotal.truncate() -
+                        drawLengthTotalAverage.truncate();
                     if (over < 0) {
                       over = 0;
                     }
-                    unfilled = drawLengthTotalAverage - drawLengthTotal;
+                    //unfilled = drawLengthTotalAverage - drawLengthTotal;
                     appState.update();
                   });
                   print('readChar');
@@ -5571,11 +5576,11 @@ class DeviceScreen extends StatelessWidget {
   }
 }
 
-void main() => runApp(BlueDash());
+void main() => runApp(BlueDashb());
 
 abstract class CounterBlocEvent {}
 
-class DecreaseCounterEvent extends CounterBlocEvent {
+class UpdateDataEvent extends CounterBlocEvent {
   //overide this method when class extends equatable
 
   @override
@@ -5604,11 +5609,40 @@ class LatestCounterState extends CounterBlocState {
   List<Object> get props => [newCounterValue];
 }
 
+class DataState extends CounterBlocState {
+  final int newDrawCountValue;
+  final int newSeshCountValue;
+  final double newDrawLengthValue;
+  final int newDrawLengthTotalValue;
+  final int newAverageDrawLengthValue;
+  final int newAverageDrawLengthTotalValue;
+
+  DataState(
+      {this.newDrawCountValue,
+      this.newSeshCountValue,
+      this.newDrawLengthValue,
+      this.newDrawLengthTotalValue,
+      this.newAverageDrawLengthValue,
+      this.newAverageDrawLengthTotalValue});
+
+  //overide this method as base class extends equatable and pass property inside props list
+  @override
+  // TODO: implement props
+  List<Object> get props => [newDrawCountValue];
+}
+
 class CounterBloc extends Bloc<CounterBlocEvent, CounterBlocState> {
   //Set Initial State of Counter Bloc by return the LatestCounterState Object with newCounterValue = 0
   @override
   // TODO: implement initialState
-  CounterBloc() : super(LatestCounterState(newCounterValue: 0));
+  CounterBloc() : super(DataState(
+    newDrawCountValue: 0,
+    newSeshCountValue: 0,
+    newDrawLengthValue: 0,
+    newDrawLengthTotalValue: 0,
+    newAverageDrawLengthValue: 0,
+    newAverageDrawLengthTotalValue: 0,
+  ));
 
   @override
   Stream<CounterBlocState> mapEventToState(CounterBlocEvent event) async* {
@@ -5622,19 +5656,40 @@ class CounterBloc extends Bloc<CounterBlocEvent, CounterBlocState> {
 
       //Adding new state to the Stream, yield is used to add state to the stream
       yield LatestCounterState(newCounterValue: newCounterValue);
-    } else if (event is DecreaseCounterEvent) {
+    } else if (event is UpdateDataEvent) {
       //Fetching Current Counter Value From Current State
-      int currentCounterValue = (state as LatestCounterState).newCounterValue;
+      int currentDrawCountValue = (state as DataState).newDrawCountValue;
+      int currentSeshCountValue = (state as DataState).newSeshCountValue;
+      double currentDrawLengthValue = (state as DataState).newDrawLengthValue;
+      int currentDrawLengthTotalValue = (state as DataState)
+          .newDrawLengthTotalValue;
+      int currentAverageDrawLengthValue = (state as DataState)
+          .newAverageDrawLengthValue;
+      int currentAverageDrawLengthTotalValue = (state as DataState)
+          .newAverageDrawLengthTotalValue;
 
       //Applying business Logic
-      int newCounterValue = currentCounterValue - 1;
+      int newDrawCountValue = drawCount;
+      int newSeshCountValue = seshCount;
+      double newDrawLengthValue = drawLength;
+      int newDrawLengthTotalValue = drawLengthTotal.truncate();
+      int newAverageDrawLengthValue = drawLengthAverage.truncate();
+      int newDrawLengthTotalAverageValue = drawLengthTotalAverage.truncate();
+      print('NEW DRAW COUNT FROM BLOC: ' + newDrawLengthValue.toString());
 
       //Adding new state to the Stream, yield is used to add state to the stream
-      yield LatestCounterState(newCounterValue: newCounterValue);
+      yield DataState(
+        newDrawCountValue: newDrawCountValue,
+        newSeshCountValue: newSeshCountValue,
+        newDrawLengthValue: newDrawLengthValue,
+        newDrawLengthTotalValue: newDrawLengthTotalValue,
+        newAverageDrawLengthValue: newAverageDrawLengthValue,
+        newAverageDrawLengthTotalValue: newDrawLengthTotalAverageValue,
+      );
     }
   }
 }
-
+/*
 class CounterScreen extends StatefulWidget {
   @override
   _CounterScreenState createState() => _CounterScreenState();
@@ -5690,7 +5745,7 @@ class _CounterScreenState extends State<CounterScreen> {
                       child: Text("Decrease Counter"),
                       onPressed: () {
                         //Send Decrease Counter EVent to the Bloc
-                        _counterBlocSink.add(DecreaseCounterEvent());
+                        _counterBlocSink.add(UpdateDataEvent());
                       },
                       color: Colors.blue,
                       textColor: Colors.white,
@@ -5700,8 +5755,7 @@ class _CounterScreenState extends State<CounterScreen> {
               },
             )));
   }
-}
-
+}/
 class BlocTest extends StatefulWidget {
   @override
   _BlocTestState createState() => _BlocTestState();
@@ -5721,7 +5775,7 @@ class _BlocTestState extends State<BlocTest> {
     );
   }
 }
-
+*/
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
   final String title;
@@ -5747,6 +5801,7 @@ class _MyHomePageState extends State<MyHomePage> {
   var _myService = "00001523-1212-efde-1523-785feabcd123";
   var _myChar = "00001524-1212-efde-1523-785feabcd123";
   var _readval;
+  var _lastval;
 
   bool _getLEDChar(List<BluetoothService> services) {
     print('Getting Characteristic...');
@@ -5781,12 +5836,80 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  //READ VALUE B DOES NOT RUN, LISTENER ONLY RUNS UNTIL READ VALUE A.
+  //DATA IN CALCULATIONS CALLS UPON NULL VALUES
+  //IF CALCULATIONS FUNCTION IS REMOVED THEN READ VALUE A AND B RUN
+  //IF AWAIT USED FOR CALCULATIONS AND PRINT STATEMENTS THEN
   void _listener() {
     _ledChar.setNotifyValue(true);
     _ledChar.value.listen((event) async {
-      _readval = await _ledChar.read();
-      _counterBlocSink.add(IncreaseCounterEvent());
-      print('READ VALUE = ' + _readval.toString());
+      if (_ledChar == null) {
+        print('READ VALUE IS NULL');
+      } else {
+        _readval = await _ledChar.read();
+        if (_readval.toString() == _lastval.toString()) {
+          print('READ VALUE A = ' + _readval.toString());
+          print('DRAW COUNT = ' + drawCount.toString());
+          print('SESH COUNT = ' + seshCount.toString());
+          print('CURRENT TIME = ' + currentTime.toString());
+          print('DRAW LENGTH = ' + drawLength.toString());
+          print(
+              'DRAW LENGTH TOTAL = ' + drawLengthTotal.toStringAsPrecision(1));
+        } else {
+          print('READ VALUE A = ' + _readval.toString());
+          currentTime = int.parse(
+              hex.encode(_readval.sublist(0, 4)).toString(),
+              radix: 16);
+          drawLength = int.parse(
+              hex.encode(_readval.sublist(4, 6)).toString(),
+              radix: 16) /
+              1000;
+          drawCount = int.parse(
+              hex.encode(_readval.sublist(6, 8)).toString(),
+              radix: 16);
+          seshCount = int.parse(
+              hex.encode(_readval.sublist(8, 10)).toString(),
+              radix: 16);
+          drawLengthTotal += drawLength;
+          drawLengthAverage = drawLengthTotal / drawCount;
+
+          drawLengthTotalAverage = drawLengthTotal /
+              dayNum; //CHANGE TO CALCULATION ARRAY FOR DLT BY DAY
+          drawCountAverage = drawCount /
+              dayNum; //CHANGE TO CALCULATION ARRAY FOR DCT BY DAY
+          seshCountAverage = seshCount /
+              dayNum; //CHANGE TO CALCULATION ARRAY FOR DCT BY DAY
+          suggestion =
+              drawLengthTotalAverage / drawCountAverage * decay;
+          if (hitTimeNow == null) {
+            hitTimeNow = currentTime;
+          } else {
+            hitTimeThen = hitTimeNow;
+            hitTimeNow = currentTime;
+          }
+          waitPeriod = 16 / seshCountAverage * 60 * 60;
+          timeBetween = hitTimeNow - hitTimeThen;
+          timeUntilNext = waitPeriod - timeBetween;
+          hitLengthArray.add(drawLength);
+          timestampArray.add(currentTime);
+          /*
+          for (drawCountIndex; drawCountIndex > 0; drawCountIndex--) {
+            hitLengthArray[drawCountIndex] = drawLength;
+            timestampArray[drawCountIndex] = currentTime;
+          }
+           */
+          drawCountIndex++;
+          fill = drawLengthTotal.truncate();
+          over = drawLengthTotal.truncate() - drawLengthTotalAverage.truncate();
+          _counterBlocSink.add(UpdateDataEvent());
+          print('DRAW COUNT = ' + drawCount.toString());
+          print('SESH COUNT = ' + seshCount.toString());
+          print('CURRENT TIME = ' + currentTime.toString());
+          print('DRAW LENGTH = ' + drawLength.toString());
+          print('DRAW LENGTH TOTAL = ' + drawLengthTotal.truncate().toString());
+          _lastval = _readval;
+        }
+      }
     });
   }
 
@@ -5826,7 +5949,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Text(
-                      "You have updated the state ${(state as LatestCounterState).newCounterValue} Times"),
+                      "Draws: ${(state as DataState).newDrawCountValue}"),
                   FloatingActionButton(
                     onPressed: () {
                       _ledChar.write([0xff, 0xff, 0xff, 0x10]);
