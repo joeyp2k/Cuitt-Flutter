@@ -1,7 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bloc/bloc.dart';
-import 'package:cuitt/presentation/design_system/colors.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 List<double> hitLengthArray = [];
 List<int> timestampArray = [];
@@ -19,6 +17,7 @@ var timeBetweenAverage;
 var drawCountAverage;
 double drawLengthTotal = 0;
 var drawLengthTotalYest;
+var drawLengthTotalAverageYest;
 double drawLengthTotalAverage;
 double drawLengthAverage = 0;
 var drawLengthAverageYest;
@@ -69,14 +68,15 @@ class DataState extends CounterBlocState {
   final int newAverageDrawLengthTotalValue;
   final int newAverageWaitPeriodValue;
 
-  DataState(
-      {this.newDrawCountValue,
-      this.newSeshCountValue,
-      this.newDrawLengthValue,
-      this.newDrawLengthTotalValue,
-      this.newAverageDrawLengthValue,
-      this.newAverageDrawLengthTotalValue,
-      this.newAverageWaitPeriodValue});
+  DataState({
+    this.newDrawCountValue,
+    this.newSeshCountValue,
+    this.newDrawLengthValue,
+    this.newDrawLengthTotalValue,
+    this.newAverageDrawLengthValue,
+    this.newAverageDrawLengthTotalValue,
+    this.newAverageWaitPeriodValue,
+  });
 
   //overide this method as base class extends equatable and pass property inside props list
   @override

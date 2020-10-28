@@ -1,9 +1,11 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:convert/convert.dart';
 import 'package:cuitt/bloc/dashboard_bloc.dart';
+import 'package:cuitt/cubit/charts_cubit.dart';
 import 'package:cuitt/data/datasources/buttons.dart';
 import 'package:cuitt/data/datasources/dash_tiles.dart';
-import 'package:cuitt/data/datasources/dial_data.dart';
 import 'package:cuitt/data/datasources/user.dart';
 import 'package:cuitt/presentation/design_system/colors.dart';
 import 'package:cuitt/presentation/design_system/dimensions.dart';
@@ -15,7 +17,6 @@ import 'package:cuitt/presentation/pages/join_group.dart';
 import 'package:cuitt/presentation/widgets/dashboard_button.dart';
 import 'package:cuitt/presentation/widgets/dashboard_tile_large.dart';
 import 'package:cuitt/presentation/widgets/dashboard_tile_square.dart';
-import 'package:cuitt/presentation/widgets/dmwy_bar.dart';
 import 'package:cuitt/presentation/widgets/list_button.dart';
 import 'package:cuitt/presentation/widgets/usage_dial.dart';
 import 'package:cuitt/presentation/widgets/usage_graph.dart';
@@ -41,10 +42,25 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   @override
+  Timer timer;
+
+  @override
+  void initState() {
+    super.initState();
+    timer = Timer.periodic(Duration(hours: 24), (Timer t) {
+      //send all current stats before daily reset
+      drawLengthTotalAverageYest = drawLengthTotalAverage;
+      drawLengthTotal = 0;
+      dayNum++;
+    });
+  }
+
   void dispose() {
     // TODO: implement dispose
     super.dispose();
-
+    //Stop Timer
+    timer?.cancel();
+    super.dispose();
     //Close the Stream Sink when the widget is disposed
     _counterBlocSink?.close();
   }
@@ -57,13 +73,11 @@ class _MyHomePageState extends State<MyHomePage> {
   var _lastval;
 
   bool _getLEDChar(List<BluetoothService> services) {
-    print('Getting Characteristic...');
     for (BluetoothService s in services) {
       if (s.uuid.toString() == _myService) {
         var characteristics = s.characteristics;
         for (BluetoothCharacteristic c in characteristics) {
           if (c.uuid.toString() == _myChar) {
-            print('SAVED CHARACTERISTIC');
             _ledChar = c;
             _listener();
             return true;
@@ -75,7 +89,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _connectDevice(BluetoothDevice device) async {
-    await print('Connecting...');
     flutterBlue.stopScan();
     try {
       await device.connect();
@@ -97,19 +110,13 @@ class _MyHomePageState extends State<MyHomePage> {
       } else {
         _readval = await _ledChar.read();
         if (_readval.toString() == _lastval.toString()) {
-          print('READ VALUE A = ' + _readval.toString());
-          print('DRAW COUNT = ' + drawCount.toString());
-          print('SESH COUNT = ' + seshCount.toString());
-          print('CURRENT TIME = ' + currentTime.toString());
-          print('DRAW LENGTH = ' + drawLength.toString());
-          print(
-              'DRAW LENGTH TOTAL = ' + drawLengthTotal.toStringAsPrecision(1));
+          //do nothing
         } else {
           print('READ VALUE A = ' + _readval.toString());
           currentTime = int.parse(hex.encode(_readval.sublist(0, 4)).toString(),
               radix: 16);
           drawLength = int.parse(hex.encode(_readval.sublist(4, 6)).toString(),
-              radix: 16) /
+                  radix: 16) /
               1000;
           drawCount = int.parse(hex.encode(_readval.sublist(6, 8)).toString(),
               radix: 16);
@@ -125,18 +132,23 @@ class _MyHomePageState extends State<MyHomePage> {
           seshCountAverage =
               seshCount / dayNum; //CHANGE TO CALCULATION ARRAY FOR DCT BY DAY
           suggestion = drawLengthTotalAverage / drawCountAverage * decay;
+
           if (hitTimeNow == null) {
             hitTimeNow = currentTime;
           } else {
             hitTimeThen = hitTimeNow;
             hitTimeNow = currentTime;
           }
+
           waitPeriod = 16 / seshCountAverage * 60 * 60;
           timeBetween = hitTimeNow - hitTimeThen;
           timeUntilNext = waitPeriod - timeBetween;
           hitLengthArray.add(drawLength);
           timestampArray.add(currentTime);
+          /*
+          //update dial and chart with new data
           if (dayNum == 1) {
+            fill = drawLengthTotal.truncate();
             over = 0;
             if (fill == 0) {
               unfilled = 1;
@@ -144,23 +156,84 @@ class _MyHomePageState extends State<MyHomePage> {
               unfilled = 0;
             }
           } else {
-            over = drawLengthTotal.truncate() - drawLengthTotalAverage
-                .truncate(); //change to drawLengthTotalAverage for yesterday using new variable or array corresponding to dayNum drawlengthtotalaverages
+            if (drawLengthTotal.truncate() >=
+                drawLengthTotalAverageYest) {
+              //stop increasing fill
+            } else {
+              //increase fill
+              fill = drawLengthTotal.truncate();
+            }
+            //if yesterday's average is larger than today's total, over = 0.  Otherwise, start increasing over
+            if(drawLengthTotal.truncate() -
+                drawLengthTotalAverageYest
+                    .truncate() <= 0){
+              over = 0;
+            }else{
+              over = drawLengthTotal.truncate() -
+                  drawLengthTotalAverageYest
+                      .truncate();
+            }
           }
-          if (drawLengthTotal.truncate() >=
-              drawLengthTotalAverage /*yesterday*/) {
-
-          } else {
-            fill = drawLengthTotal.truncate();
-          }
-          if (drawLengthTotalAverage.truncate() /*yesterday*/ <=
+          //if yesterday's average is larger than today's total, unfilled = 0.  Otherwise, start decreasing over.
+          if (drawLengthTotalAverageYest.truncate() <=
               drawLengthTotal.truncate()) {
             unfilled = 0;
           }
-          {
-            unfilled = drawLengthTotalAverage.truncate() - drawLengthTotal
-                .truncate(); //yesterday's draw length total average
+          else{
+            unfilled = drawLengthTotalAverageYest.truncate() -
+                drawLengthTotal
+                    .truncate();
           }
+
+          data = [
+            DialData('Over', over, Red),
+            DialData('Fill', fill, Green),
+            DialData('Unfilled', unfilled, TransWhite),
+          ];
+
+          viewportVal = DateTime(timeData.year, timeData.month,
+              timeData.day, timeData.hour).toLocal();
+
+          if (timeData == null) {
+            timeData = DateTime.now();
+          }
+          timeData = DateTime(timeData.year, timeData.month, timeData.day,
+              timeData.hour)
+              .toLocal();
+          print('Time Data: ' + timeData.toString());
+          if (time.isEmpty) {
+            time.add(DateTime(timeData.year, timeData.month, timeData.day,
+                timeData.hour)
+                .toLocal());
+          }
+          if (sec.isEmpty) {
+            sec.add(0);
+          }
+          if (timeData == time[i]) {
+            sec[i] += drawLength;
+            print('Data Length: ' + overviewData.length.toString());
+            print('Current Time: ' + time[i].toString());
+            print('Sec: ' + sec[i].toString());
+            overviewData[i] = UsageData(time[i], sec[i]);
+          } else {
+            i++;
+            if (overviewData.length <= i) {
+              sec.add(drawLength);
+              time.add(timeData);
+              print('ADD');
+              print('Current Time: ' + time[i].toString());
+              print('Sec: ' + sec[i].toString());
+              overviewData.add(UsageData(time[i], sec[i]));
+            } else {
+              sec.add(drawLength);
+              time.add(timeData);
+              print('REPLACE');
+              print('Current Time: ' + time[i].toString());
+              print('Sec: ' + sec[i].toString());
+              overviewData[i] = UsageData(time[i], sec[i]);
+            }
+          }
+          */
           _counterBlocSink.add(UpdateDataEvent());
           print('DRAW COUNT = ' + drawCount.toString());
           print('SESH COUNT = ' + seshCount.toString());
@@ -173,13 +246,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void _onread() async {
-    _readval = await _ledChar.read();
-    print('READ VALUE = ' + _readval.toString());
-  }
-
   void _scanForDevice() {
-    print('Scanning...');
     flutterBlue.scanResults.listen((List<ScanResult> results) {
       for (ScanResult result in results) {
         if (result.device.name == "Cuitt") {
@@ -241,6 +308,9 @@ class _BlueDashbState extends State<BlueDashb> {
         BlocProvider<CounterBloc>(
           create: (BuildContext context) => CounterBloc(),
         ),
+        BlocProvider<DialCubit>(
+          create: (BuildContext context) => DialCubit(),
+        ),
       ],
       child: MaterialApp(
         home: Scaffold(
@@ -300,10 +370,146 @@ class _DashboardbState extends State<Dashboardb> {
                   padding: spacer.x.xs,
                   child: Column(
                     children: [
+                      /*
+                      Padding(
+                        padding: spacer.y.xs,
+                        child: Stack(
+                          children: [
+                            Container(
+                              height: gridSpacer * 4,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                children: [
+                                  Padding(
+                                    padding: spacer.left.xxl,
+                                    child: Expanded(
+                                      child: Container(
+                                        color: White,
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Container(
+                                      color: LightBlue,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Container(
+                                      color: LightBlue,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Container(
+                                      color: LightBlue,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  Expanded(
+                                    child: GestureDetector(
+                                      behavior: HitTestBehavior.translucent,
+                                      child: Container(
+                                        child: Center(
+                                          child: RichText(
+                                            text: TextSpan(
+                                              text: 'D',
+                                              style: ButtonRegular,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      onTap: () {
+                                        setState(() {
+                                          padValue = 0;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: GestureDetector(
+                                      behavior: HitTestBehavior.translucent,
+                                      child: Container(
+                                        child: Center(
+                                          child: RichText(
+                                            text: TextSpan(
+                                              text: 'M',
+                                              style: ButtonRegular,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      onTap: () {
+                                        setState(() {
+                                          padValue = 0;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: GestureDetector(
+                                      behavior: HitTestBehavior.translucent,
+                                      child: Container(
+                                        child: Center(
+                                          child: RichText(
+                                            text: TextSpan(
+                                              text: 'W',
+                                              style: ButtonRegular,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      onTap: () {
+                                        setState(() {
+                                          padValue = 0;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: GestureDetector(
+                                      behavior: HitTestBehavior.translucent,
+                                      child: Container(
+                                        child: Center(
+                                          child: RichText(
+                                            text: TextSpan(
+                                              text: 'Y',
+                                              style: ButtonRegular,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      onTap: () {
+                                        setState(() {
+                                          padValue = 0;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              decoration: BoxDecoration(
+                                color: TransWhite,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10)),
+                              ),
+                              height: gridSpacer * 4,
+                            ),
+                          ],
+                        ),
+                      ),
+
                       Padding(
                         padding: spacer.y.xs,
                         child: DMWYBar(),
                       ),
+
+                       */
                       Padding(
                         padding: spacer.bottom.xs,
                         child: dayViewChartWidget,
@@ -339,7 +545,9 @@ class _DashboardbState extends State<Dashboardb> {
                         ),
                       ),
                       Stack(children: [
-                        loopChartWidget,
+                        Container(
+                          child: loopChartWidget,
+                        ),
                         Center(
                           child: Padding(
                             padding: spacer.top.xxl * 1.5,
@@ -360,9 +568,10 @@ class _DashboardbState extends State<Dashboardb> {
                                 RichText(
                                   text: TextSpan(
                                     style: TileHeader,
-                                    text: "Current: " + (state as DataState)
-                                        .newDrawLengthTotalValue
-                                        .toString(),
+                                    text: "Current: " +
+                                        (state as DataState)
+                                            .newDrawLengthTotalValue
+                                            .toString(),
                                   ),
                                 ),
                               ],
@@ -376,7 +585,8 @@ class _DashboardbState extends State<Dashboardb> {
                             header: avgDrawTile.header,
                             textData: (state as DataState)
                                 .newAverageDrawLengthValue
-                                .toString() + ' seconds',
+                                .toString() +
+                                ' seconds',
                           ),
                         ],
                       ),

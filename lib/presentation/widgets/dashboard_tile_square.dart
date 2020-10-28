@@ -27,6 +27,7 @@ class _DashboardTileState extends State<DashboardTile> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             RichText(
+              textAlign: TextAlign.center,
               text: TextSpan(
                 style: TileHeader,
                 text: widget.header,
@@ -35,6 +36,7 @@ class _DashboardTileState extends State<DashboardTile> {
             Padding(
               padding: spacer.top.xxs,
               child: RichText(
+                textAlign: TextAlign.center,
                 text: TextSpan(
                   style: TileDataLarge,
                   text: widget.data,

@@ -8,6 +8,10 @@ class UsageData {
   UsageData(this.time, this.seconds);
 }
 
+var time = [];
+var sec = [];
+var i = 0;
+
 DateTime viewport = DateTime.now();
 DateTime timeData;
 DateTime viewportVal =
@@ -15,9 +19,9 @@ DateTime viewportVal =
         .toLocal();
 
 var overviewData = [
+  //try with n incrementing by 1 instead of 2+.  Multiple y values per bar is why bars aren't loading
   UsageData(viewportVal, 0),
   UsageData(viewportVal.add(Duration(hours: 1)), 0),
-  //try with n incrementing by 1 instead of 2+.  Multiple y values per bar is why bars aren't loading
   UsageData(viewportVal.add(Duration(hours: 2)), 0),
   UsageData(viewportVal.add(Duration(hours: 3)), 0),
   UsageData(viewportVal.add(Duration(hours: 4)), 0),

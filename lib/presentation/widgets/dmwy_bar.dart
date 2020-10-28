@@ -111,24 +111,36 @@ class _DMWYBarState extends State<DMWYBar> {
                 ),
               ),
             ),
-            Row(
-              children: [
-                AnimatedPadding(
-                  curve: Curves.easeOut,
-                  duration: const Duration(milliseconds: 300),
-                  padding: EdgeInsets.only(left: padValue),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: TransWhite,
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                    ),
-                    height: 35,
-                    width: 350 / 4,
-                  ),
-                ),
-              ],
-            ),
+            Selection(),
           ],
+        ),
+      ],
+    );
+  }
+}
+
+class Selection extends StatefulWidget {
+  @override
+  _SelectionState createState() => _SelectionState();
+}
+
+class _SelectionState extends State<Selection> {
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        AnimatedPadding(
+          curve: Curves.easeOut,
+          duration: const Duration(milliseconds: 300),
+          padding: EdgeInsets.only(left: padValue),
+          child: Container(
+            decoration: BoxDecoration(
+              color: TransWhite,
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+            ),
+            height: 35,
+            width: 350 / 4,
+          ),
         ),
       ],
     );

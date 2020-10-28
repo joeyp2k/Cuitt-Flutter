@@ -2,6 +2,7 @@ import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:cuitt/data/datasources/dash_tiles.dart';
 import 'package:cuitt/presentation/design_system/colors.dart';
 import 'package:cuitt/presentation/design_system/dimensions.dart';
+import 'package:cuitt/presentation/design_system/texts.dart';
 import 'package:cuitt/presentation/widgets/button.dart';
 import 'package:cuitt/presentation/widgets/dashboard_button.dart';
 import 'package:cuitt/presentation/widgets/dashboard_tile_large.dart';
@@ -35,6 +36,7 @@ class _ScratchState extends State<Scratch> {
                 child: TextEntryBox(
                   textController: _firstNameController,
                   text: "Email",
+                  obscureText: false,
                 ),
               ),
               Padding(
@@ -135,9 +137,9 @@ var time = [];
 var sec = [];
 var i = 0;
 var overviewData = [
+  //try with n incrementing by 1 instead of 2+.  Multiple values per bar is why bars aren't loading
   UsageData(viewportVal, 0),
   UsageData(viewportVal.add(Duration(hours: 1)), 0),
-  //try with n incrementing by 1 instead of 2+.  Multiple values per bar is why bars aren't loading
   UsageData(viewportVal.add(Duration(hours: 2)), 0),
   UsageData(viewportVal.add(Duration(hours: 3)), 0),
   UsageData(viewportVal.add(Duration(hours: 4)), 0),
@@ -284,19 +286,145 @@ class _ScratchBoardState extends State<ScratchBoard> {
     return MaterialApp(
       home: Scaffold(
         backgroundColor: Background,
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              Padding(
-                padding: spacer.top.xxl * 1.5,
-                child: DMWYBar(),
-              ),
-              Container(child: loopChartWidget),
-              overviewChartWidget,
-            ],
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Padding(
+                  padding: spacer.all.xs,
+                  child: Stack(
+                    children: [
+                      AnimatedPadding(
+                        curve: Curves.easeOut,
+                        duration: const Duration(milliseconds: 300),
+                        padding: EdgeInsets.only(left: padValue),
+                        child: Container(
+                          height: gridSpacer * 4.5,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: TransWhite,
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(10)),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Container(
+                        child: Row(
+                          mainAxisAlignment:
+                          MainAxisAlignment.spaceAround,
+                          children: [
+                            Expanded(
+                              child: GestureDetector(
+                                behavior: HitTestBehavior.translucent,
+                                child: Container(
+                                  child: Center(
+                                    child: RichText(
+                                      text: TextSpan(
+                                        text: 'D',
+                                        style: ButtonRegular,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    padValue = 0;
+                                  });
+                                },
+                              ),
+                            ),
+                            Expanded(
+                              child: GestureDetector(
+                                behavior: HitTestBehavior.translucent,
+                                child: Container(
+                                  child: Center(
+                                    child: RichText(
+                                      text: TextSpan(
+                                        text: 'M',
+                                        style: ButtonRegular,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    padValue = 0;
+                                  });
+                                },
+                              ),
+                            ),
+                            Expanded(
+                              child: GestureDetector(
+                                behavior: HitTestBehavior.translucent,
+                                child: Container(
+                                  child: Center(
+                                    child: RichText(
+                                      text: TextSpan(
+                                        text: 'W',
+                                        style: ButtonRegular,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    padValue = 0;
+                                  });
+                                },
+                              ),
+                            ),
+                            Expanded(
+                              child: GestureDetector(
+                                behavior: HitTestBehavior.translucent,
+                                child: Container(
+                                  child: Center(
+                                    child: RichText(
+                                      text: TextSpan(
+                                        text: 'Y',
+                                        style: ButtonRegular,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    padValue = 0;
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                        decoration: BoxDecoration(
+                          color: TransWhite,
+                          borderRadius:
+                          BorderRadius.all(Radius.circular(10)),
+                        ),
+                        height: gridSpacer * 4.5,
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: spacer.top.xxl * 1.5,
+                  child: DMWYBar(),
+                ),
+                Container(child: loopChartWidget),
+                overviewChartWidget,
+              ],
+            ),
           ),
         ),
         floatingActionButton: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             FloatingActionButton(
               onPressed: () {
@@ -304,12 +432,12 @@ class _ScratchBoardState extends State<ScratchBoard> {
                   timeData = DateTime.now();
                 }
                 timeData = DateTime(timeData.year, timeData.month, timeData.day,
-                        timeData.hour)
+                    timeData.hour)
                     .toLocal();
                 print('Time Data: ' + timeData.toString());
                 if (time.isEmpty) {
                   time.add(DateTime(timeData.year, timeData.month, timeData.day,
-                          timeData.hour)
+                      timeData.hour)
                       .toLocal());
                 }
                 if (sec.isEmpty) {
@@ -344,12 +472,13 @@ class _ScratchBoardState extends State<ScratchBoard> {
                     viewportVal.add(Duration(hours: 12)).toString());
                 setState(() {});
               },
+              child: Text('Increment draw length for hour'),
             ),
             FloatingActionButton(
               backgroundColor: Colors.white,
               onPressed: () {
                 viewportVal = DateTime(timeData.year, timeData.month,
-                        timeData.day, timeData.hour)
+                    timeData.day, timeData.hour)
                     .add(Duration(hours: n))
                     .toLocal();
                 timeData = timeData.add(Duration(hours: n));
@@ -358,6 +487,17 @@ class _ScratchBoardState extends State<ScratchBoard> {
                 print('Viewport End: ' +
                     viewportVal.add(Duration(hours: 12)).toString());
               },
+              child: Text('Increment hour'),
+            ),
+            FloatingActionButton(
+              backgroundColor: LightBlue,
+              onPressed: () {
+                fill++;
+                setState(() {
+
+                });
+              },
+              child: Text('Increment dial'),
             ),
           ],
         ),

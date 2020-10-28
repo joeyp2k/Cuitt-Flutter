@@ -10,6 +10,7 @@ import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:convert/convert.dart';
 import 'package:cuitt/presentation/design_system/colors.dart';
+import 'package:cuitt/presentation/pages/dashboard.dart';
 import 'package:cuitt/presentation/pages/scratch.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -21,14 +22,13 @@ import 'package:flutter_blue/flutter_blue.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:secure_random/secure_random.dart';
-import 'package:cuitt/presentation/pages/dashboard.dart';
+
 import 'widgets.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
 var secureRandom = SecureRandom();
 String randID;
-//void main() => runApp(FlutterBlueApp());
 
 int currentIndex = 2;
 int locationPage = 0;
