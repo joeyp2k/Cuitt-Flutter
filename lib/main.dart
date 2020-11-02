@@ -22,6 +22,7 @@ import 'package:flutter_blue/flutter_blue.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:secure_random/secure_random.dart';
+import 'package:cuitt/data/datasources/dial_data.dart';
 
 import 'widgets.dart';
 
@@ -5576,7 +5577,7 @@ class DeviceScreen extends StatelessWidget {
   }
 }
 
-void main() => runApp(BlueDashb());
+void main() => runApp(ScratchBoard());
 
 abstract class CounterBlocEvent {}
 

@@ -1,6 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+CounterBloc counterBlocSink;
+
 List<double> hitLengthArray = [];
 List<int> timestampArray = [];
 var drawCountIndex = 0;
@@ -124,6 +126,7 @@ class CounterBloc extends Bloc<CounterBlocEvent, CounterBlocState> {
           (state as DataState).newAverageDrawLengthTotalValue;
 
       //Applying business Logic
+      /*
       int newDrawCountValue = drawCount;
       int newSeshCountValue = seshCount;
       double newDrawLengthValue = drawLength;
@@ -131,10 +134,12 @@ class CounterBloc extends Bloc<CounterBlocEvent, CounterBlocState> {
       int newAverageDrawLengthValue = drawLengthAverage.truncate();
       int newDrawLengthTotalAverageValue = drawLengthTotalAverage.truncate();
       int newAverageWaitPeriodValue;
-      print('NEW DRAW COUNT FROM BLOC: ' + newDrawLengthValue.toString());
 
+      print('NEW DRAW COUNT FROM BLOC: ' + newDrawLengthValue.toString());
+      */
       //Adding new state to the Stream, yield is used to add state to the stream
       yield DataState(
+        /*
         newDrawCountValue: newDrawCountValue,
         newSeshCountValue: newSeshCountValue,
         newDrawLengthValue: newDrawLengthValue,
@@ -142,7 +147,8 @@ class CounterBloc extends Bloc<CounterBlocEvent, CounterBlocState> {
         newAverageDrawLengthValue: newAverageDrawLengthValue,
         newAverageDrawLengthTotalValue: newDrawLengthTotalAverageValue,
         newAverageWaitPeriodValue: newAverageWaitPeriodValue,
-      );
+        */
+          );
     }
   }
 }

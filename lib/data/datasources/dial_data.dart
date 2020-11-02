@@ -12,9 +12,9 @@ class DialData {
             r: color.red, g: color.green, b: color.blue, a: color.alpha);
 }
 
-var fill = 2;
+var fill = 1;
 var over = 0;
-var unfilled = 1;
+var unfilled = 2;
 
 var data = [
   new DialData('Over', over, Red),
