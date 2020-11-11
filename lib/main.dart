@@ -23,6 +23,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:secure_random/secure_random.dart';
 import 'package:cuitt/data/datasources/dial_data.dart';
+import 'package:cuitt/presentation/pages/introduction.dart';
 
 import 'widgets.dart';
 
@@ -5577,7 +5578,7 @@ class DeviceScreen extends StatelessWidget {
   }
 }
 
-void main() => runApp(ScratchBoard());
+void main() => runApp(BlueDash());
 
 abstract class CounterBlocEvent {}
 
@@ -5776,7 +5777,7 @@ class _BlocTestState extends State<BlocTest> {
     );
   }
 }
-*/
+
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
   final String title;
@@ -5979,6 +5980,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+*/
 
 class BlueDash extends StatefulWidget {
   @override
@@ -5991,9 +5993,7 @@ class _BlueDashState extends State<BlueDash> {
     return MaterialApp(
       home: Scaffold(
         backgroundColor: Background,
-        body: MyHomePage(
-          title: 'Test',
-        ),
+        body: introPages,
       ),
     );
   }

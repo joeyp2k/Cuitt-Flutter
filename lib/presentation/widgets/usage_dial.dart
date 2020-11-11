@@ -14,3 +14,14 @@ var loopChartWidget = SizedBox(
   child: loopChart,
 );
 
+class DialChart extends StatefulWidget {
+  @override
+  _DialChartState createState() => _DialChartState();
+}
+
+class _DialChartState extends State<DialChart> {
+  @override
+  Widget build(BuildContext context) {
+    return loopChartWidget;
+  }
+}

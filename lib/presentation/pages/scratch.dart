@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:cuitt/bloc/dashboard_bloc.dart';
 import 'package:cuitt/data/datasources/dash_tiles.dart';
@@ -12,13 +14,19 @@ import 'package:cuitt/presentation/widgets/dashboard_tile_square.dart';
 import 'package:cuitt/presentation/widgets/dmwy_bar.dart';
 import 'package:cuitt/presentation/widgets/list_button.dart';
 import 'package:cuitt/presentation/widgets/text_entry_box.dart';
-import 'package:cuitt/presentation/widgets/usage_dial.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-CounterBloc _counterBlocSink;
+//MOVE DIAL CHART AND OVERVIEW CHART INTO DASHBOARD PAGE AND UPDATE STATE WITH EVERY UPDATE OF DATA IN ORDER TO UPDATE CHARTS-
+
+final _counterStreamController = StreamController<int>();
+
+StreamSink<int> get counter_sink => _counterStreamController.sink;
+
+// expose data from stream
+Stream<int> get stream_counter => _counterStreamController.stream;
 
 final TextEditingController _firstNameController = TextEditingController();
 
@@ -123,8 +131,8 @@ final DateTime start = DateTime.now();
 DateTime viewport = DateTime.now();
 DateTime timeData;
 DateTime viewportVal =
-    DateTime(viewport.year, viewport.month, viewport.day, viewport.hour)
-        .toLocal();
+DateTime(viewport.year, viewport.month, viewport.day, viewport.hour)
+    .toLocal();
 
 //var fill = 1;
 //var over = 1;
@@ -132,6 +140,7 @@ DateTime viewportVal =
 var time = [];
 var sec = [];
 var i = 0;
+
 var overviewData = [
   //try with n incrementing by 1 instead of 2+.  Multiple values per bar is why bars aren't loading
   UsageData(viewportVal, 0),
@@ -149,9 +158,37 @@ var overviewData = [
 ];
 int n = 1;
 
+var data = [
+  new DialData('Over', over, Red),
+  new DialData('Fill', fill, Green),
+  new DialData('Unfilled', unfilled, TransWhite),
+];
+
 class _ScratchBoardState extends State<ScratchBoard> {
   @override
   Widget build(BuildContext context) {
+    var loopSeries = [
+      new charts.Series(
+        id: 'Today',
+        domainFn: (DialData tData, _) => tData.type,
+        measureFn: (DialData tData, _) => tData.seconds,
+        colorFn: (DialData tData, _) => tData.color,
+        data: data,
+      ),
+    ];
+
+    var loopChart = new charts.PieChart(
+      loopSeries,
+      defaultRenderer: new charts.ArcRendererConfig(arcWidth: 25),
+      animate: false,
+      behaviors: [],
+      animationDuration: Duration(milliseconds: 750),
+    );
+
+    var loopChartWidget = SizedBox(
+      height: 300.0,
+      child: loopChart,
+    );
 
     var overviewSeries = [
       new charts.Series(
@@ -190,7 +227,7 @@ class _ScratchBoardState extends State<ScratchBoard> {
 
       /// Assign a custom style for the measure axis.
       primaryMeasureAxis:
-          new charts.NumericAxisSpec(renderSpec: new charts.NoneRenderSpec()),
+      new charts.NumericAxisSpec(renderSpec: new charts.NoneRenderSpec()),
     );
 
     var dayViewChart = new charts.TimeSeriesChart(
@@ -217,7 +254,7 @@ class _ScratchBoardState extends State<ScratchBoard> {
               start: viewportVal.subtract(Duration(hours: 11)),
               end: viewportVal.add(Duration(hours: 1))),
           renderSpec: new charts.SmallTickRendererSpec(
-              // Tick and Label styling here.
+            // Tick and Label styling here.
               labelStyle: new charts.TextStyleSpec(
                   fontSize: 12, // size in Pts.
                   color: charts.MaterialPalette.white),
@@ -229,10 +266,10 @@ class _ScratchBoardState extends State<ScratchBoard> {
       /// Assign a custom style for the measure axis.
       primaryMeasureAxis: new charts.NumericAxisSpec(
           tickProviderSpec:
-              new charts.BasicNumericTickProviderSpec(desiredTickCount: 4),
+          new charts.BasicNumericTickProviderSpec(desiredTickCount: 4),
           renderSpec: new charts.GridlineRendererSpec(
 
-              // Tick and Label styling here.
+            // Tick and Label styling here.
               labelStyle: new charts.TextStyleSpec(
                   fontSize: 18, // size in Pts.
                   color: charts.MaterialPalette.white),
@@ -388,90 +425,125 @@ class _ScratchBoardState extends State<ScratchBoard> {
                     padding: spacer.top.xxl * 1.5,
                     child: DMWYBar(),
                   ),
-                  loopChartWidget,
+                  StreamBuilder<int>(
+                      stream: stream_counter,
+                      builder: (context, snapshot) {
+                        return Column(
+                          children: [
+                            Container(
+                              child: Text(snapshot.data.toString()),
+                            ),
+                            loopChartWidget,
+                          ],
+                        );
+                      }
+                  ),
                   overviewChartWidget,
                 ],
               ),
             ),
           ),
-          floatingActionButton: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          floatingActionButton: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              FloatingActionButton(
-                onPressed: () {
-                  if (timeData == null) {
-                    timeData = DateTime.now();
-                  }
-                  timeData =
-                      DateTime(timeData.year, timeData.month, timeData.day,
-                          timeData.hour)
+              Row(
+                children: [
+                  FloatingActionButton.extended(
+                    onPressed: () {
+                      if (timeData == null) {
+                        timeData = DateTime.now();
+                      }
+                      timeData =
+                          DateTime(timeData.year, timeData.month, timeData.day,
+                              timeData.hour)
+                              .toLocal();
+                      print('Time Data: ' + timeData.toString());
+                      if (time.isEmpty) {
+                        time.add(
+                            DateTime(timeData.year, timeData.month,
+                                timeData.day,
+                                timeData.hour)
+                                .toLocal());
+                      }
+                      if (sec.isEmpty) {
+                        sec.add(0);
+                      }
+                      if (timeData == time[i]) {
+                        sec[i] += 1;
+                        print('Data Length: ' + overviewData.length.toString());
+                        print('Current Time: ' + time[i].toString());
+                        print('Sec: ' + sec[i].toString());
+                        overviewData[i] = UsageData(time[i], sec[i]);
+                      } else {
+                        i++;
+                        if (overviewData.length <= i) {
+                          sec.add(1);
+                          time.add(timeData);
+                          print('ADD');
+                          print('Current Time: ' + time[i].toString());
+                          print('Sec: ' + sec[i].toString());
+                          overviewData.add(UsageData(time[i], sec[i]));
+                        } else {
+                          sec.add(1);
+                          time.add(timeData);
+                          print('REPLACE');
+                          print('Current Time: ' + time[i].toString());
+                          print('Sec: ' + sec[i].toString());
+                          overviewData[i] = UsageData(time[i], sec[i]);
+                        }
+                      }
+                      print('Viewport Start: ' + viewportVal.toString());
+                      print('Viewport Start: ' +
+                          viewportVal.add(Duration(hours: 12)).toString());
+                      setState(() {});
+                    },
+                    label: Text('Increment draw length for hour'),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  FloatingActionButton.extended(
+                    backgroundColor: Green,
+                    onPressed: () {
+                      viewportVal = DateTime(timeData.year, timeData.month,
+                          timeData.day, timeData.hour)
+                          .add(Duration(hours: n))
                           .toLocal();
-                  print('Time Data: ' + timeData.toString());
-                  if (time.isEmpty) {
-                    time.add(
-                        DateTime(timeData.year, timeData.month, timeData.day,
-                            timeData.hour)
-                            .toLocal());
-                  }
-                  if (sec.isEmpty) {
-                    sec.add(0);
-                  }
-                  if (timeData == time[i]) {
-                    sec[i] += 1;
-                    print('Data Length: ' + overviewData.length.toString());
-                    print('Current Time: ' + time[i].toString());
-                    print('Sec: ' + sec[i].toString());
-                    overviewData[i] = UsageData(time[i], sec[i]);
-                  } else {
-                    i++;
-                    if (overviewData.length <= i) {
-                      sec.add(1);
-                      time.add(timeData);
-                      print('ADD');
-                      print('Current Time: ' + time[i].toString());
-                      print('Sec: ' + sec[i].toString());
-                      overviewData.add(UsageData(time[i], sec[i]));
-                    } else {
-                      sec.add(1);
-                      time.add(timeData);
-                      print('REPLACE');
-                      print('Current Time: ' + time[i].toString());
-                      print('Sec: ' + sec[i].toString());
-                      overviewData[i] = UsageData(time[i], sec[i]);
-                    }
-                  }
-                  print('Viewport Start: ' + viewportVal.toString());
-                  print('Viewport Start: ' +
-                      viewportVal.add(Duration(hours: 12)).toString());
-                  setState(() {});
-                },
-                child: Text('Increment draw length for hour'),
+                      timeData = timeData.add(Duration(hours: n));
+                      print('Time Data: ' + timeData.toString());
+                      print('Viewport Start: ' + viewportVal.toString());
+                      print('Viewport End: ' +
+                          viewportVal.add(Duration(hours: 12)).toString());
+                    },
+                    label: Text('Increment hour'),
+                  ),
+                ],
               ),
-              FloatingActionButton(
-                backgroundColor: Colors.white,
-                onPressed: () {
-                  viewportVal = DateTime(timeData.year, timeData.month,
-                      timeData.day, timeData.hour)
-                      .add(Duration(hours: n))
-                      .toLocal();
-                  timeData = timeData.add(Duration(hours: n));
-                  print('Time Data: ' + timeData.toString());
-                  print('Viewport Start: ' + viewportVal.toString());
-                  print('Viewport End: ' +
-                      viewportVal.add(Duration(hours: 12)).toString());
-                },
-                child: Text('Increment hour'),
-              ),
-              FloatingActionButton(
-                backgroundColor: LightBlue,
-                onPressed: () {
-                  fill++;
-                  setState(() {
+              Row(
+                children: [
+                  FloatingActionButton.extended(
+                    backgroundColor: LightBlue,
+                    onPressed: () {
+                      fill++;
+                      data = [
+                        DialData('Over', over, Red),
+                        DialData('Fill', fill, Green),
+                        DialData('Unfilled', unfilled, TransWhite),
+                      ];
+                      setState(() {
 
-                  });
-                  counterBlocSink.add(UpdateDataEvent());
-                },
-                child: Text('Increment dial'),
+                      });
+                      counter_sink.add(fill);
+                      print(data
+                          .elementAt(1)
+                          .seconds
+                          .toString());
+                      //counterBlocSink.add(UpdateDataEvent());
+                    },
+                    label: Text('Increment dial'),
+                  ),
+                ],
               ),
             ],
           ),

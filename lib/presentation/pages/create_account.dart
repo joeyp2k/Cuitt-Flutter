@@ -75,7 +75,7 @@ class _CreateAccountState extends State<CreateAccount>
         _success = true;
         _userEmail = user.email;
         Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-          return Dashboardb();
+          return BlueDashb();
         }));
       } else {
         _success = false;
@@ -85,15 +85,16 @@ class _CreateAccountState extends State<CreateAccount>
     return Scaffold(
       backgroundColor: Background,
       body: SafeArea(
-        child: Center(
-          child: Column(
-            children: [
-              Column(
-                children: [
-                  Form(
-                    key: _formKey,
-                    child: Padding(
-                      padding: spacer.x.xxl,
+        child: SingleChildScrollView(
+          child: Center(
+            child: Column(
+              children: [
+                Column(
+                  children: [
+                    Form(
+                      key: _formKey,
+                      child: Padding(
+                        padding: spacer.x.xxl,
                         child: Column(
                           children: [
                             Padding(
@@ -160,7 +161,7 @@ class _CreateAccountState extends State<CreateAccount>
                   ),
                 ),
                 Padding(
-                  padding: spacer.x.xl,
+                  padding: spacer.x.md,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -173,10 +174,10 @@ class _CreateAccountState extends State<CreateAccount>
                       GestureDetector(
                         behavior: HitTestBehavior.translucent,
                         onTap: () {
-                          Navigator.of(context).push(
-                              MaterialPageRoute(builder: (context) {
-                                return introPagesB;
-                              }));
+                          Navigator.of(context)
+                              .push(MaterialPageRoute(builder: (context) {
+                            return introPagesB;
+                          }));
                         },
                         child: Container(
                           margin: spacer.y.xs + spacer.left.xs,
@@ -191,7 +192,8 @@ class _CreateAccountState extends State<CreateAccount>
                     ],
                   ),
                 ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

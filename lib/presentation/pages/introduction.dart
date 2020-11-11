@@ -52,7 +52,7 @@ final introPagesC = PageView(
     Intro(),
     Partner(),
     Location(),
-    Login(),
+    CreateAccount(),
   ],
 );
 

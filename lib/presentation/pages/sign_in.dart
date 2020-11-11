@@ -57,7 +57,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
         _success = true;
         _userEmail = user.email;
         Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-          return Dashboardb();
+          return BlueDashb();
         }));
       } else {
         _success = false;
@@ -67,15 +67,16 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
     return Scaffold(
       backgroundColor: Background,
       body: SafeArea(
-        child: Center(
-          child: Column(
-            children: [
-              Padding(
-                padding: spacer.x.xxl + spacer.top.xxl,
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    children: <Widget>[
+        child: SingleChildScrollView(
+          child: Center(
+            child: Column(
+              children: [
+                Padding(
+                  padding: spacer.x.xxl + spacer.top.xxl,
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: <Widget>[
                         TextEntryBox(
                           text: "Email",
                           obscureText: false,
@@ -111,16 +112,24 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                           text: "Don't have an account?",
                         ),
                       ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: spacer.x.md,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
                       GestureDetector(
                         behavior: HitTestBehavior.translucent,
                         onTap: () {
-                          Navigator.of(context).push(
-                              MaterialPageRoute(builder: (context) {
-                                return introPagesC;
-                              }));
+                          Navigator.of(context)
+                              .push(MaterialPageRoute(builder: (context) {
+                            return introPagesC;
+                          }));
                         },
                         child: Container(
-                          margin: spacer.y.xs + spacer.left.xs,
+                          margin: spacer.y.xs + spacer.x.xs,
                           child: RichText(
                             text: TextSpan(
                               style: primaryListGreen,
@@ -132,7 +141,8 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                     ],
                   ),
                 ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
