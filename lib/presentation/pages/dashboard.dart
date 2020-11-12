@@ -45,7 +45,7 @@ int daynum = 1;
 
 class UsageData {
   final DateTime time;
-  final int seconds;
+  final double seconds;
 
   UsageData(this.time, this.seconds);
 }
@@ -65,7 +65,6 @@ var overviewData = [
   UsageData(viewportVal.add(Duration(hours: 10)), 0),
   UsageData(viewportVal.add(Duration(hours: 11)), 0),
 ];
-
 int n = 1;
 
 var data = [
@@ -154,7 +153,6 @@ class _MyHomePageState extends State<MyHomePage> {
       } else {
         _readval = await _ledChar.read();
         if (_readval.toString() == _lastval.toString()) {
-
         } else {
           print('READ VALUE A = ' + _readval.toString());
           currentTime = int.parse(hex.encode(_readval.sublist(0, 4)).toString(),
@@ -190,10 +188,100 @@ class _MyHomePageState extends State<MyHomePage> {
           hitLengthArray.add(drawLength);
           timestampArray.add(currentTime);
 
+          /*
+          //update dial and chart with new data
+          if (firstRun == 1) {
+            firstRun = 0;
+            fill = 0;
+            over = 0;
+            unfilled = 1;
+          }
+          if (dayNum == 1) {
+            if (fill > 0) {
+              unfilled = 0;
+              over = 0;
+            }
+          }
+          if (drawLengthTotal.truncate() >=
+              drawLengthTotalAverageYest) {
+            //stop increasing fill
+          } else {
+            //increase fill
+            fill = drawLengthTotal.truncate();
+          }
+            //if yesterday's average is larger than today's total, over = 0.  Otherwise, start increasing over
+            if(drawLengthTotal.truncate() -
+                drawLengthTotalAverageYest
+                    .truncate() <= 0){
+              over = 0;
+            }else{
+              over = drawLengthTotal.truncate() -
+                  drawLengthTotalAverageYest
+                      .truncate();
+            }
+          }
+          //if yesterday's average is larger than today's total, unfilled = 0.  Otherwise, start decreasing over.
+          if (drawLengthTotalAverageYest.truncate() <=
+              drawLengthTotal.truncate()) {
+            unfilled = 0;
+          }
+          else{
+            unfilled = drawLengthTotalAverageYest.truncate() -
+                drawLengthTotal
+                    .truncate();
+          }
+
+          data = [
+            DialData('Over', over, Red),
+            DialData('Fill', fill, Green),
+            DialData('Unfilled', unfilled, TransWhite),
+          ];
+
+          viewportVal = DateTime(timeData.year, timeData.month,
+              timeData.day, timeData.hour).toLocal();
+
+          if (timeData == null) {
+            timeData = DateTime.now();
+          }
+          timeData = DateTime(timeData.year, timeData.month, timeData.day,
+              timeData.hour)
+              .toLocal();
+          print('Time Data: ' + timeData.toString());
+          if (time.isEmpty) {
+            time.add(DateTime(timeData.year, timeData.month, timeData.day,
+                timeData.hour)
+                .toLocal());
+          }
+          if (sec.isEmpty) {
+            sec.add(0);
+          }
+          if (timeData == time[i]) {
+            sec[i] += drawLength;
+            print('Data Length: ' + overviewData.length.toString());
+            print('Current Time: ' + time[i].toString());
+            print('Sec: ' + sec[i].toString());
+            overviewData[i] = UsageData(time[i], sec[i]);
+          } else {
+            i++;
+            if (overviewData.length <= i) {
+              sec.add(drawLength);
+              time.add(timeData);
+              print('ADD');
+              print('Current Time: ' + time[i].toString());
+              print('Sec: ' + sec[i].toString());
+              overviewData.add(UsageData(time[i], sec[i]));
+            } else {
+              sec.add(drawLength);
+              time.add(timeData);
+              print('REPLACE');
+              print('Current Time: ' + time[i].toString());
+              print('Sec: ' + sec[i].toString());
+              overviewData[i] = UsageData(time[i], sec[i]);
+            }
+          }
+          */
+
           _counterBlocSink.add(UpdateDataEvent());
-
-          //TODO Implement sending data to firestore and loading buffer if connection unsuccessful
-
           _lastval = _readval;
         }
       }
@@ -219,7 +307,7 @@ class _MyHomePageState extends State<MyHomePage> {
         _counterBlocSink = BlocProvider.of<CounterBloc>(context);
         return Scaffold(
           floatingActionButtonLocation:
-          FloatingActionButtonLocation.centerFloat,
+              FloatingActionButtonLocation.centerFloat,
           backgroundColor: Background,
           body: Container(
             width: double.infinity,
@@ -288,59 +376,56 @@ class _DashboardbState extends State<Dashboardb> {
     super.initState();
     timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
       print('Draw Length Total: ' + drawLengthTotal.toString());
-      //if today's total is larger or equal to yesterday's average
-      if (drawLengthTotal >=
-          drawLengthTotalAverageYest) {
-        //stop increasing fill
-      } else {
-        //increase fill
-        fill = drawLengthTotal;
-      }
       //if it is the first day recorded, start with no fill and full unfilled
       if (daynum == 1) {
+        //increase fill
+        fill = drawLengthTotal;
         if (fill > 0) {
           over = 0;
           unfilled = 0;
         } else {
+          over = 0;
           unfilled = 1;
+        } //if today's total is larger or equal to yesterday's average
+      } else if (drawLengthTotal >= drawLengthTotalAverageYest) {
+        //stop increasing fill
+        //if today's total is larger than yesterday's average, start increasing over
+        if (drawLengthTotal > drawLengthTotalAverageYest) {
+          over = drawLengthTotal - drawLengthTotalAverageYest;
+        }
+      } else {
+        //increase fill
+        over = 0;
+        fill = drawLengthTotal;
+        //if yesterday's average is larger than today's total, unfilled = 0.  Otherwise, start decreasing over.
+        if (drawLengthTotalAverageYest <= drawLengthTotal) {
+          unfilled = 0;
+        } else {
+          unfilled = drawLengthTotalAverageYest.round() - drawLengthTotal;
         }
       }
-      //if yesterday's average is larger than today's total, over = 0.  Otherwise, start increasing over
-      if (drawLengthTotal -
-          drawLengthTotalAverageYest <= 0) {
-        over = 0;
-      } else {
-        over = drawLengthTotal -
-            drawLengthTotalAverageYest;
-      }
-      //if yesterday's average is larger than today's total, unfilled = 0.  Otherwise, start decreasing over.
-      if (drawLengthTotalAverageYest <= drawLengthTotal) {
-        unfilled = 0;
-      }
-      else {
-        unfilled = drawLengthTotalAverageYest.truncate() -
-            drawLengthTotal;
-      }
-      /*
-      //TODO implement updated overview chart viewport and data
+
+      timeData = DateTime.now();
+
       viewportVal = DateTime(timeData.year, timeData.month,
           timeData.day, timeData.hour).toLocal();
 
-      if (timeData == null) {
-        timeData = DateTime.now();
-      }
       timeData = DateTime(timeData.year, timeData.month, timeData.day,
           timeData.hour)
           .toLocal();
+
       print('Time Data: ' + timeData.toString());
+
       if (time.isEmpty) {
         time.add(DateTime(timeData.year, timeData.month, timeData.day,
             timeData.hour)
             .toLocal());
       }
+
       if (sec.isEmpty) {
         sec.add(0);
       }
+
       if (timeData == time[i]) {
         sec[i] += drawLength;
         print('Data Length: ' + overviewData.length.toString());
@@ -365,8 +450,10 @@ class _DashboardbState extends State<Dashboardb> {
           overviewData[i] = UsageData(time[i], sec[i]);
         }
       }
-      */
+
       print('Fill: ' + fill.toString());
+      print('Unfilled: ' + unfilled.toString());
+      print('Over: ' + over.toString());
 
       setState(() {
         data = [
@@ -430,8 +517,7 @@ class _DashboardbState extends State<Dashboardb> {
       loopSeries,
       defaultRenderer: new charts.ArcRendererConfig(arcWidth: 25),
       animate: false,
-      behaviors: [
-      ],
+      behaviors: [],
       animationDuration: Duration(milliseconds: 750),
     );
 
@@ -482,7 +568,7 @@ class _DashboardbState extends State<Dashboardb> {
 
     var dayViewChart = new charts.TimeSeriesChart(
       overviewSeries,
-      animate: false,
+      animate: true,
       animationDuration: Duration(milliseconds: 250),
       behaviors: [
         // Add the sliding viewport behavior to have the viewport center on the
@@ -543,6 +629,16 @@ class _DashboardbState extends State<Dashboardb> {
       builder: (context, state) {
         _counterBlocSink = BlocProvider.of<CounterBloc>(context);
         return Scaffold(
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              fill++;
+              data = [
+                DialData('Over', over, Red),
+                DialData('Fill', fill, Green),
+                DialData('Unfilled', unfilled, TransWhite),
+              ];
+            },
+          ),
           backgroundColor: Background,
           body: SingleChildScrollView(
             child: SafeArea(

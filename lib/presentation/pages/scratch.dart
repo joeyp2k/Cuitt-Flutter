@@ -534,6 +534,7 @@ class _ScratchBoardState extends State<ScratchBoard> {
                       setState(() {
 
                       });
+                      //counter_sink.add(fill);
                       print(data
                           .elementAt(1)
                           .seconds
