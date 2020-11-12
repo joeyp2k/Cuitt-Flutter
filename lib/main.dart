@@ -5990,10 +5990,7 @@ class _BlueDashState extends State<BlueDash> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        backgroundColor: Background,
-        body: introPages,
-      ),
+      home: introPages,
     );
   }
 }

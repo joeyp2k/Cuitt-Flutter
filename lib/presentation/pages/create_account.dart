@@ -75,7 +75,7 @@ class _CreateAccountState extends State<CreateAccount>
         _success = true;
         _userEmail = user.email;
         Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-          return BlueDashb();
+          return ConnectPage();
         }));
       } else {
         _success = false;
