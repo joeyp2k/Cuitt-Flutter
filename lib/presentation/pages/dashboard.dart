@@ -188,99 +188,6 @@ class _MyHomePageState extends State<MyHomePage> {
           hitLengthArray.add(drawLength);
           timestampArray.add(currentTime);
 
-          /*
-          //update dial and chart with new data
-          if (firstRun == 1) {
-            firstRun = 0;
-            fill = 0;
-            over = 0;
-            unfilled = 1;
-          }
-          if (dayNum == 1) {
-            if (fill > 0) {
-              unfilled = 0;
-              over = 0;
-            }
-          }
-          if (drawLengthTotal.truncate() >=
-              drawLengthTotalAverageYest) {
-            //stop increasing fill
-          } else {
-            //increase fill
-            fill = drawLengthTotal.truncate();
-          }
-            //if yesterday's average is larger than today's total, over = 0.  Otherwise, start increasing over
-            if(drawLengthTotal.truncate() -
-                drawLengthTotalAverageYest
-                    .truncate() <= 0){
-              over = 0;
-            }else{
-              over = drawLengthTotal.truncate() -
-                  drawLengthTotalAverageYest
-                      .truncate();
-            }
-          }
-          //if yesterday's average is larger than today's total, unfilled = 0.  Otherwise, start decreasing over.
-          if (drawLengthTotalAverageYest.truncate() <=
-              drawLengthTotal.truncate()) {
-            unfilled = 0;
-          }
-          else{
-            unfilled = drawLengthTotalAverageYest.truncate() -
-                drawLengthTotal
-                    .truncate();
-          }
-
-          data = [
-            DialData('Over', over, Red),
-            DialData('Fill', fill, Green),
-            DialData('Unfilled', unfilled, TransWhite),
-          ];
-
-          viewportVal = DateTime(timeData.year, timeData.month,
-              timeData.day, timeData.hour).toLocal();
-
-          if (timeData == null) {
-            timeData = DateTime.now();
-          }
-          timeData = DateTime(timeData.year, timeData.month, timeData.day,
-              timeData.hour)
-              .toLocal();
-          print('Time Data: ' + timeData.toString());
-          if (time.isEmpty) {
-            time.add(DateTime(timeData.year, timeData.month, timeData.day,
-                timeData.hour)
-                .toLocal());
-          }
-          if (sec.isEmpty) {
-            sec.add(0);
-          }
-          if (timeData == time[i]) {
-            sec[i] += drawLength;
-            print('Data Length: ' + overviewData.length.toString());
-            print('Current Time: ' + time[i].toString());
-            print('Sec: ' + sec[i].toString());
-            overviewData[i] = UsageData(time[i], sec[i]);
-          } else {
-            i++;
-            if (overviewData.length <= i) {
-              sec.add(drawLength);
-              time.add(timeData);
-              print('ADD');
-              print('Current Time: ' + time[i].toString());
-              print('Sec: ' + sec[i].toString());
-              overviewData.add(UsageData(time[i], sec[i]));
-            } else {
-              sec.add(drawLength);
-              time.add(timeData);
-              print('REPLACE');
-              print('Current Time: ' + time[i].toString());
-              print('Sec: ' + sec[i].toString());
-              overviewData[i] = UsageData(time[i], sec[i]);
-            }
-          }
-          */
-
           _counterBlocSink.add(UpdateDataEvent());
           _lastval = _readval;
         }
@@ -363,12 +270,12 @@ class _BlueDashbState extends State<BlueDashb> {
   }
 }
 
-class Dashboardb extends StatefulWidget {
+class DialChart extends StatefulWidget {
   @override
-  _DashboardbState createState() => _DashboardbState();
+  _DialChartState createState() => _DialChartState();
 }
 
-class _DashboardbState extends State<Dashboardb> {
+class _DialChartState extends State<DialChart> {
   Timer timer;
 
   @override
@@ -405,21 +312,86 @@ class _DashboardbState extends State<Dashboardb> {
         }
       }
 
+      print('Fill: ' + fill.toString());
+      print('Unfilled: ' + unfilled.toString());
+      print('Over: ' + over.toString());
+
+      setState(() {
+        data = [
+          DialData('Over', over, Red),
+          DialData('Fill', fill, Green),
+          DialData('Unfilled', unfilled, TransWhite),
+        ];
+      });
+    });
+  }
+
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    //Stop Timer
+    timer?.cancel();
+    super.dispose();
+    //Close the Stream Sink when the widget is disposed
+    _counterBlocSink?.close();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var loopSeries = [
+      new charts.Series(
+        id: 'Today',
+        domainFn: (DialData tData, _) => tData.type,
+        measureFn: (DialData tData, _) => tData.seconds,
+        colorFn: (DialData tData, _) => tData.color,
+        data: data,
+      ),
+    ];
+
+    var loopChart = new charts.PieChart(
+      loopSeries,
+      defaultRenderer: new charts.ArcRendererConfig(arcWidth: 25),
+      animate: false,
+      behaviors: [],
+      animationDuration: Duration(milliseconds: 750),
+    );
+
+    var loopChartWidget = SizedBox(
+      height: 300.0,
+      child: loopChart,
+    );
+    return loopChartWidget;
+  }
+}
+
+class BarChart extends StatefulWidget {
+  @override
+  _BarChartState createState() => _BarChartState();
+}
+
+class _BarChartState extends State<BarChart> {
+  Timer timer;
+
+  @override
+  void initState() {
+    super.initState();
+    timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
       timeData = DateTime.now();
 
-      viewportVal = DateTime(timeData.year, timeData.month,
-          timeData.day, timeData.hour).toLocal();
+      viewportVal =
+          DateTime(timeData.year, timeData.month, timeData.day, timeData.hour)
+              .toLocal();
 
-      timeData = DateTime(timeData.year, timeData.month, timeData.day,
-          timeData.hour)
-          .toLocal();
+      timeData =
+          DateTime(timeData.year, timeData.month, timeData.day, timeData.hour)
+              .toLocal();
 
       print('Time Data: ' + timeData.toString());
 
       if (time.isEmpty) {
-        time.add(DateTime(timeData.year, timeData.month, timeData.day,
-            timeData.hour)
-            .toLocal());
+        time.add(
+            DateTime(timeData.year, timeData.month, timeData.day, timeData.hour)
+                .toLocal());
       }
 
       if (sec.isEmpty) {
@@ -455,13 +427,7 @@ class _DashboardbState extends State<Dashboardb> {
       print('Unfilled: ' + unfilled.toString());
       print('Over: ' + over.toString());
 
-      setState(() {
-        data = [
-          DialData('Over', over, Red),
-          DialData('Fill', fill, Green),
-          DialData('Unfilled', unfilled, TransWhite),
-        ];
-      });
+      setState(() {});
     });
   }
 
@@ -475,57 +441,8 @@ class _DashboardbState extends State<Dashboardb> {
     _counterBlocSink?.close();
   }
 
-  void groups() async {
-    int arrayindex = 0;
-    var firebaseUser = await FirebaseAuth.instance.currentUser();
-    var value = await firestoreInstance
-        .collection("groups")
-        .where("members", arrayContains: firebaseUser.uid)
-        .getDocuments();
-
-    groupNameList.clear();
-    groupIDList.clear();
-    value.documents.forEach((element) {
-      groupNameList.insert(arrayindex, element.data["group name"]);
-      groupIDList.insert(arrayindex, element.documentID);
-      arrayindex++;
-    });
-    if (groupNameList.isEmpty) {
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-        return GroupListEmpty();
-      }));
-    } else {
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-        return GroupsList();
-      }));
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    var loopSeries = [
-      new charts.Series(
-        id: 'Today',
-        domainFn: (DialData tData, _) => tData.type,
-        measureFn: (DialData tData, _) => tData.seconds,
-        colorFn: (DialData tData, _) => tData.color,
-        data: data,
-      ),
-    ];
-
-    var loopChart = new charts.PieChart(
-      loopSeries,
-      defaultRenderer: new charts.ArcRendererConfig(arcWidth: 25),
-      animate: false,
-      behaviors: [],
-      animationDuration: Duration(milliseconds: 750),
-    );
-
-    var loopChartWidget = SizedBox(
-      height: 300.0,
-      child: loopChart,
-    );
-
     var overviewSeries = [
       new charts.Series(
         id: 'Overview',
@@ -563,7 +480,7 @@ class _DashboardbState extends State<Dashboardb> {
 
       /// Assign a custom style for the measure axis.
       primaryMeasureAxis:
-      new charts.NumericAxisSpec(renderSpec: new charts.NoneRenderSpec()),
+          new charts.NumericAxisSpec(renderSpec: new charts.NoneRenderSpec()),
     );
 
     var dayViewChart = new charts.TimeSeriesChart(
@@ -590,7 +507,7 @@ class _DashboardbState extends State<Dashboardb> {
               start: viewportVal.subtract(Duration(hours: 11)),
               end: viewportVal.add(Duration(hours: 1))),
           renderSpec: new charts.SmallTickRendererSpec(
-            // Tick and Label styling here.
+              // Tick and Label styling here.
               labelStyle: new charts.TextStyleSpec(
                   fontSize: 12, // size in Pts.
                   color: charts.MaterialPalette.white),
@@ -602,10 +519,10 @@ class _DashboardbState extends State<Dashboardb> {
       /// Assign a custom style for the measure axis.
       primaryMeasureAxis: new charts.NumericAxisSpec(
           tickProviderSpec:
-          new charts.BasicNumericTickProviderSpec(desiredTickCount: 4),
+              new charts.BasicNumericTickProviderSpec(desiredTickCount: 4),
           renderSpec: new charts.GridlineRendererSpec(
 
-            // Tick and Label styling here.
+              // Tick and Label styling here.
               labelStyle: new charts.TextStyleSpec(
                   fontSize: 18, // size in Pts.
                   color: charts.MaterialPalette.white),
@@ -624,7 +541,45 @@ class _DashboardbState extends State<Dashboardb> {
       height: 200,
       child: AbsorbPointer(absorbing: true, child: overviewChart),
     );
+    return dayViewChartWidget;
+  }
+}
 
+class Dashboardb extends StatefulWidget {
+  @override
+  _DashboardbState createState() => _DashboardbState();
+}
+
+class _DashboardbState extends State<Dashboardb> {
+  @override
+  void groups() async {
+    int arrayindex = 0;
+    var firebaseUser = await FirebaseAuth.instance.currentUser();
+    var value = await firestoreInstance
+        .collection("groups")
+        .where("members", arrayContains: firebaseUser.uid)
+        .getDocuments();
+
+    groupNameList.clear();
+    groupIDList.clear();
+    value.documents.forEach((element) {
+      groupNameList.insert(arrayindex, element.data["group name"]);
+      groupIDList.insert(arrayindex, element.documentID);
+      arrayindex++;
+    });
+    if (groupNameList.isEmpty) {
+      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+        return GroupListEmpty();
+      }));
+    } else {
+      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+        return GroupsList();
+      }));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return BlocBuilder<CounterBloc, CounterBlocState>(
       builder: (context, state) {
         _counterBlocSink = BlocProvider.of<CounterBloc>(context);
@@ -789,7 +744,7 @@ class _DashboardbState extends State<Dashboardb> {
                        */
                       Padding(
                         padding: spacer.bottom.xs,
-                        child: dayViewChartWidget,
+                        child: BarChart(),
                       ),
                       Row(
                         children: [
@@ -823,7 +778,7 @@ class _DashboardbState extends State<Dashboardb> {
                       ),
                       Stack(children: [
                         Container(
-                          child: loopChartWidget,
+                          child: DialChart(),
                         ),
                         Center(
                           child: Padding(
