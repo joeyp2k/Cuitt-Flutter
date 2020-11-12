@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class DialData {
   final String type;
-  final int seconds;
+  final double seconds;
   final charts.Color color;
 
   DialData(this.type, this.seconds, Color color)
@@ -12,9 +12,9 @@ class DialData {
             r: color.red, g: color.green, b: color.blue, a: color.alpha);
 }
 
-var fill = 1;
-var over = 0;
-var unfilled = 2;
+double fill = 0;
+double over = 0;
+double unfilled = 1;
 
 var data = [
   new DialData('Over', over, Red),

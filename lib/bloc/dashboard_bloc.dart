@@ -20,8 +20,8 @@ var timeBetween;
 var timeBetweenAverage;
 var drawCountAverage;
 double drawLengthTotal = 0;
-var drawLengthTotalYest;
-var drawLengthTotalAverageYest;
+double drawLengthTotalYest;
+double drawLengthTotalAverageYest;
 double drawLengthTotalAverage;
 double drawLengthAverage = 0;
 var drawLengthAverageYest;
@@ -94,14 +94,14 @@ class CounterBloc extends Bloc<CounterBlocEvent, CounterBlocState> {
   // TODO: implement initialState
   CounterBloc()
       : super(DataState(
-    newDrawCountValue: 0,
-    newSeshCountValue: 0,
-    newDrawLengthValue: 0,
-    newDrawLengthTotalValue: 0,
-    newAverageDrawLengthValue: 0,
-    newAverageDrawLengthTotalValue: 0,
-    newAverageWaitPeriodValue: 0,
-  ));
+          newDrawCountValue: 0,
+          newSeshCountValue: 0,
+          newDrawLengthValue: 0,
+          newDrawLengthTotalValue: 0,
+          newAverageDrawLengthValue: 0,
+          newAverageDrawLengthTotalValue: 0,
+          newAverageWaitPeriodValue: 0,
+        ));
 
   @override
   Stream<CounterBlocState> mapEventToState(CounterBlocEvent event) async* {
@@ -132,9 +132,9 @@ class CounterBloc extends Bloc<CounterBlocEvent, CounterBlocState> {
       int newDrawCountValue = drawCount;
       int newSeshCountValue = seshCount;
       double newDrawLengthValue = drawLength;
-      int newDrawLengthTotalValue = drawLengthTotal.truncate();
-      int newAverageDrawLengthValue = drawLengthAverage.truncate();
-      int newDrawLengthTotalAverageValue = drawLengthTotalAverage.truncate();
+      int newDrawLengthTotalValue = drawLengthTotal.round();
+      int newAverageDrawLengthValue = drawLengthAverage.round();
+      int newDrawLengthTotalAverageValue = drawLengthTotalAverage.round();
       int newAverageWaitPeriodValue;
 
       //Adding new state to the Stream, yield is used to add state to the stream

@@ -36,13 +36,12 @@ DateTime viewportVal =
     DateTime(viewport.year, viewport.month, viewport.day, viewport.hour)
         .toLocal();
 
-//var fill = 1;
-//var over = 1;
-//var unfilled = 1;
 var time = [];
 var sec = [];
 var i = 0;
+
 int firstRun = 1;
+int daynum = 1;
 
 class UsageData {
   final DateTime time;
@@ -66,6 +65,7 @@ var overviewData = [
   UsageData(viewportVal.add(Duration(hours: 10)), 0),
   UsageData(viewportVal.add(Duration(hours: 11)), 0),
 ];
+
 int n = 1;
 
 var data = [
@@ -190,100 +190,10 @@ class _MyHomePageState extends State<MyHomePage> {
           hitLengthArray.add(drawLength);
           timestampArray.add(currentTime);
 
-          /*
-          //update dial and chart with new data
-          if (firstRun == 1) {
-            firstRun = 0;
-            fill = 0;
-            over = 0;
-            unfilled = 1;
-          }
-          if (dayNum == 1) {
-            if (fill > 0) {
-              unfilled = 0;
-              over = 0;
-            }
-          }
-          if (drawLengthTotal.truncate() >=
-              drawLengthTotalAverageYest) {
-            //stop increasing fill
-          } else {
-            //increase fill
-            fill = drawLengthTotal.truncate();
-          }
-            //if yesterday's average is larger than today's total, over = 0.  Otherwise, start increasing over
-            if(drawLengthTotal.truncate() -
-                drawLengthTotalAverageYest
-                    .truncate() <= 0){
-              over = 0;
-            }else{
-              over = drawLengthTotal.truncate() -
-                  drawLengthTotalAverageYest
-                      .truncate();
-            }
-          }
-          //if yesterday's average is larger than today's total, unfilled = 0.  Otherwise, start decreasing over.
-          if (drawLengthTotalAverageYest.truncate() <=
-              drawLengthTotal.truncate()) {
-            unfilled = 0;
-          }
-          else{
-            unfilled = drawLengthTotalAverageYest.truncate() -
-                drawLengthTotal
-                    .truncate();
-          }
-
-          data = [
-            DialData('Over', over, Red),
-            DialData('Fill', fill, Green),
-            DialData('Unfilled', unfilled, TransWhite),
-          ];
-
-          viewportVal = DateTime(timeData.year, timeData.month,
-              timeData.day, timeData.hour).toLocal();
-
-          if (timeData == null) {
-            timeData = DateTime.now();
-          }
-          timeData = DateTime(timeData.year, timeData.month, timeData.day,
-              timeData.hour)
-              .toLocal();
-          print('Time Data: ' + timeData.toString());
-          if (time.isEmpty) {
-            time.add(DateTime(timeData.year, timeData.month, timeData.day,
-                timeData.hour)
-                .toLocal());
-          }
-          if (sec.isEmpty) {
-            sec.add(0);
-          }
-          if (timeData == time[i]) {
-            sec[i] += drawLength;
-            print('Data Length: ' + overviewData.length.toString());
-            print('Current Time: ' + time[i].toString());
-            print('Sec: ' + sec[i].toString());
-            overviewData[i] = UsageData(time[i], sec[i]);
-          } else {
-            i++;
-            if (overviewData.length <= i) {
-              sec.add(drawLength);
-              time.add(timeData);
-              print('ADD');
-              print('Current Time: ' + time[i].toString());
-              print('Sec: ' + sec[i].toString());
-              overviewData.add(UsageData(time[i], sec[i]));
-            } else {
-              sec.add(drawLength);
-              time.add(timeData);
-              print('REPLACE');
-              print('Current Time: ' + time[i].toString());
-              print('Sec: ' + sec[i].toString());
-              overviewData[i] = UsageData(time[i], sec[i]);
-            }
-          }
-          */
-
           _counterBlocSink.add(UpdateDataEvent());
+
+          //TODO Implement sending data to firestore and loading buffer if connection unsuccessful
+
           _lastval = _readval;
         }
       }
@@ -377,7 +287,87 @@ class _DashboardbState extends State<Dashboardb> {
   void initState() {
     super.initState();
     timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
-      print('SEC');
+      print('Draw Length Total: ' + drawLengthTotal.toString());
+      //if today's total is larger or equal to yesterday's average
+      if (drawLengthTotal >=
+          drawLengthTotalAverageYest) {
+        //stop increasing fill
+      } else {
+        //increase fill
+        fill = drawLengthTotal;
+      }
+      //if it is the first day recorded, start with no fill and full unfilled
+      if (daynum == 1) {
+        if (fill > 0) {
+          over = 0;
+          unfilled = 0;
+        } else {
+          unfilled = 1;
+        }
+      }
+      //if yesterday's average is larger than today's total, over = 0.  Otherwise, start increasing over
+      if (drawLengthTotal -
+          drawLengthTotalAverageYest <= 0) {
+        over = 0;
+      } else {
+        over = drawLengthTotal -
+            drawLengthTotalAverageYest;
+      }
+      //if yesterday's average is larger than today's total, unfilled = 0.  Otherwise, start decreasing over.
+      if (drawLengthTotalAverageYest <= drawLengthTotal) {
+        unfilled = 0;
+      }
+      else {
+        unfilled = drawLengthTotalAverageYest.truncate() -
+            drawLengthTotal;
+      }
+      /*
+      //TODO implement updated overview chart viewport and data
+      viewportVal = DateTime(timeData.year, timeData.month,
+          timeData.day, timeData.hour).toLocal();
+
+      if (timeData == null) {
+        timeData = DateTime.now();
+      }
+      timeData = DateTime(timeData.year, timeData.month, timeData.day,
+          timeData.hour)
+          .toLocal();
+      print('Time Data: ' + timeData.toString());
+      if (time.isEmpty) {
+        time.add(DateTime(timeData.year, timeData.month, timeData.day,
+            timeData.hour)
+            .toLocal());
+      }
+      if (sec.isEmpty) {
+        sec.add(0);
+      }
+      if (timeData == time[i]) {
+        sec[i] += drawLength;
+        print('Data Length: ' + overviewData.length.toString());
+        print('Current Time: ' + time[i].toString());
+        print('Sec: ' + sec[i].toString());
+        overviewData[i] = UsageData(time[i], sec[i]);
+      } else {
+        i++;
+        if (overviewData.length <= i) {
+          sec.add(drawLength);
+          time.add(timeData);
+          print('ADD');
+          print('Current Time: ' + time[i].toString());
+          print('Sec: ' + sec[i].toString());
+          overviewData.add(UsageData(time[i], sec[i]));
+        } else {
+          sec.add(drawLength);
+          time.add(timeData);
+          print('REPLACE');
+          print('Current Time: ' + time[i].toString());
+          print('Sec: ' + sec[i].toString());
+          overviewData[i] = UsageData(time[i], sec[i]);
+        }
+      }
+      */
+      print('Fill: ' + fill.toString());
+
       setState(() {
         data = [
           DialData('Over', over, Red),
@@ -553,16 +543,6 @@ class _DashboardbState extends State<Dashboardb> {
       builder: (context, state) {
         _counterBlocSink = BlocProvider.of<CounterBloc>(context);
         return Scaffold(
-          floatingActionButton: FloatingActionButton(
-            onPressed: () {
-              fill++;
-              data = [
-                DialData('Over', over, Red),
-                DialData('Fill', fill, Green),
-                DialData('Unfilled', unfilled, TransWhite),
-              ];
-            },
-          ),
           backgroundColor: Background,
           body: SingleChildScrollView(
             child: SafeArea(
@@ -772,7 +752,7 @@ class _DashboardbState extends State<Dashboardb> {
                                     text: "Current: " +
                                         (state as DataState)
                                             .newDrawLengthTotalValue
-                                            .toString(),
+                                            .toString() + 's',
                                   ),
                                 ),
                               ],

@@ -5541,9 +5541,8 @@ class DeviceScreen extends StatelessWidget {
                     }
                     */
                     drawCountIndex++;
-                    fill = drawLengthTotal.truncate();
-                    over = drawLengthTotal.truncate() -
-                        drawLengthTotalAverage.truncate();
+                    fill = drawLengthTotal;
+                    over = drawLengthTotal - drawLengthTotalAverage;
                     if (over < 0) {
                       over = 0;
                     }
