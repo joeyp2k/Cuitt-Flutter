@@ -13,7 +13,7 @@ var hitTimeThen;
 var timeUntilNext;
 var decay = 0.95;
 var dayNum = 1;
-var drawLength;
+double drawLength = 0;
 var currentTime;
 var waitPeriod;
 var timeBetween;

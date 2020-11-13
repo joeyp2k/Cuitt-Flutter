@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:convert/convert.dart';
 import 'package:cuitt/bloc/dashboard_bloc.dart';
@@ -19,6 +18,8 @@ import 'package:cuitt/presentation/widgets/dashboard_button.dart';
 import 'package:cuitt/presentation/widgets/dashboard_tile_large.dart';
 import 'package:cuitt/presentation/widgets/dashboard_tile_square.dart';
 import 'package:cuitt/presentation/widgets/list_button.dart';
+import 'package:cuitt/presentation/widgets/usage_dial.dart';
+import 'package:cuitt/presentation/widgets/usage_graph.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -29,326 +30,7 @@ final FirebaseAuth _auth = FirebaseAuth.instance;
 final firestoreInstance = Firestore.instance;
 var firebaseUser;
 
-final DateTime start = DateTime.now();
-DateTime viewport = DateTime.now();
-DateTime timeData;
-DateTime viewportVal =
-    DateTime(viewport.year, viewport.month, viewport.day, viewport.hour)
-        .toLocal();
-
-var time = [];
-var sec = [];
-var i = 0;
-
-int firstRun = 1;
-int daynum = 1;
-
-class UsageData {
-  final DateTime time;
-  final double seconds;
-
-  UsageData(this.time, this.seconds);
-}
-
-var overviewData = [
-  //try with n incrementing by 1 instead of 2+.  Multiple values per bar is why bars aren't loading
-  UsageData(viewportVal, 0),
-  UsageData(viewportVal.add(Duration(hours: 1)), 0),
-  UsageData(viewportVal.add(Duration(hours: 2)), 0),
-  UsageData(viewportVal.add(Duration(hours: 3)), 0),
-  UsageData(viewportVal.add(Duration(hours: 4)), 0),
-  UsageData(viewportVal.add(Duration(hours: 5)), 0),
-  UsageData(viewportVal.add(Duration(hours: 6)), 0),
-  UsageData(viewportVal.add(Duration(hours: 7)), 0),
-  UsageData(viewportVal.add(Duration(hours: 8)), 0),
-  UsageData(viewportVal.add(Duration(hours: 9)), 0),
-  UsageData(viewportVal.add(Duration(hours: 10)), 0),
-  UsageData(viewportVal.add(Duration(hours: 11)), 0),
-];
-int n = 1;
-
-var data = [
-  new DialData('Over', over, Red),
-  new DialData('Fill', fill, Green),
-  new DialData('Unfilled', unfilled, TransWhite),
-];
-
 CounterBloc _counterBlocSink;
-
-class DialChart extends StatefulWidget {
-  @override
-  _DialChartState createState() => _DialChartState();
-}
-
-class _DialChartState extends State<DialChart> {
-  Timer timer;
-
-  @override
-  void initState() {
-    super.initState();
-    timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
-      print('Draw Length Total: ' + drawLengthTotal.toString());
-      //if it is the first day recorded, start with no fill and full unfilled
-      if (daynum == 1) {
-        //increase fill
-        fill = drawLengthTotal;
-        if (fill > 0) {
-          over = 0;
-          unfilled = 0;
-        } else {
-          over = 0;
-          unfilled = 1;
-        } //if today's total is larger or equal to yesterday's average
-      } else if (drawLengthTotal >= drawLengthTotalAverageYest) {
-        //stop increasing fill
-        //if today's total is larger than yesterday's average, start increasing over
-        if (drawLengthTotal > drawLengthTotalAverageYest) {
-          over = drawLengthTotal - drawLengthTotalAverageYest;
-        }
-      } else {
-        //increase fill
-        over = 0;
-        fill = drawLengthTotal;
-        //if yesterday's average is larger than today's total, unfilled = 0.  Otherwise, start decreasing over.
-        if (drawLengthTotalAverageYest <= drawLengthTotal) {
-          unfilled = 0;
-        } else {
-          unfilled = drawLengthTotalAverageYest.round() - drawLengthTotal;
-        }
-      }
-
-      print('Fill: ' + fill.toString());
-      print('Unfilled: ' + unfilled.toString());
-      print('Over: ' + over.toString());
-
-      setState(() {
-        data = [
-          DialData('Over', over, Red),
-          DialData('Fill', fill, Green),
-          DialData('Unfilled', unfilled, TransWhite),
-        ];
-      });
-    });
-  }
-
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    //Stop Timer
-    timer?.cancel();
-    super.dispose();
-    //Close the Stream Sink when the widget is disposed
-    _counterBlocSink?.close();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    var loopSeries = [
-      new charts.Series(
-        id: 'Today',
-        domainFn: (DialData tData, _) => tData.type,
-        measureFn: (DialData tData, _) => tData.seconds,
-        colorFn: (DialData tData, _) => tData.color,
-        data: data,
-      ),
-    ];
-
-    var loopChart = new charts.PieChart(
-      loopSeries,
-      defaultRenderer: new charts.ArcRendererConfig(arcWidth: 25),
-      animate: false,
-      behaviors: [],
-      animationDuration: Duration(milliseconds: 750),
-    );
-
-    var loopChartWidget = SizedBox(
-      height: 300.0,
-      child: loopChart,
-    );
-    return loopChartWidget;
-  }
-}
-
-class BarChart extends StatefulWidget {
-  @override
-  _BarChartState createState() => _BarChartState();
-}
-
-class _BarChartState extends State<BarChart> {
-  Timer timer;
-
-  @override
-  void initState() {
-    super.initState();
-    timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
-      timeData = DateTime.now();
-
-      viewportVal =
-          DateTime(timeData.year, timeData.month, timeData.day, timeData.hour)
-              .toLocal();
-
-      timeData =
-          DateTime(timeData.year, timeData.month, timeData.day, timeData.hour)
-              .toLocal();
-
-      print('Time Data: ' + timeData.toString());
-
-      if (time.isEmpty) {
-        time.add(
-            DateTime(timeData.year, timeData.month, timeData.day, timeData.hour)
-                .toLocal());
-      }
-
-      if (sec.isEmpty) {
-        sec.add(0);
-      }
-
-      if (timeData == time[i]) {
-        sec[i] += drawLength;
-        print('Data Length: ' + overviewData.length.toString());
-        print('Current Time: ' + time[i].toString());
-        print('Sec: ' + sec[i].toString());
-        overviewData[i] = UsageData(time[i], sec[i]);
-      } else {
-        i++;
-        if (overviewData.length <= i) {
-          sec.add(drawLength);
-          time.add(timeData);
-          print('ADD');
-          print('Current Time: ' + time[i].toString());
-          print('Sec: ' + sec[i].toString());
-          overviewData.add(UsageData(time[i], sec[i]));
-        } else {
-          sec.add(drawLength);
-          time.add(timeData);
-          print('REPLACE');
-          print('Current Time: ' + time[i].toString());
-          print('Sec: ' + sec[i].toString());
-          overviewData[i] = UsageData(time[i], sec[i]);
-        }
-      }
-
-      print('Fill: ' + fill.toString());
-      print('Unfilled: ' + unfilled.toString());
-      print('Over: ' + over.toString());
-
-      setState(() {});
-    });
-  }
-
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    //Stop Timer
-    timer?.cancel();
-    super.dispose();
-    //Close the Stream Sink when the widget is disposed
-    _counterBlocSink?.close();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    var overviewSeries = [
-      new charts.Series(
-        id: 'Overview',
-        domainFn: (UsageData uData, _) => uData.time,
-        measureFn: (UsageData uData, _) => uData.seconds,
-        colorFn: (UsageData uData, _) {
-          return charts.ColorUtil.fromDartColor(Colors.greenAccent);
-        },
-        data: overviewData,
-      ),
-    ];
-
-    var overviewChart = new charts.TimeSeriesChart(
-      overviewSeries,
-      animate: true,
-      animationDuration: Duration(milliseconds: 500),
-      behaviors: [
-        // Add the sliding viewport behavior to have the viewport center on the
-        // domain that is currently selected.
-        new charts.SlidingViewport(),
-        // A pan and zoom behavior helps demonstrate the sliding viewport
-        // behavior by allowing the data visible in the viewport to be adjusted
-        // dynamically.
-      ],
-      defaultRenderer: new charts.BarRendererConfig<DateTime>(),
-      domainAxis: new charts.DateTimeAxisSpec(
-          showAxisLine: true,
-          tickFormatterSpec: new charts.AutoDateTimeTickFormatterSpec(
-              day: new charts.TimeFormatterSpec(
-                  format: 'HH', transitionFormat: 'HH')),
-          viewport: new charts.DateTimeExtents(
-              start: viewportVal.subtract(Duration(hours: 23)),
-              end: viewportVal.add(Duration(hours: 1))),
-          renderSpec: new charts.NoneRenderSpec()),
-
-      /// Assign a custom style for the measure axis.
-      primaryMeasureAxis:
-          new charts.NumericAxisSpec(renderSpec: new charts.NoneRenderSpec()),
-    );
-
-    var dayViewChart = new charts.TimeSeriesChart(
-      overviewSeries,
-      animate: true,
-      animationDuration: Duration(milliseconds: 250),
-      behaviors: [
-        // Add the sliding viewport behavior to have the viewport center on the
-        // domain that is currently selected.
-        new charts.SlidingViewport(charts.SelectionModelType.action),
-        // A pan and zoom behavior helps demonstrate the sliding viewport
-        // behavior by allowing the data visible in the viewport to be adjusted
-        // dynamically.
-        new charts.PanAndZoomBehavior(),
-        new charts.SelectNearest(),
-        new charts.DomainHighlighter(),
-      ],
-      defaultRenderer: new charts.BarRendererConfig<DateTime>(),
-      domainAxis: new charts.DateTimeAxisSpec(
-          tickFormatterSpec: new charts.AutoDateTimeTickFormatterSpec(
-              day: new charts.TimeFormatterSpec(
-                  format: 'HH', transitionFormat: 'HH')),
-          viewport: new charts.DateTimeExtents(
-              start: viewportVal.subtract(Duration(hours: 11)),
-              end: viewportVal.add(Duration(hours: 1))),
-          renderSpec: new charts.SmallTickRendererSpec(
-              // Tick and Label styling here.
-              labelStyle: new charts.TextStyleSpec(
-                  fontSize: 12, // size in Pts.
-                  color: charts.MaterialPalette.white),
-
-              // Change the line colors to match text color.
-              lineStyle: new charts.LineStyleSpec(
-                  color: charts.MaterialPalette.white))),
-
-      /// Assign a custom style for the measure axis.
-      primaryMeasureAxis: new charts.NumericAxisSpec(
-          tickProviderSpec:
-              new charts.BasicNumericTickProviderSpec(desiredTickCount: 4),
-          renderSpec: new charts.GridlineRendererSpec(
-
-              // Tick and Label styling here.
-              labelStyle: new charts.TextStyleSpec(
-                  fontSize: 18, // size in Pts.
-                  color: charts.MaterialPalette.white),
-
-              // Change the line colors to match text color.
-              lineStyle: new charts.LineStyleSpec(
-                  color: charts.MaterialPalette.white))),
-    );
-
-    var dayViewChartWidget = Container(
-      height: 200,
-      child: dayViewChart,
-    );
-
-    var overviewChartWidget = Container(
-      height: 200,
-      child: AbsorbPointer(absorbing: true, child: overviewChart),
-    );
-    return dayViewChartWidget;
-  }
-}
 
 class ConnectPage extends StatefulWidget {
   ConnectPage({Key key, this.title}) : super(key: key);
@@ -361,6 +43,9 @@ class ConnectPage extends StatefulWidget {
 class _ConnectPageState extends State<ConnectPage> {
   @override
   Timer timer;
+
+  var _readval;
+  var _lastval;
 
   @override
   void initState() {
@@ -387,8 +72,6 @@ class _ConnectPageState extends State<ConnectPage> {
   BluetoothCharacteristic _ledChar;
   var _myService = "00001523-1212-efde-1523-785feabcd123";
   var _myChar = "00001524-1212-efde-1523-785feabcd123";
-  var _readval;
-  var _lastval;
 
   bool _getLEDChar(List<BluetoothService> services) {
     for (BluetoothService s in services) {
@@ -463,6 +146,7 @@ class _ConnectPageState extends State<ConnectPage> {
           timestampArray.add(currentTime);
 
           _counterBlocSink.add(UpdateDataEvent());
+
           _lastval = _readval;
         }
       }

@@ -3,14 +3,16 @@ import 'package:flutter/material.dart';
 
 class UsageData {
   final DateTime time;
-  final int seconds;
+  final double seconds;
 
   UsageData(this.time, this.seconds);
 }
 
 var time = [];
-var sec = [];
+List<double> sec = [];
 var i = 0;
+int firstRun = 1;
+int n = 1;
 
 DateTime viewport = DateTime.now();
 DateTime timeData;

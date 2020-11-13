@@ -4,6 +4,7 @@ import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:cuitt/bloc/dashboard_bloc.dart';
 import 'package:cuitt/data/datasources/dash_tiles.dart';
 import 'package:cuitt/data/datasources/dial_data.dart';
+import 'package:cuitt/data/datasources/user_chart_data.dart';
 import 'package:cuitt/presentation/design_system/colors.dart';
 import 'package:cuitt/presentation/design_system/dimensions.dart';
 import 'package:cuitt/presentation/design_system/texts.dart';
@@ -114,13 +115,6 @@ class _ScratchState extends State<Scratch> {
 
 double padValue = 0;
 bool selected = false;
-
-class UsageData {
-  final DateTime time;
-  final int seconds;
-
-  UsageData(this.time, this.seconds);
-}
 
 class ScratchBoard extends StatefulWidget {
   @override

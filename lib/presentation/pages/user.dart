@@ -39,7 +39,7 @@ class _UserDashboardState extends State<UserDashboard> {
                   ),
                   Padding(
                     padding: spacer.bottom.xs,
-                    child: dayViewChartWidget,
+                    child: BarChart(),
                   ),
                   Row(
                     children: [
@@ -68,7 +68,7 @@ class _UserDashboardState extends State<UserDashboard> {
                     ),
                   ),
                   Stack(children: [
-                    loopChartWidget,
+                    DialChart(),
                     Center(
                       child: Padding(
                         padding: spacer.top.xxl * 1.5,

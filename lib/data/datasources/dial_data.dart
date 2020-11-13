@@ -2,6 +2,8 @@ import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:cuitt/presentation/design_system/colors.dart';
 import 'package:flutter/material.dart';
 
+int daynum = 1;
+
 class DialData {
   final String type;
   final double seconds;
@@ -20,14 +22,4 @@ var data = [
   new DialData('Over', over, Red),
   new DialData('Fill', fill, Green),
   new DialData('Unfilled', unfilled, TransWhite),
-];
-
-var loopSeries = [
-  new charts.Series(
-    id: 'Today',
-    domainFn: (DialData tData, _) => tData.type,
-    measureFn: (DialData tData, _) => tData.seconds,
-    colorFn: (DialData tData, _) => tData.color,
-    data: data,
-  ),
 ];

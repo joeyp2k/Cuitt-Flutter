@@ -37,7 +37,7 @@ class _PartnerDashboardState extends State<PartnerDashboard> {
                     ),
                     Padding(
                       padding: spacer.bottom.xs,
-                      child: dayViewChartWidget,
+                      child: BarChart(),
                     ),
                     Row(
                       children: [
@@ -66,7 +66,7 @@ class _PartnerDashboardState extends State<PartnerDashboard> {
                       ),
                     ),
                     Stack(children: [
-                      loopChartWidget,
+                      DialChart(),
                       Center(
                         child: Padding(
                           padding: spacer.top.xxl * 1.5,
