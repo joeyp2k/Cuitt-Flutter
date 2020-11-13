@@ -31,8 +31,8 @@ class _CreateCasualPageState extends State<CreateCasualPage> {
   final _formKey = GlobalKey<FormState>();
 
   void _createCasualGroup() async {
-    firebaseUser = (await FirebaseAuth.instance.currentUser());
-    firestoreInstance.collection("groups").document(randID).setData({
+    firebaseUser = (await FirebaseAuth.instance.currentUser);
+    firestoreInstance.collection("groups").doc(randID).set({
       "administrative group": false,
       "group name": _groupNameController.text,
       "group password": _groupPasswordController.text,
@@ -43,17 +43,17 @@ class _CreateCasualPageState extends State<CreateCasualPage> {
 
   void groups() async {
     int arrayindex = 0;
-    var firebaseUser = await FirebaseAuth.instance.currentUser();
+    var firebaseUser = await FirebaseAuth.instance.currentUser;
     var value = await firestoreInstance
         .collection("groups")
         .where("members", arrayContains: firebaseUser.uid)
-        .getDocuments();
+        .get();
 
     groupNameList.clear();
     groupIDList.clear();
-    value.documents.forEach((element) {
-      groupNameList.insert(arrayindex, element.data["group name"]);
-      groupIDList.insert(arrayindex, element.documentID);
+    value.docs.forEach((element) {
+      groupNameList.insert(arrayindex, element.get("group name"));
+      groupIDList.insert(arrayindex, element.id);
       arrayindex++;
     });
     if (groupNameList.isEmpty) {

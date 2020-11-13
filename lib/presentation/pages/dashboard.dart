@@ -26,7 +26,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
-final firestoreInstance = Firestore.instance;
+final firestoreInstance = FirebaseFirestore.instance;
 var firebaseUser;
 int refresh = 0;
 
@@ -216,17 +216,17 @@ class _DashboardbState extends State<Dashboardb> {
   @override
   void groups() async {
     int arrayindex = 0;
-    var firebaseUser = await FirebaseAuth.instance.currentUser();
+    var firebaseUser = await FirebaseAuth.instance.currentUser;
     var value = await firestoreInstance
         .collection("groups")
         .where("members", arrayContains: firebaseUser.uid)
-        .getDocuments();
+        .get();
 
     groupNameList.clear();
     groupIDList.clear();
-    value.documents.forEach((element) {
-      groupNameList.insert(arrayindex, element.data["group name"]);
-      groupIDList.insert(arrayindex, element.documentID);
+    value.docs.forEach((element) {
+      groupNameList.insert(arrayindex, element.get("group name"));
+      groupIDList.insert(arrayindex, element.id);
       arrayindex++;
     });
     if (groupNameList.isEmpty) {

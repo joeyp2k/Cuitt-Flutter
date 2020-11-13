@@ -21,7 +21,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
 
   final snackBar = SnackBar(content: Text('Passwords do not match'));
 
-  final firestoreInstance = Firestore.instance;
+  final firestoreInstance = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   var firebaseUser;
 
@@ -48,19 +48,19 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     //final appState = Provider.of<AppState>(context, listen: false);
     void _signInWithEmailAndPassword() async {
-      final FirebaseUser user = (await _auth.signInWithEmailAndPassword(
+      final User user = (await _auth.signInWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
       ))
           .user;
-      if (user != null) {
+      if (user == null) {
+        _success = false;
+      } else {
         _success = true;
         _userEmail = user.email;
         Navigator.of(context).push(MaterialPageRoute(builder: (context) {
           return ConnectPage();
         }));
-      } else {
-        _success = false;
       }
     }
 

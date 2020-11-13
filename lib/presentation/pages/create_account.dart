@@ -20,9 +20,15 @@ class _CreateAccountState extends State<CreateAccount>
     with SingleTickerProviderStateMixin {
   AnimationController _controller;
 
+  @override
+  void initState() {
+    _controller = AnimationController(vsync: this);
+    super.initState();
+  }
+
   final snackBar = SnackBar(content: Text('Passwords do not match'));
 
-  final firestoreInstance = Firestore.instance;
+  final firestoreInstance = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   var firebaseUser;
 
@@ -39,12 +45,6 @@ class _CreateAccountState extends State<CreateAccount>
   final TextEditingController _lastNameController = TextEditingController();
 
   @override
-  void initState() {
-    _controller = AnimationController(vsync: this);
-    super.initState();
-  }
-
-  @override
   void dispose() {
     _controller.dispose();
     super.dispose();
@@ -55,17 +55,16 @@ class _CreateAccountState extends State<CreateAccount>
     //final appState = Provider.of<AppState>(context, listen: false);
     void _register() async {
       var groupList = [];
-      final FirebaseUser user = (await _auth.createUserWithEmailAndPassword(
+      final User user = (await _auth.createUserWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
       ))
           .user;
-      if (user != null) {
-        firebaseUser = (await FirebaseAuth.instance.currentUser());
-        firestoreInstance
-            .collection("users")
-            .document(firebaseUser.uid)
-            .setData({
+      if (user == null) {
+        _success = false;
+      } else {
+        firebaseUser = (await FirebaseAuth.instance.currentUser);
+        firestoreInstance.collection("users").doc(firebaseUser.uid).set({
           "username": _usernameController.text,
           "email": _emailController.text,
           "first name": _firstNameController.text,
@@ -77,8 +76,6 @@ class _CreateAccountState extends State<CreateAccount>
         Navigator.of(context).push(MaterialPageRoute(builder: (context) {
           return ConnectPage();
         }));
-      } else {
-        _success = false;
       }
     }
 

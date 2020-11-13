@@ -2,12 +2,16 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:cuitt/presentation/pages/introduction.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:cuitt/presentation/pages/introduction.dart';
-import 'package:cuitt/presentation/pages/scratch.dart';
 
-void main() => runApp(ScratchBoard());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(Cuitt());
+}
 
 class Cuitt extends StatefulWidget {
   @override

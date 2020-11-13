@@ -22,18 +22,18 @@ class _GroupsListState extends State<GroupsList> {
     var usernameindex = 0;
     var value = await firestoreInstance
         .collection("groups")
-        .document(selection) //selection = group name and should be group ID
+        .doc(selection) //selection = group name and should be group ID
         .get()
-        .then((value) => userIDList = value.data["members"]);
+        .then((value) => userIDList = value.get("members"));
     usernameindex = userIDList.length;
     userNameList.clear();
     for (int i = 0; i < usernameindex; i++) {
       value = await firestoreInstance
           .collection("users")
-          .document(userIDList[i])
+          .doc(userIDList[i])
           .get()
           .then((value) {
-        userNameList.insert(i, value.data["username"]);
+        userNameList.insert(i, value.get("username"));
       });
     }
     if (userNameList.isEmpty) {

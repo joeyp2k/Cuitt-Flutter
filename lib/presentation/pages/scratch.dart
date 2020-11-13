@@ -1,23 +1,5 @@
-import 'dart:async';
 
-import 'package:charts_flutter/flutter.dart' as charts;
-import 'package:cuitt/bloc/dashboard_bloc.dart';
-import 'package:cuitt/data/datasources/dash_tiles.dart';
-import 'package:cuitt/data/datasources/dial_data.dart';
-import 'package:cuitt/data/datasources/user_chart_data.dart';
-import 'package:cuitt/presentation/design_system/colors.dart';
-import 'package:cuitt/presentation/design_system/dimensions.dart';
-import 'package:cuitt/presentation/design_system/texts.dart';
-import 'package:cuitt/presentation/widgets/button.dart';
-import 'package:cuitt/presentation/widgets/dashboard_button.dart';
-import 'package:cuitt/presentation/widgets/dashboard_tile_large.dart';
-import 'package:cuitt/presentation/widgets/dashboard_tile_square.dart';
-import 'package:cuitt/presentation/widgets/dmwy_bar.dart';
-import 'package:cuitt/presentation/widgets/list_button.dart';
-import 'package:cuitt/presentation/widgets/text_entry_box.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_circular_chart/flutter_circular_chart.dart';
+/*
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 
 class ScratchBoard extends StatefulWidget {
@@ -259,3 +241,4 @@ class MyHomePage extends StatelessWidget {
     }
   }
 }
+*/

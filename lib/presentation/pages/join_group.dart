@@ -9,7 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
-final firestoreInstance = Firestore.instance;
+final firestoreInstance = FirebaseFirestore.instance;
 var firebaseUser;
 
 class JoinGroupPage extends StatefulWidget {
@@ -24,11 +24,8 @@ class _JoinGroupPageState extends State<JoinGroupPage> {
   final _formKey = GlobalKey<FormState>();
 
   void _joinGroup() async {
-    firebaseUser = (await FirebaseAuth.instance.currentUser());
-    firestoreInstance
-        .collection("groups")
-        .document(_groupIDController.text)
-        .updateData({
+    firebaseUser = (await FirebaseAuth.instance.currentUser);
+    firestoreInstance.collection("groups").doc(_groupIDController.text).update({
       "members": FieldValue.arrayUnion([firebaseUser.uid]),
     });
   }
