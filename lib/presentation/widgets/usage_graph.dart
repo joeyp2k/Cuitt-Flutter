@@ -1,8 +1,10 @@
-import 'package:charts_flutter/flutter.dart' as charts;
-import 'package:cuitt/data/datasources/my_chart_data.dart';
-import 'package:flutter/material.dart';
-import 'package:cuitt/bloc/dashboard_bloc.dart';
 import 'dart:async';
+
+import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:cuitt/bloc/dashboard_bloc.dart';
+import 'package:cuitt/data/datasources/my_chart_data.dart';
+import 'package:cuitt/presentation/pages/dashboard.dart';
+import 'package:flutter/material.dart';
 
 class BarChart extends StatefulWidget {
   @override
@@ -16,53 +18,57 @@ class _BarChartState extends State<BarChart> {
   void initState() {
     super.initState();
     timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
-      timeData = DateTime.now();
+      if (refresh == 1) {
+        timeData = DateTime.now();
 
-      viewportVal =
-          DateTime(timeData.year, timeData.month, timeData.day, timeData.hour)
-              .toLocal();
-
-      timeData =
-          DateTime(timeData.year, timeData.month, timeData.day, timeData.hour)
-              .toLocal();
-
-      print('Time Data: ' + timeData.toString());
-
-      if (time.isEmpty) {
-        time.add(
+        viewportVal =
             DateTime(timeData.year, timeData.month, timeData.day, timeData.hour)
-                .toLocal());
-      }
+                .toLocal();
 
-      if (sec.isEmpty) {
-        sec.add(0);
-      }
+        timeData =
+            DateTime(timeData.year, timeData.month, timeData.day, timeData.hour)
+                .toLocal();
 
-      if (timeData == time[i]) {
-        sec[i] += drawLength;
-        print('Data Length: ' + overviewData.length.toString());
-        print('Current Time: ' + time[i].toString());
-        print('Sec: ' + sec[i].toString());
-        overviewData[i] = UsageData(time[i], sec[i]);
-      } else {
-        i++;
-        if (overviewData.length <= i) {
-          sec.add(drawLength);
-          time.add(timeData);
-          print('ADD');
-          print('Current Time: ' + time[i].toString());
-          print('Sec: ' + sec[i].toString());
-          overviewData.add(UsageData(time[i], sec[i]));
-        } else {
-          sec.add(drawLength);
-          time.add(timeData);
-          print('REPLACE');
+        print('Time Data: ' + timeData.toString());
+
+        if (time.isEmpty) {
+          time.add(DateTime(
+                  timeData.year, timeData.month, timeData.day, timeData.hour)
+              .toLocal());
+        }
+
+        if (sec.isEmpty) {
+          sec.add(0);
+        }
+
+        if (timeData == time[i]) {
+          sec[i] += drawLength;
+          print('Data Length: ' + overviewData.length.toString());
           print('Current Time: ' + time[i].toString());
           print('Sec: ' + sec[i].toString());
           overviewData[i] = UsageData(time[i], sec[i]);
+        } else {
+          i++;
+          if (overviewData.length <= i) {
+            sec.add(drawLength);
+            time.add(timeData);
+            print('ADD');
+            print('Current Time: ' + time[i].toString());
+            print('Sec: ' + sec[i].toString());
+            overviewData.add(UsageData(time[i], sec[i]));
+          } else {
+            sec.add(drawLength);
+            time.add(timeData);
+            print('REPLACE');
+            print('Current Time: ' + time[i].toString());
+            print('Sec: ' + sec[i].toString());
+            overviewData[i] = UsageData(time[i], sec[i]);
+          }
         }
+        setState(() {
+          refresh = 0;
+        });
       }
-      setState(() {});
     });
   }
 
@@ -113,7 +119,7 @@ class _BarChartState extends State<BarChart> {
 
       /// Assign a custom style for the measure axis.
       primaryMeasureAxis:
-          new charts.NumericAxisSpec(renderSpec: new charts.NoneRenderSpec()),
+      new charts.NumericAxisSpec(renderSpec: new charts.NoneRenderSpec()),
     );
 
     var dayViewChart = new charts.TimeSeriesChart(
@@ -140,7 +146,7 @@ class _BarChartState extends State<BarChart> {
               start: viewportVal.subtract(Duration(hours: 11)),
               end: viewportVal.add(Duration(hours: 1))),
           renderSpec: new charts.SmallTickRendererSpec(
-              // Tick and Label styling here.
+            // Tick and Label styling here.
               labelStyle: new charts.TextStyleSpec(
                   fontSize: 12, // size in Pts.
                   color: charts.MaterialPalette.white),
@@ -152,10 +158,10 @@ class _BarChartState extends State<BarChart> {
       /// Assign a custom style for the measure axis.
       primaryMeasureAxis: new charts.NumericAxisSpec(
           tickProviderSpec:
-              new charts.BasicNumericTickProviderSpec(desiredTickCount: 4),
+          new charts.BasicNumericTickProviderSpec(desiredTickCount: 4),
           renderSpec: new charts.GridlineRendererSpec(
 
-              // Tick and Label styling here.
+            // Tick and Label styling here.
               labelStyle: new charts.TextStyleSpec(
                   fontSize: 18, // size in Pts.
                   color: charts.MaterialPalette.white),

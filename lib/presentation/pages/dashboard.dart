@@ -5,7 +5,6 @@ import 'package:convert/convert.dart';
 import 'package:cuitt/bloc/dashboard_bloc.dart';
 import 'package:cuitt/data/datasources/buttons.dart';
 import 'package:cuitt/data/datasources/dash_tiles.dart';
-import 'package:cuitt/data/datasources/dial_data.dart';
 import 'package:cuitt/data/datasources/user.dart';
 import 'package:cuitt/presentation/design_system/colors.dart';
 import 'package:cuitt/presentation/design_system/dimensions.dart';
@@ -29,6 +28,7 @@ import 'package:flutter_blue/flutter_blue.dart';
 final FirebaseAuth _auth = FirebaseAuth.instance;
 final firestoreInstance = Firestore.instance;
 var firebaseUser;
+int refresh = 0;
 
 CounterBloc _counterBlocSink;
 
@@ -148,6 +148,7 @@ class _ConnectPageState extends State<ConnectPage> {
           _counterBlocSink.add(UpdateDataEvent());
 
           _lastval = _readval;
+          refresh = 1;
         }
       }
     });
@@ -247,16 +248,6 @@ class _DashboardbState extends State<Dashboardb> {
         builder: (context, state) {
           _counterBlocSink = BlocProvider.of<CounterBloc>(context);
           return Scaffold(
-            floatingActionButton: FloatingActionButton(
-              onPressed: () {
-                fill++;
-                data = [
-                  DialData('Over', over, Red),
-                  DialData('Fill', fill, Green),
-                  DialData('Unfilled', unfilled, TransWhite),
-              ];
-            },
-          ),
           backgroundColor: Background,
           body: SingleChildScrollView(
             child: SafeArea(
