@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:convert/convert.dart';
 import 'package:cuitt/bloc/dashboard_bloc.dart';
@@ -17,13 +16,13 @@ import 'package:cuitt/presentation/widgets/dashboard_button.dart';
 import 'package:cuitt/presentation/widgets/dashboard_tile_large.dart';
 import 'package:cuitt/presentation/widgets/dashboard_tile_square.dart';
 import 'package:cuitt/presentation/widgets/list_button.dart';
-import 'package:cuitt/presentation/widgets/usage_dial.dart';
 import 'package:cuitt/presentation/widgets/usage_graph.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+import 'package:cuitt/presentation/pages/scratch.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 final firestoreInstance = FirebaseFirestore.instance;
@@ -51,7 +50,7 @@ class _ConnectPageState extends State<ConnectPage> {
   void initState() {
     super.initState();
     timer = Timer.periodic(Duration(hours: 24), (Timer t) {
-      //send all current stats before daily reset
+      //TODO send all current stats before daily reset
       drawLengthTotalAverageYest = drawLengthTotalAverage;
       drawLengthTotal = 0;
       dayNum++;
@@ -103,6 +102,47 @@ class _ConnectPageState extends State<ConnectPage> {
     }
   }
 
+  void _copyData() {
+    currentTime =
+        int.parse(hex.encode(_readval.sublist(0, 4)).toString(), radix: 16);
+    drawLength =
+        int.parse(hex.encode(_readval.sublist(4, 6)).toString(), radix: 16) /
+            1000;
+    drawCount =
+        int.parse(hex.encode(_readval.sublist(6, 8)).toString(), radix: 16);
+    seshCount =
+        int.parse(hex.encode(_readval.sublist(8, 10)).toString(), radix: 16);
+  }
+
+  void _calculateA() {
+    drawLengthTotal += drawLength;
+    drawLengthAverage = drawLengthTotal / drawCount;
+    drawLengthTotalAverage =
+        drawLengthTotal / dayNum; //CHANGE TO CALCULATION ARRAY FOR DLT BY DAY
+    drawCountAverage =
+        drawCount / dayNum; //CHANGE TO CALCULATION ARRAY FOR DCT BY DAY
+    seshCountAverage =
+        seshCount / dayNum; //CHANGE TO CALCULATION ARRAY FOR DCT BY DAY
+    suggestion = drawLengthTotalAverage / drawCountAverage * decay;
+  }
+
+  void _checkTime() {
+    if (hitTimeNow == null) {
+      hitTimeNow = currentTime;
+    } else {
+      hitTimeThen = hitTimeNow;
+      hitTimeNow = currentTime;
+    }
+  }
+
+  void _calculateB() {
+    waitPeriod = 16 / seshCountAverage * 60 * 60;
+    timeBetween = hitTimeNow - hitTimeThen;
+    timeUntilNext = waitPeriod - timeBetween;
+    hitLengthArray.add(drawLength);
+    timestampArray.add(currentTime);
+  }
+
   void _listener() {
     _ledChar.setNotifyValue(true);
     _ledChar.value.listen((event) async {
@@ -110,43 +150,13 @@ class _ConnectPageState extends State<ConnectPage> {
         print('READ VALUE IS NULL');
       } else {
         _readval = await _ledChar.read();
-        if (_readval.toString() == _lastval.toString()) {} else {
-          print('READ VALUE A = ' + _readval.toString());
-          currentTime = int.parse(hex.encode(_readval.sublist(0, 4)).toString(),
-              radix: 16);
-          drawLength = int.parse(hex.encode(_readval.sublist(4, 6)).toString(),
-              radix: 16) /
-              1000;
-          drawCount = int.parse(hex.encode(_readval.sublist(6, 8)).toString(),
-              radix: 16);
-          seshCount = int.parse(hex.encode(_readval.sublist(8, 10)).toString(),
-              radix: 16);
-
-          drawLengthTotal += drawLength;
-          drawLengthAverage = drawLengthTotal / drawCount;
-          drawLengthTotalAverage = drawLengthTotal /
-              dayNum; //CHANGE TO CALCULATION ARRAY FOR DLT BY DAY
-          drawCountAverage =
-              drawCount / dayNum; //CHANGE TO CALCULATION ARRAY FOR DCT BY DAY
-          seshCountAverage =
-              seshCount / dayNum; //CHANGE TO CALCULATION ARRAY FOR DCT BY DAY
-          suggestion = drawLengthTotalAverage / drawCountAverage * decay;
-
-          if (hitTimeNow == null) {
-            hitTimeNow = currentTime;
-          } else {
-            hitTimeThen = hitTimeNow;
-            hitTimeNow = currentTime;
-          }
-
-          waitPeriod = 16 / seshCountAverage * 60 * 60;
-          timeBetween = hitTimeNow - hitTimeThen;
-          timeUntilNext = waitPeriod - timeBetween;
-          hitLengthArray.add(drawLength);
-          timestampArray.add(currentTime);
-
+        if (_readval.toString() == _lastval.toString()) {
+        } else {
+          _copyData();
+          _calculateA();
+          _checkTime();
+          _calculateB();
           _counterBlocSink.add(UpdateDataEvent());
-
           _lastval = _readval;
           refresh = 1;
         }
@@ -214,21 +224,34 @@ class Dashboardb extends StatefulWidget {
 
 class _DashboardbState extends State<Dashboardb> {
   @override
-  void groups() async {
-    int arrayindex = 0;
+  int arrayIndex;
+  var value;
+
+  void _getGroupsWithUser() async {
+    arrayIndex = 0;
+
     var firebaseUser = await FirebaseAuth.instance.currentUser;
-    var value = await firestoreInstance
+    value = await firestoreInstance
         .collection("groups")
         .where("members", arrayContains: firebaseUser.uid)
         .get();
+  }
 
+  void _loadGroupData() {
     groupNameList.clear();
     groupIDList.clear();
+
     value.docs.forEach((element) {
-      groupNameList.insert(arrayindex, element.get("group name"));
-      groupIDList.insert(arrayindex, element.id);
-      arrayindex++;
+      groupNameList.insert(arrayIndex, element.get("group name"));
+      groupIDList.insert(arrayIndex, element.id);
+      arrayIndex++;
     });
+  }
+
+  void groups() async {
+    _getGroupsWithUser();
+    _loadGroupData();
+
     if (groupNameList.isEmpty) {
       Navigator.of(context).push(MaterialPageRoute(builder: (context) {
         return GroupListEmpty();
@@ -431,8 +454,11 @@ class _DashboardbState extends State<Dashboardb> {
                         ),
                       ),
                       Stack(children: [
-                        Container(
-                          child: DialChart(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            AnimatedRadialChartExample(),
+                          ],
                         ),
                         Center(
                           child: Padding(

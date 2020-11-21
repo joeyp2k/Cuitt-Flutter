@@ -14,57 +14,65 @@ class BarChart extends StatefulWidget {
 class _BarChartState extends State<BarChart> {
   Timer timer;
 
+  void _timeUpdate() {
+    timeData = DateTime.now();
+
+    viewportVal =
+        DateTime(timeData.year, timeData.month, timeData.day, timeData.hour)
+            .toLocal();
+
+    timeData =
+        DateTime(timeData.year, timeData.month, timeData.day, timeData.hour)
+            .toLocal();
+  }
+
+  void _ifNoData() {
+    if (time.isEmpty) {
+      time.add(
+          DateTime(timeData.year, timeData.month, timeData.day, timeData.hour)
+              .toLocal());
+    }
+
+    if (sec.isEmpty) {
+      sec.add(0);
+    }
+  }
+
+  void _update() {
+    sec[i] += drawLength;
+    dayData[i] = UsageData(time[i], sec[i]);
+  }
+
+  void _add() {
+    i++;
+    if (dayData.length <= i) {
+      sec.add(drawLength);
+      time.add(timeData);
+      dayData.add(UsageData(time[i], sec[i]));
+    } else {
+      sec.add(drawLength);
+      time.add(timeData);
+      dayData[i] = UsageData(time[i], sec[i]);
+    }
+  }
+
+  void _transmitData() {
+    //TODO: IMPLEMENT TRANSMIT DATA
+  }
+
   @override
   void initState() {
     super.initState();
     timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
       if (refresh == 1) {
-        timeData = DateTime.now();
-
-        viewportVal =
-            DateTime(timeData.year, timeData.month, timeData.day, timeData.hour)
-                .toLocal();
-
-        timeData =
-            DateTime(timeData.year, timeData.month, timeData.day, timeData.hour)
-                .toLocal();
-
-        print('Time Data: ' + timeData.toString());
-
-        if (time.isEmpty) {
-          time.add(DateTime(
-                  timeData.year, timeData.month, timeData.day, timeData.hour)
-              .toLocal());
-        }
-
-        if (sec.isEmpty) {
-          sec.add(0);
-        }
-
+        _timeUpdate();
+        _ifNoData();
         if (timeData == time[i]) {
-          sec[i] += drawLength;
-          print('Data Length: ' + overviewData.length.toString());
-          print('Current Time: ' + time[i].toString());
-          print('Sec: ' + sec[i].toString());
-          overviewData[i] = UsageData(time[i], sec[i]);
+          _update();
         } else {
-          i++;
-          if (overviewData.length <= i) {
-            sec.add(drawLength);
-            time.add(timeData);
-            print('ADD');
-            print('Current Time: ' + time[i].toString());
-            print('Sec: ' + sec[i].toString());
-            overviewData.add(UsageData(time[i], sec[i]));
-          } else {
-            sec.add(drawLength);
-            time.add(timeData);
-            print('REPLACE');
-            print('Current Time: ' + time[i].toString());
-            print('Sec: ' + sec[i].toString());
-            overviewData[i] = UsageData(time[i], sec[i]);
-          }
+          _add();
         }
+        _transmitData();
         setState(() {
           refresh = 0;
         });
@@ -90,7 +98,7 @@ class _BarChartState extends State<BarChart> {
         colorFn: (UsageData uData, _) {
           return charts.ColorUtil.fromDartColor(Colors.greenAccent);
         },
-        data: overviewData,
+        data: dayData,
       ),
     ];
 
@@ -102,6 +110,11 @@ class _BarChartState extends State<BarChart> {
         // Add the sliding viewport behavior to have the viewport center on the
         // domain that is currently selected.
         new charts.SlidingViewport(),
+        new charts.LinePointHighlighter(
+            showHorizontalFollowLine:
+            charts.LinePointHighlighterFollowLineType.none,
+            showVerticalFollowLine:
+            charts.LinePointHighlighterFollowLineType.none),
         // A pan and zoom behavior helps demonstrate the sliding viewport
         // behavior by allowing the data visible in the viewport to be adjusted
         // dynamically.

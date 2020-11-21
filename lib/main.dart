@@ -7,10 +7,14 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'presentation/pages/scratch.dart';
+
+//TODO: organize imports
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(Cuitt());
+  runApp(ScratchBoard());
 }
 
 class Cuitt extends StatefulWidget {

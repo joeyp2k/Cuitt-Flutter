@@ -18,16 +18,25 @@ class GroupsList extends StatefulWidget {
 }
 
 class _GroupsListState extends State<GroupsList> {
-  void groupSelection() async {
-    var usernameindex = 0;
+  var userNameIndex;
+  var value;
+
+  void _getUsers() async {
+    userNameIndex = 0;
+
     var value = await firestoreInstance
         .collection("groups")
         .doc(selection) //selection = group name and should be group ID
         .get()
         .then((value) => userIDList = value.get("members"));
-    usernameindex = userIDList.length;
+
+    userNameIndex = userIDList.length;
+  }
+
+  void _loadUserData() async {
     userNameList.clear();
-    for (int i = 0; i < usernameindex; i++) {
+
+    for (int i = 0; i < userNameIndex; i++) {
       value = await firestoreInstance
           .collection("users")
           .doc(userIDList[i])
@@ -36,6 +45,12 @@ class _GroupsListState extends State<GroupsList> {
         userNameList.insert(i, value.get("username"));
       });
     }
+  }
+
+  void groupSelection() async {
+    _getUsers();
+    _loadUserData();
+
     if (userNameList.isEmpty) {
       Navigator.of(context).push(MaterialPageRoute(builder: (context) {
         return UserListEmpty();

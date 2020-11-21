@@ -20,8 +20,7 @@ DateTime viewportVal =
     DateTime(viewport.year, viewport.month, viewport.day, viewport.hour)
         .toLocal();
 
-var overviewData = [
-  //try with n incrementing by 1 instead of 2+.  Multiple y values per bar is why bars aren't loading
+var dayData = [
   UsageData(viewportVal, 0),
   UsageData(viewportVal.add(Duration(hours: 1)), 0),
   UsageData(viewportVal.add(Duration(hours: 2)), 0),
@@ -36,6 +35,18 @@ var overviewData = [
   UsageData(viewportVal.add(Duration(hours: 11)), 0),
 ];
 
+//TODO: Implement data and switching viewport
+
+var weekData = [
+  //data by day of week
+];
+var monthData = [
+  //data by day of month
+];
+var yearData = [
+  //data by month
+];
+
 var overviewSeries = [
   new charts.Series(
     id: 'Overview',
@@ -45,6 +56,6 @@ var overviewSeries = [
     colorFn: (UsageData uData, _) {
       return charts.ColorUtil.fromDartColor(Colors.greenAccent);
     },
-    data: overviewData,
+    data: dayData,
   ),
 ];

@@ -1,5 +1,5 @@
-
-/*
+import 'package:cuitt/presentation/design_system/colors.dart';
+import 'package:flutter_circular_chart/flutter_circular_chart.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 
 class ScratchBoard extends StatefulWidget {
@@ -10,14 +10,15 @@ class ScratchBoard extends StatefulWidget {
 class _ScratchBoardState extends State<ScratchBoard> {
   @override
   Widget build(BuildContext context) {
-    NeumorphicApp(
+    return NeumorphicApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       themeMode: ThemeMode.light,
       theme: NeumorphicThemeData(
-        baseColor: Color(0xFFFFFFFF),
-        lightSource: LightSource.topLeft,
-        depth: 10,
+        baseColor: Color(0xFF332158),
+        lightSource: LightSource.top,
+        depth: 3,
+        intensity: 0.5,
       ),
       darkTheme: NeumorphicThemeData(
         baseColor: Color(0xFF3E3E3E),
@@ -38,11 +39,10 @@ class AnimatedRadialChartExample extends StatefulWidget {
 class _AnimatedRadialChartExampleState
     extends State<AnimatedRadialChartExample> {
   final GlobalKey<AnimatedCircularChartState> _chartKey =
-  new GlobalKey<AnimatedCircularChartState>();
-  final _chartSize = const Size(200.0, 200.0);
+      new GlobalKey<AnimatedCircularChartState>();
+  final _chartSize = const Size(350.0, 350.0);
 
   double value = 50.0;
-  Color labelColor = Colors.blue[200];
 
   void _increment() {
     setState(() {
@@ -61,13 +61,7 @@ class _AnimatedRadialChartExampleState
   }
 
   List<CircularStackEntry> _generateChartData(double value) {
-    Color dialColor = Colors.blue[200];
-    if (value < 0) {
-      dialColor = Colors.red[200];
-    } else if (value < 50) {
-      dialColor = Colors.yellow[200];
-    }
-    labelColor = dialColor;
+    Color dialColor = Green;
 
     List<CircularStackEntry> data = <CircularStackEntry>[
       new CircularStackEntry(
@@ -75,25 +69,20 @@ class _AnimatedRadialChartExampleState
           new CircularSegmentEntry(
             value,
             dialColor,
-            rankKey: 'percentage',
           )
         ],
-        rankKey: 'percentage',
       ),
     ];
 
     if (value > 100) {
-      labelColor = Colors.green[200];
 
       data.add(new CircularStackEntry(
         <CircularSegmentEntry>[
           new CircularSegmentEntry(
             value - 100,
-            Colors.green[200],
-            rankKey: 'percentage',
+            Red,
           ),
         ],
-        rankKey: 'percentage2',
       ));
     }
 
@@ -102,16 +91,8 @@ class _AnimatedRadialChartExampleState
 
   @override
   Widget build(BuildContext context) {
-    TextStyle _labelStyle = Theme
-        .of(context)
-        .textTheme
-        .title
-        .merge(new TextStyle(color: labelColor));
 
     return new Scaffold(
-      appBar: new AppBar(
-        title: const Text('Percentage Dial'),
-      ),
       body: new Column(
         children: <Widget>[
           new Container(
@@ -122,8 +103,7 @@ class _AnimatedRadialChartExampleState
               chartType: CircularChartType.Radial,
               edgeStyle: SegmentEdgeStyle.round,
               percentageValues: true,
-              holeLabel: '$value%',
-              labelStyle: _labelStyle,
+              holeRadius: 75,
             ),
           ),
           new Row(
@@ -218,6 +198,25 @@ class MyHomePage extends StatelessWidget {
                   "Go to full sample",
                   style: TextStyle(color: _textColor(context)),
                 )),
+            NeumorphicButton(
+                margin: EdgeInsets.only(top: 12),
+                onPressed: () {
+
+                },
+                style: NeumorphicStyle(
+                  shape: NeumorphicShape.flat,
+                  boxShape:
+                  NeumorphicBoxShape.roundRect(BorderRadius.circular(25)),
+                ),
+                padding: const EdgeInsets.all(12.0),
+                child: Container(
+                  height: 150,
+                  width: 150,
+                  child: Text(
+                    "Toggle Theme",
+                    style: TextStyle(color: _textColor(context)),
+                  ),
+                )),
           ],
         ),
       ),
@@ -241,4 +240,3 @@ class MyHomePage extends StatelessWidget {
     }
   }
 }
-*/

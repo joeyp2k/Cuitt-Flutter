@@ -5,7 +5,7 @@ class User {
   String numSec;
   String seconds = "seconds";
   String today = "today";
-  String change;
+  String difference;
 }
 
 var userList = [];

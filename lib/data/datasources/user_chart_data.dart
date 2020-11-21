@@ -19,7 +19,6 @@ class UsageData {
 }
 
 var overviewData = [
-  //try with n incrementing by 1 instead of 2+.  Multiple values per bar is why bars aren't loading
   UsageData(viewportVal, 0),
   UsageData(viewportVal.add(Duration(hours: 1)), 0),
   UsageData(viewportVal.add(Duration(hours: 2)), 0),
