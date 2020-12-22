@@ -1,3 +1,4 @@
+import 'package:cuitt/bloc/dashboard_bloc.dart';
 import 'package:cuitt/presentation/design_system/colors.dart';
 import 'package:flutter_circular_chart/flutter_circular_chart.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
@@ -30,56 +31,50 @@ class _ScratchBoardState extends State<ScratchBoard> {
   }
 }
 
-class AnimatedRadialChartExample extends StatefulWidget {
+class AnimatedRadialChart extends StatefulWidget {
   @override
-  _AnimatedRadialChartExampleState createState() =>
-      new _AnimatedRadialChartExampleState();
+  _AnimatedRadialChartState createState() => new _AnimatedRadialChartState();
 }
 
-class _AnimatedRadialChartExampleState
-    extends State<AnimatedRadialChartExample> {
+class _AnimatedRadialChartState extends State<AnimatedRadialChart> {
   final GlobalKey<AnimatedCircularChartState> _chartKey =
-      new GlobalKey<AnimatedCircularChartState>();
+  new GlobalKey<AnimatedCircularChartState>();
   final _chartSize = const Size(350.0, 350.0);
 
-  double value = 50.0;
+  double usage = 50;
 
-  void _increment() {
+  void _update() {
     setState(() {
-      value += 10;
-      List<CircularStackEntry> data = _generateChartData(value);
+      if (drawLengthTotal == 0) {
+        usage = 0;
+      } else {
+        usage = (drawLengthTotalAverage / drawLengthTotal) *
+            100; //percentage of allowed usage for chart
+      }
+      List<CircularStackEntry> data = _generateChartData(usage);
       _chartKey.currentState.updateData(data);
     });
   }
 
-  void _decrement() {
-    setState(() {
-      value -= 10;
-      List<CircularStackEntry> data = _generateChartData(value);
-      _chartKey.currentState.updateData(data);
-    });
-  }
-
-  List<CircularStackEntry> _generateChartData(double value) {
+  List<CircularStackEntry> _generateChartData(double usage) {
     Color dialColor = Green;
 
     List<CircularStackEntry> data = <CircularStackEntry>[
       new CircularStackEntry(
         <CircularSegmentEntry>[
           new CircularSegmentEntry(
-            value,
+            usage,
             dialColor,
           )
         ],
       ),
     ];
 
-    if (value > 100) {
-
+    if (usage > 100) {
       data.add(new CircularStackEntry(
         <CircularSegmentEntry>[
           new CircularSegmentEntry(
-            value - 100,
+            usage - 100,
             Red,
           ),
         ],
@@ -91,42 +86,20 @@ class _AnimatedRadialChartExampleState
 
   @override
   Widget build(BuildContext context) {
-
-    return new Scaffold(
-      body: new Column(
-        children: <Widget>[
-          new Container(
-            child: new AnimatedCircularChart(
-              key: _chartKey,
-              size: _chartSize,
-              initialChartData: _generateChartData(value),
-              chartType: CircularChartType.Radial,
-              edgeStyle: SegmentEdgeStyle.round,
-              percentageValues: true,
-              holeRadius: 75,
-            ),
+    return new Column(
+      children: <Widget>[
+        new Container(
+          child: new AnimatedCircularChart(
+            key: _chartKey,
+            size: _chartSize,
+            initialChartData: _generateChartData(usage),
+            chartType: CircularChartType.Radial,
+            edgeStyle: SegmentEdgeStyle.round,
+            percentageValues: true,
+            holeRadius: 75,
           ),
-          new Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              new RaisedButton(
-                onPressed: _decrement,
-                child: const Icon(Icons.remove),
-                shape: const CircleBorder(),
-                color: Colors.red[200],
-                textColor: Colors.white,
-              ),
-              new RaisedButton(
-                onPressed: _increment,
-                child: const Icon(Icons.add),
-                shape: const CircleBorder(),
-                color: Colors.blue[200],
-                textColor: Colors.white,
-              ),
-            ],
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -182,10 +155,7 @@ class MyHomePage extends StatelessWidget {
             NeumorphicButton(
                 margin: EdgeInsets.only(top: 12),
                 onPressed: () {
-                  Navigator.of(context)
-                      .pushReplacement(MaterialPageRoute(builder: (context) {
-                    return AnimatedRadialChartExample();
-                  }));
+
                 },
                 style: NeumorphicStyle(
                   shape: NeumorphicShape.flat,
@@ -200,9 +170,7 @@ class MyHomePage extends StatelessWidget {
                 )),
             NeumorphicButton(
                 margin: EdgeInsets.only(top: 12),
-                onPressed: () {
-
-                },
+                onPressed: () {},
                 style: NeumorphicStyle(
                   shape: NeumorphicShape.flat,
                   boxShape:

@@ -90,57 +90,59 @@ class _CreateAdminPageState extends State<CreateAdminPage> {
               ),
             ),
             Expanded(
-              child: Container(
-                color: Background,
-                child: Center(
-                  child: Padding(
-                    padding: spacer.x.xs,
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: spacer.top.sm + spacer.bottom.md,
-                          child: GroupIDBox(),
-                        ),
-                        Form(
-                          key: _formKey,
-                          child: Padding(
-                            padding: spacer.x.xxl,
-                            child: Column(
-                              children: [
-                                TextEntryBox(
-                                  text: "Group Name",
-                                  obscureText: false,
-                                  textController: _groupNameController,
-                                ),
-                                Padding(
-                                  padding: spacer.y.xs,
-                                  child: TextEntryBox(
-                                    text: "Group Password",
-                                    obscureText: true,
-                                    textController: _groupPasswordController,
+              child: SingleChildScrollView(
+                child: Container(
+                  color: Background,
+                  child: Center(
+                    child: Padding(
+                      padding: spacer.x.xs,
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: spacer.top.sm + spacer.bottom.md,
+                            child: GroupIDBox(),
+                          ),
+                          Form(
+                            key: _formKey,
+                            child: Padding(
+                              padding: spacer.x.xxl,
+                              child: Column(
+                                children: [
+                                  TextEntryBox(
+                                    text: "Group Name",
+                                    obscureText: false,
+                                    textController: _groupNameController,
                                   ),
-                                ),
-                                TextEntryBox(
-                                  text: "Verify Password",
-                                  obscureText: true,
-                                  textController:
-                                      _verifyGroupPasswordController,
-                                ),
-                              ],
+                                  Padding(
+                                    padding: spacer.y.xs,
+                                    child: TextEntryBox(
+                                      text: "Group Password",
+                                      obscureText: true,
+                                      textController: _groupPasswordController,
+                                    ),
+                                  ),
+                                  TextEntryBox(
+                                    text: "Verify Password",
+                                    obscureText: true,
+                                    textController:
+                                        _verifyGroupPasswordController,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        Padding(
-                          padding: spacer.x.md + spacer.top.lg,
-                          child: Button(
-                            text: "Create Administrative Group",
-                            function: () async {
-                              _createAdminGroup();
-                              groups();
-                            },
+                          Padding(
+                            padding: spacer.x.xs + spacer.y.lg,
+                            child: Button(
+                              text: "Create Administrative Group",
+                              function: () async {
+                                _createAdminGroup();
+                                groups();
+                              },
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),

@@ -8,6 +8,34 @@ class User {
   String difference;
 }
 
+List<double> hitLengthArray = [];
+List<int> timestampArray = [];
+var drawCountIndex = 0;
+var hitTimeNow;
+var hitTimeThen;
+var timeUntilNext;
+var decay = 0.95;
+var dayNum = 1;
+double drawLength = 0;
+var currentTime;
+var waitPeriod;
+var timeBetween;
+var timeBetweenAverage;
+var drawCountAverage;
+double drawLengthTotal = 0;
+double drawLengthTotalYest = 0;
+double drawLengthTotalAverageYest = 50.0;
+double drawLengthTotalAverage = 0;
+double drawLengthAverage = 0;
+double drawLengthAverageYest = 0;
+var drawCount = 0;
+var seshCount = 0;
+var seshCountAverage;
+var drawCountYest = 0;
+var seshCountYest = 0;
+var suggestion;
+double usage = 0;
+
 var userList = [];
 var userIDList = [];
 var userNameList = [];

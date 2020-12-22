@@ -1,98 +1,20 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:cuitt/bloc/dashboard_event.dart';
+import 'package:cuitt/bloc/dashboard_state.dart';
+import 'package:cuitt/data/datasources/user.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-CounterBloc counterBlocSink;
+export 'package:cuitt/bloc/dashboard_event.dart';
+export 'package:cuitt/bloc/dashboard_state.dart';
+export 'package:cuitt/data/datasources/user.dart';
 
-List<double> hitLengthArray = [];
-List<int> timestampArray = [];
-var drawCountIndex = 0;
-var hitTimeNow;
-var hitTimeThen;
-var timeUntilNext;
-var decay = 0.95;
-var dayNum = 1;
-double drawLength = 0;
-var currentTime;
-var waitPeriod;
-var timeBetween;
-var timeBetweenAverage;
-var drawCountAverage;
-double drawLengthTotal = 0;
-double drawLengthTotalYest = 0;
-double drawLengthTotalAverageYest = 0;
-double drawLengthTotalAverage = 0;
-double drawLengthAverage = 0;
-double drawLengthAverageYest = 0;
-var drawCount = 0;
-var seshCount = 0;
-var seshCountAverage;
-var drawCountYest = 0;
-var seshCountYest = 0;
-var suggestion;
-
-abstract class CounterBlocEvent {}
-
-class UpdateDataEvent extends CounterBlocEvent {
-  //overide this method when class extends equatable
-
-  @override
-  // TODO: implement props
-  List<Object> get props => [];
-}
-
-class IncreaseCounterEvent extends CounterBlocEvent {
-//overide this method when class extends equatable
-
-  @override
-  // TODO: implement props
-  List<Object> get props => [];
-}
-
-abstract class CounterBlocState {}
-
-class LatestCounterState extends CounterBlocState {
-  final int newCounterValue;
-
-  LatestCounterState({this.newCounterValue});
-
-  //overide this method as base class extends equatable and pass property inside props list
-  @override
-  // TODO: implement props
-  List<Object> get props => [newCounterValue];
-}
-
-class DataState extends CounterBlocState {
-  final int newDrawCountValue;
-  final int newSeshCountValue;
-  final double newDrawLengthValue;
-  final int newDrawLengthTotalValue;
-  final int newAverageDrawLengthValue;
-  final int newAverageDrawLengthTotalValue;
-  final int newAverageWaitPeriodValue;
-
-  DataState({
-    this.newDrawCountValue,
-    this.newSeshCountValue,
-    this.newDrawLengthValue,
-    this.newDrawLengthTotalValue,
-    this.newAverageDrawLengthValue,
-    this.newAverageDrawLengthTotalValue,
-    this.newAverageWaitPeriodValue,
-  });
-
-  //overide this method as base class extends equatable and pass property inside props list
-  @override
-  // TODO: implement props
-  List<Object> get props => [newDrawCountValue];
-}
-
-class CounterBloc extends Bloc<CounterBlocEvent, CounterBlocState> {
+class DashBloc extends Bloc<DashBlocEvent, DashBlocState> {
   //Set Initial State of Counter Bloc by return the LatestCounterState Object with newCounterValue = 0
   @override
   // TODO: implement initialState
-  CounterBloc()
+  DashBloc()
       : super(DataState(
           newDrawCountValue: 0,
           newSeshCountValue: 0,
@@ -104,28 +26,19 @@ class CounterBloc extends Bloc<CounterBlocEvent, CounterBlocState> {
         ));
 
   @override
-  Stream<CounterBlocState> mapEventToState(CounterBlocEvent event) async* {
+  Stream<DashBlocState> mapEventToState(DashBlocEvent event) async* {
     // TODO: implement mapEventToState
-    if (event is IncreaseCounterEvent) {
+    if (event is NavigateToPageEvent) {
       //Fetching Current Counter Value From Current State
-      int currentCounterValue = (state as LatestCounterState).newCounterValue;
+      int currentCounterValue = (state as LatestDashState).newCounterValue;
 
       //Applying business Logic
       int newCounterValue = currentCounterValue + 1;
 
       //Adding new state to the Stream, yield is used to add state to the stream
-      yield LatestCounterState(newCounterValue: newCounterValue);
+
+      yield LatestDashState(newCounterValue: newCounterValue);
     } else if (event is UpdateDataEvent) {
-      //Fetching Current Counter Value From Current State
-      int currentDrawCountValue = (state as DataState).newDrawCountValue;
-      int currentSeshCountValue = (state as DataState).newSeshCountValue;
-      double currentDrawLengthValue = (state as DataState).newDrawLengthValue;
-      int currentDrawLengthTotalValue =
-          (state as DataState).newDrawLengthTotalValue;
-      int currentAverageDrawLengthValue =
-          (state as DataState).newAverageDrawLengthValue;
-      int currentAverageDrawLengthTotalValue =
-          (state as DataState).newAverageDrawLengthTotalValue;
 
       //Applying business Logic
 
@@ -136,6 +49,7 @@ class CounterBloc extends Bloc<CounterBlocEvent, CounterBlocState> {
       int newAverageDrawLengthValue = drawLengthAverage.round();
       int newDrawLengthTotalAverageValue = drawLengthTotalAverage.round();
       int newAverageWaitPeriodValue;
+      print('newDrawLengthTotal: ' + newDrawLengthTotalValue.toString());
 
       //Adding new state to the Stream, yield is used to add state to the stream
 
