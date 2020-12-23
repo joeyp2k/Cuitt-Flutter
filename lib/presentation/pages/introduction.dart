@@ -101,6 +101,7 @@ class _WelcomeState extends State<Welcome> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    gridSpacer = MediaQuery.of(context).size.width * 0.02;
     return Scaffold(
       backgroundColor: Green,
       body: SafeArea(
@@ -133,7 +134,7 @@ class _WelcomeState extends State<Welcome> with SingleTickerProviderStateMixin {
                     textAlign: TextAlign.center,
                     text: TextSpan(
                       text:
-                          "Your vape analytics curated to take control of your consumption",
+                      "Your vape analytics curated to take control of your consumption",
                       style: primaryPLight,
                     ),
                   ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-double gridSpacer = 8.0;
+double gridSpacer;
+//8.0
 
 class Dimension {
   final double spacerValue;

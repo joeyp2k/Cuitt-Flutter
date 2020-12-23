@@ -13,6 +13,7 @@ import 'package:cuitt/presentation/pages/join_group.dart';
 import 'package:cuitt/presentation/widgets/dashboard_button.dart';
 import 'package:cuitt/presentation/widgets/dashboard_tile_large.dart';
 import 'package:cuitt/presentation/widgets/dashboard_tile_square.dart';
+import 'package:cuitt/presentation/widgets/dmwy_bar.dart';
 import 'package:cuitt/presentation/widgets/list_button.dart';
 import 'package:cuitt/presentation/widgets/radial_chart.dart';
 import 'package:cuitt/presentation/widgets/usage_graph.dart';
@@ -94,146 +95,136 @@ class _DashboardbState extends State<Dashboardb> {
                     padding: spacer.x.xs,
                     child: Column(
                       children: [
-                        /*
-                      Padding(
-                        padding: spacer.y.xs,
-                        child: Stack(
-                          children: [
-                            Container(
-                              height: gridSpacer * 4,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                children: [
-                                  Padding(
-                                    padding: spacer.left.xxl,
-                                    child: Expanded(
-                                      child: Container(
-                                        color: White,
-                                      ),
-                                    ),
+                        Padding(
+                          padding: spacer.y.xs,
+                          child: Stack(
+                            children: [
+                              AnimatedPadding(
+                                curve: Curves.easeOut,
+                                duration: const Duration(milliseconds: 300),
+                                padding: EdgeInsets.only(left: padValue),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: TransWhite,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10)),
                                   ),
-                                  Expanded(
-                                    child: Container(
-                                      color: LightBlue,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Container(
-                                      color: LightBlue,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Container(
-                                      color: LightBlue,
-                                    ),
-                                  ),
-                                ],
+                                  height: gridSpacer * 4,
+                                  width: MediaQuery.of(context).size.width / 4 -
+                                      gridSpacer,
+                                ),
                               ),
-                            ),
-                            Container(
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [
-                                  Expanded(
-                                    child: GestureDetector(
-                                      behavior: HitTestBehavior.translucent,
-                                      child: Container(
-                                        child: Center(
-                                          child: RichText(
-                                            text: TextSpan(
-                                              text: 'D',
-                                              style: ButtonRegular,
+                              Container(
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    Expanded(
+                                      child: GestureDetector(
+                                        behavior: HitTestBehavior.translucent,
+                                        child: Container(
+                                          child: Center(
+                                            child: RichText(
+                                              text: TextSpan(
+                                                text: 'D',
+                                                style: ButtonRegular,
+                                              ),
                                             ),
                                           ),
                                         ),
+                                        onTap: () {
+                                          setState(() {
+                                            padValue = 0;
+                                          });
+                                        },
                                       ),
-                                      onTap: () {
-                                        setState(() {
-                                          padValue = 0;
-                                        });
-                                      },
                                     ),
-                                  ),
-                                  Expanded(
-                                    child: GestureDetector(
-                                      behavior: HitTestBehavior.translucent,
-                                      child: Container(
-                                        child: Center(
-                                          child: RichText(
-                                            text: TextSpan(
-                                              text: 'M',
-                                              style: ButtonRegular,
+                                    Expanded(
+                                      child: GestureDetector(
+                                        behavior: HitTestBehavior.translucent,
+                                        child: Container(
+                                          child: Center(
+                                            child: RichText(
+                                              text: TextSpan(
+                                                text: 'M',
+                                                style: ButtonRegular,
+                                              ),
                                             ),
                                           ),
                                         ),
+                                        onTap: () {
+                                          setState(() {
+                                            padValue = MediaQuery.of(context)
+                                                        .size
+                                                        .width /
+                                                    4 -
+                                                gridSpacer;
+                                          });
+                                        },
                                       ),
-                                      onTap: () {
-                                        setState(() {
-                                          padValue = 0;
-                                        });
-                                      },
                                     ),
-                                  ),
-                                  Expanded(
-                                    child: GestureDetector(
-                                      behavior: HitTestBehavior.translucent,
-                                      child: Container(
-                                        child: Center(
-                                          child: RichText(
-                                            text: TextSpan(
-                                              text: 'W',
-                                              style: ButtonRegular,
+                                    Expanded(
+                                      child: GestureDetector(
+                                        behavior: HitTestBehavior.translucent,
+                                        child: Container(
+                                          child: Center(
+                                            child: RichText(
+                                              text: TextSpan(
+                                                text: 'W',
+                                                style: ButtonRegular,
+                                              ),
                                             ),
                                           ),
                                         ),
+                                        onTap: () {
+                                          setState(() {
+                                            padValue = (MediaQuery.of(context)
+                                                            .size
+                                                            .width /
+                                                        4 -
+                                                    gridSpacer) *
+                                                2;
+                                          });
+                                        },
                                       ),
-                                      onTap: () {
-                                        setState(() {
-                                          padValue = 0;
-                                        });
-                                      },
                                     ),
-                                  ),
-                                  Expanded(
-                                    child: GestureDetector(
-                                      behavior: HitTestBehavior.translucent,
-                                      child: Container(
-                                        child: Center(
-                                          child: RichText(
-                                            text: TextSpan(
-                                              text: 'Y',
-                                              style: ButtonRegular,
+                                    Expanded(
+                                      child: GestureDetector(
+                                        behavior: HitTestBehavior.translucent,
+                                        child: Container(
+                                          child: Center(
+                                            child: RichText(
+                                              text: TextSpan(
+                                                text: 'Y',
+                                                style: ButtonRegular,
+                                              ),
                                             ),
                                           ),
                                         ),
+                                        onTap: () {
+                                          setState(() {
+                                            padValue = (MediaQuery.of(context)
+                                                            .size
+                                                            .width /
+                                                        4 -
+                                                    gridSpacer) *
+                                                3;
+                                          });
+                                        },
                                       ),
-                                      onTap: () {
-                                        setState(() {
-                                          padValue = 0;
-                                        });
-                                      },
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
+                                decoration: BoxDecoration(
+                                  color: TransWhite,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10)),
+                                ),
+                                height: gridSpacer * 4,
                               ),
-                              decoration: BoxDecoration(
-                                color: TransWhite,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
-                              ),
-                              height: gridSpacer * 4,
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-
-                      Padding(
-                        padding: spacer.y.xs,
-                        child: DMWYBar(),
-                      ),
-
-                       */
                         Padding(
                           padding: spacer.bottom.xs,
                           child: BarChart(),
