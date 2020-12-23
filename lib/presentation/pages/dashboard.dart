@@ -289,7 +289,10 @@ class _DashboardbState extends State<Dashboardb> {
                                   RichText(
                                     text: TextSpan(
                                       style: TileDataLarge,
-                                      text: "50s",
+                                      text: (state as DataState)
+                                              .newAverageDrawLengthTotalYestValue
+                                              .toString() +
+                                          's',
                                     ),
                                   ),
                                   RichText(
@@ -370,7 +373,7 @@ class _DashboardbState extends State<Dashboardb> {
                         ),
                         ListButton(
                           color: TransWhite,
-                          text: "List Button",
+                          text: "Recent Group",
                         ),
                         Padding(
                           padding: spacer.y.xs,

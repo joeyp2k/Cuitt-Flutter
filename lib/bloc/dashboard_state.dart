@@ -18,6 +18,7 @@ class DataState extends DashBlocState {
   final int newDrawLengthTotalValue;
   final int newAverageDrawLengthValue;
   final int newAverageDrawLengthTotalValue;
+  final int newAverageDrawLengthTotalYestValue;
   final int newAverageWaitPeriodValue;
 
   DataState({
@@ -27,6 +28,7 @@ class DataState extends DashBlocState {
     this.newDrawLengthTotalValue,
     this.newAverageDrawLengthValue,
     this.newAverageDrawLengthTotalValue,
+    this.newAverageDrawLengthTotalYestValue,
     this.newAverageWaitPeriodValue,
   });
 
