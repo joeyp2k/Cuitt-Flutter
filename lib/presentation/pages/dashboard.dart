@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cuitt/bloc/dashboard_bloc.dart';
 import 'package:cuitt/data/datasources/buttons.dart';
 import 'package:cuitt/data/datasources/dash_tiles.dart';
+import 'package:cuitt/data/datasources/my_chart_data.dart';
 import 'package:cuitt/data/datasources/user.dart';
 import 'package:cuitt/presentation/design_system/colors.dart';
 import 'package:cuitt/presentation/design_system/dimensions.dart';
@@ -135,6 +136,12 @@ class _DashboardbState extends State<Dashboardb> {
                                         onTap: () {
                                           setState(() {
                                             padValue = 0;
+                                            dataSelection = dayData;
+                                            viewportSelectionStart =
+                                                viewportHour.subtract(
+                                                    Duration(hours: 11));
+                                            viewportSelectionEnd = viewportHour
+                                                .add(Duration(hours: 1));
                                           });
                                         },
                                       ),
@@ -154,11 +161,19 @@ class _DashboardbState extends State<Dashboardb> {
                                         ),
                                         onTap: () {
                                           setState(() {
-                                            padValue = MediaQuery.of(context)
-                                                        .size
-                                                        .width /
-                                                    4 -
+                                            padValue = MediaQuery
+                                                .of(context)
+                                                .size
+                                                .width /
+                                                4 -
                                                 gridSpacer;
+                                            dataSelection = weekData;
+                                            viewportSelectionStart =
+                                                viewportDay.subtract(
+                                                    Duration(days: 6));
+                                            viewportSelectionEnd =
+                                                viewportDay.add(
+                                                    Duration(days: 1));
                                           });
                                         },
                                       ),
@@ -178,12 +193,20 @@ class _DashboardbState extends State<Dashboardb> {
                                         ),
                                         onTap: () {
                                           setState(() {
-                                            padValue = (MediaQuery.of(context)
-                                                            .size
-                                                            .width /
-                                                        4 -
-                                                    gridSpacer) *
+                                            padValue = (MediaQuery
+                                                .of(context)
+                                                .size
+                                                .width /
+                                                4 -
+                                                gridSpacer) *
                                                 2;
+                                            dataSelection = weekData;
+                                            viewportSelectionStart =
+                                                viewportDay.subtract(
+                                                    Duration(days: 29));
+                                            viewportSelectionEnd =
+                                                viewportDay.add(
+                                                    Duration(days: 1));
                                           });
                                         },
                                       ),

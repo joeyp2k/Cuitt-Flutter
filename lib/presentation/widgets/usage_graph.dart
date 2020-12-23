@@ -17,9 +17,12 @@ class _BarChartState extends State<BarChart> {
   void _timeUpdate() {
     timeData = DateTime.now();
 
-    viewportVal =
+    viewportHour =
         DateTime(timeData.year, timeData.month, timeData.day, timeData.hour)
             .toLocal();
+    viewportDay =
+        DateTime(timeData.year, timeData.month, timeData.day).toLocal();
+    viewportMonth = DateTime(timeData.year, timeData.month).toLocal();
 
     timeData =
         DateTime(timeData.year, timeData.month, timeData.day, timeData.hour)
@@ -28,9 +31,9 @@ class _BarChartState extends State<BarChart> {
 
   void _ifNoData() {
     if (time.isEmpty) {
-      time.add(
-          DateTime(timeData.year, timeData.month, timeData.day, timeData.hour)
-              .toLocal());
+      time.add(timeData);
+      timeDay.add(DateTime(timeData.year, timeData.month, timeData.day)
+          .toLocal());
     }
 
     if (sec.isEmpty) {
@@ -41,6 +44,8 @@ class _BarChartState extends State<BarChart> {
   void _update() {
     sec[i] += drawLength;
     dayData[i] = UsageData(time[i], sec[i]);
+    weekData[i] = UsageData(timeDay[i], sec[i]);
+    //monthData using current month, not i
   }
 
   void _add() {
@@ -49,10 +54,14 @@ class _BarChartState extends State<BarChart> {
       sec.add(drawLength);
       time.add(timeData);
       dayData.add(UsageData(time[i], sec[i]));
+      weekData.add(UsageData(timeDay[i], sec[i]));
     } else {
       sec.add(drawLength);
       time.add(timeData);
+      timeDay.add(DateTime(timeData.year, timeData.month, timeData.day)
+          .toLocal());
       dayData[i] = UsageData(time[i], sec[i]);
+      weekData[i] = UsageData(timeDay[i], sec[i]);
     }
   }
 
@@ -98,7 +107,7 @@ class _BarChartState extends State<BarChart> {
         colorFn: (UsageData uData, _) {
           return charts.ColorUtil.fromDartColor(Colors.greenAccent);
         },
-        data: dayData,
+        data: dataSelection,
       ),
     ];
 
@@ -126,8 +135,8 @@ class _BarChartState extends State<BarChart> {
               day: new charts.TimeFormatterSpec(
                   format: 'HH', transitionFormat: 'HH')),
           viewport: new charts.DateTimeExtents(
-              start: viewportVal.subtract(Duration(hours: 23)),
-              end: viewportVal.add(Duration(hours: 1))),
+              start: viewportHour.subtract(Duration(hours: 23)),
+              end: viewportHour.add(Duration(hours: 1))),
           renderSpec: new charts.NoneRenderSpec()),
 
       /// Assign a custom style for the measure axis.
@@ -156,8 +165,8 @@ class _BarChartState extends State<BarChart> {
               day: new charts.TimeFormatterSpec(
                   format: 'HH', transitionFormat: 'HH')),
           viewport: new charts.DateTimeExtents(
-              start: viewportVal.subtract(Duration(hours: 11)),
-              end: viewportVal.add(Duration(hours: 1))),
+              start: viewportSelectionStart,
+              end: viewportSelectionEnd),
           renderSpec: new charts.SmallTickRendererSpec(
             // Tick and Label styling here.
               labelStyle: new charts.TextStyleSpec(
