@@ -32,7 +32,6 @@ class Dashboardb extends StatefulWidget {
 
 class _DashboardbState extends State<Dashboardb> {
   @override
-  DashBloc _counterBlocSink;
   int arrayIndex;
   var value;
 
@@ -78,7 +77,7 @@ class _DashboardbState extends State<Dashboardb> {
       create: (BuildContext context) => DashBloc(),
       child: BlocBuilder<DashBloc, DashBlocState>(
         builder: (context, state) {
-          _counterBlocSink = BlocProvider.of<DashBloc>(context);
+          counterBlocSink = BlocProvider.of<DashBloc>(context);
           return Scaffold(
             floatingActionButton: FloatingActionButton(
               backgroundColor: White,

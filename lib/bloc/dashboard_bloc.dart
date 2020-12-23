@@ -10,6 +10,8 @@ export 'package:cuitt/bloc/dashboard_event.dart';
 export 'package:cuitt/bloc/dashboard_state.dart';
 export 'package:cuitt/data/datasources/user.dart';
 
+DashBloc counterBlocSink;
+
 class DashBloc extends Bloc<DashBlocEvent, DashBlocState> {
   //Set Initial State of Counter Bloc by return the LatestCounterState Object with newCounterValue = 0
   @override

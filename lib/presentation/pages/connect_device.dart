@@ -17,7 +17,6 @@ class ConnectPage extends StatefulWidget {
 }
 
 class _ConnectPageState extends State<ConnectPage> {
-  DashBloc _counterBlocSink;
 
   @override
   Timer timer;
@@ -43,7 +42,7 @@ class _ConnectPageState extends State<ConnectPage> {
     timer?.cancel();
     super.dispose();
     //Close the Stream Sink when the widget is disposed
-    _counterBlocSink?.close();
+    counterBlocSink?.close();
     print('close');
   }
 
@@ -143,7 +142,7 @@ class _ConnectPageState extends State<ConnectPage> {
           _calculateA();
           _checkTime();
           _calculateB();
-          _counterBlocSink.add(UpdateDataEvent());
+          counterBlocSink.add(UpdateDataEvent());
           _lastval = _readval;
           refresh = 1;
         }
@@ -169,7 +168,7 @@ class _ConnectPageState extends State<ConnectPage> {
       create: (BuildContext context) => DashBloc(),
       child: BlocBuilder<DashBloc, DashBlocState>(
         builder: (context, state) {
-          _counterBlocSink = BlocProvider.of<DashBloc>(context);
+          counterBlocSink = BlocProvider.of<DashBloc>(context);
           return Scaffold(
             floatingActionButtonLocation:
                 FloatingActionButtonLocation.centerFloat,
