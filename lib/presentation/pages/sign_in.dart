@@ -3,6 +3,7 @@ import 'package:cuitt/presentation/design_system/colors.dart';
 import 'package:cuitt/presentation/design_system/dimensions.dart';
 import 'package:cuitt/presentation/design_system/texts.dart';
 import 'package:cuitt/presentation/pages/connect_device.dart';
+import 'package:cuitt/presentation/widgets/animated_button.dart';
 import 'package:cuitt/presentation/widgets/button.dart';
 import 'package:cuitt/presentation/widgets/text_entry_box.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -40,7 +41,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
     super.dispose();
   }
 
-  bool _success;
+  bool _success = false;
   String _userEmail;
   final _formKey = GlobalKey<FormState>();
 
@@ -48,19 +49,23 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     //final appState = Provider.of<AppState>(context, listen: false);
     void _signInWithEmailAndPassword() async {
-      final User user = (await _auth.signInWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
-      ))
-          .user;
-      if (user == null) {
+      try {
+        final User user = (await _auth.signInWithEmailAndPassword(
+          email: _emailController.text,
+          password: _passwordController.text,
+        ))
+            .user;
+        if (user == null) {
+          _success = false;
+        } else {
+          _success = true;
+          _userEmail = user.email;
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+            return ConnectPage();
+          }));
+        }
+      } on FirebaseAuthException {
         _success = false;
-      } else {
-        _success = true;
-        _userEmail = user.email;
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-          return ConnectPage();
-        }));
       }
     }
 
@@ -99,6 +104,15 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                   child: Button(
                     text: "Sign In",
                     function: _signInWithEmailAndPassword,
+                  ),
+                ),
+                Padding(
+                  padding: spacer.x.xxl * 0,
+                  child: AnimatedButton(
+                    paddingStart: spacer.x.xxl * 1.5,
+                    success: _success,
+                    function: _signInWithEmailAndPassword,
+                    text: 'Sign In',
                   ),
                 ),
                 Padding(
