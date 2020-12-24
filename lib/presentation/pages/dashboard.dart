@@ -28,6 +28,10 @@ var firebaseUser;
 int refresh = 0;
 
 class Dashboardb extends StatefulWidget {
+  final Animation<double> opacityAnimation;
+
+  const Dashboardb({Key key, this.opacityAnimation}) : super(key: key);
+
   @override
   _DashboardbState createState() => _DashboardbState();
 }
@@ -89,192 +93,135 @@ class _DashboardbState extends State<Dashboardb> {
               },
             ),
             backgroundColor: Background,
-            body: SafeArea(
-              child: SingleChildScrollView(
-                child: Center(
-                  child: Padding(
-                    padding: spacer.x.xs,
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: spacer.left.xxs * 1.25 + spacer.top.xxs,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              DrawerButton(),
-                              RichText(
-                                text: TextSpan(
-                                    style: TileHeader, text: 'My Activity'),
-                              ),
-                              IconButton(
-                                  color: White,
-                                  icon: Icon(Icons.person),
-                                  onPressed: () => {}),
-                            ],
+            body: AnimatedBuilder(
+              builder: (context, child) {
+                return FadeTransition(
+                  child: child,
+                  opacity: Tween<double>(begin: 0, end: 1.0).animate(
+                    CurvedAnimation(
+                      parent: widget.opacityAnimation,
+                      curve: Interval(
+                        0,
+                        0.5,
+                        curve: Curves.easeIn,
+                      ),
+                    ),
+                  ),
+                );
+              },
+              animation: widget.opacityAnimation,
+              child: SafeArea(
+                child: SingleChildScrollView(
+                  child: Center(
+                    child: Padding(
+                      padding: spacer.x.xs,
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: spacer.left.xxs * 1.25 + spacer.top.xxs,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                DrawerButton(),
+                                RichText(
+                                  text: TextSpan(
+                                      style: TileHeader, text: 'My Activity'),
+                                ),
+                                IconButton(
+                                    color: White,
+                                    icon: Icon(Icons.person),
+                                    onPressed: () => {}),
+                              ],
+                            ),
                           ),
-                        ),
-                        Stack(children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              AnimatedRadialChart(),
-                            ],
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              RadialChartBack(),
-                            ],
-                          ),
-                          Center(
-                            child: Padding(
-                              padding: spacer.y.xxl * 2,
-                              child: Column(
-                                children: [
-                                  RichText(
-                                    text: TextSpan(
-                                      style: Radial,
-                                      text: "Week Goal",
+                          Stack(children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                AnimatedRadialChart(),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                RadialChartBack(),
+                              ],
+                            ),
+                            Center(
+                              child: Padding(
+                                padding: spacer.y.xxl * 2,
+                                child: Column(
+                                  children: [
+                                    RichText(
+                                      text: TextSpan(
+                                        style: Radial,
+                                        text: "Week Goal",
+                                      ),
                                     ),
-                                  ),
-                                  RichText(
-                                    text: TextSpan(
-                                      style: RadialLarge,
-                                          text: (state as DataState)
-                                              .newAverageDrawLengthTotalYestValue
-                                              .toString() +
-                                              's',
+                                    RichText(
+                                      text: TextSpan(
+                                        style: RadialLarge,
+                                        text: (state as DataState)
+                                                .newAverageDrawLengthTotalYestValue
+                                                .toString() +
+                                            's',
+                                      ),
                                     ),
-                                  ),
-                                  RichText(
-                                    text: TextSpan(
-                                      style: Radial,
-                                      text: "Current: " +
-                                          (state as DataState)
-                                              .newDrawLengthTotalValue
-                                              .toString() + 's',
+                                    RichText(
+                                      text: TextSpan(
+                                        style: Radial,
+                                        text: "Current: " +
+                                            (state as DataState)
+                                                .newDrawLengthTotalValue
+                                                .toString() +
+                                            's',
+                                      ),
                                     ),
-                                  ),
-                                    ],
-                                  ),
+                                  ],
                                 ),
                               ),
-                            ]),
-                        Row(
-                          children: [
-                            DashboardTileLarge(
-                              header: timeUntilTile.header,
-                              textData: timeUntilTile.textData,
-                              color: Red,
                             ),
-                          ],
-                        ),
-                        DashboardChart(),
-                        Row(
-                          children: [
-                            DrawsTile(
-                              color: TransWhite,
-                              header: avgDrawTile.header,
-                              header2: drawTile.header,
-                              textData: (state as DataState)
-                                  .newAverageDrawLengthValue
-                                  .toString() +
-                                  ' seconds',
-                              textData2: (state as DataState)
-                                  .newDrawCountValue
-                                  .toString(),
-                            ),
-                          ],
-                        ),
-                        Padding(
-                          padding: spacer.y.xs,
-                          child: Row(
+                          ]),
+                          Row(
                             children: [
                               DashboardTileLarge(
-                                header: avgWaitTile.header,
-                                textData: avgWaitTile.textData,
+                                header: timeUntilTile.header,
+                                textData: timeUntilTile.textData,
+                                color: Red,
+                              ),
+                            ],
+                          ),
+                          DashboardChart(),
+                          Row(
+                            children: [
+                              DrawsTile(
                                 color: TransWhite,
+                                header: avgDrawTile.header,
+                                header2: drawTile.header,
+                                textData: (state as DataState)
+                                        .newAverageDrawLengthValue
+                                        .toString() +
+                                    ' seconds',
+                                textData2: (state as DataState)
+                                    .newDrawCountValue
+                                    .toString(),
                               ),
                             ],
                           ),
-                        ),
-                        Padding(
-                          padding: spacer.bottom.xs,
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: DashboardButton(
-                                  color: createTile.color,
-                                  text: createTile.header,
-                                  icon: Icons.add,
-                                  iconColor: White,
-                                  function: () async {
-                                    Navigator.of(context).push(
-                                        MaterialPageRoute(builder: (context) {
-                                          return CreateGroupPage();
-                                        }));
-                                  },
+                          Padding(
+                            padding: spacer.y.xs,
+                            child: Row(
+                              children: [
+                                DashboardTileLarge(
+                                  header: avgWaitTile.header,
+                                  textData: avgWaitTile.textData,
+                                  color: TransWhite,
                                 ),
-                              ),
-                              Padding(
-                                padding: spacer.all.xxs,
-                              ),
-                              Expanded(
-                                child: DashboardButton(
-                                  color: joinTile.color,
-                                  text: joinTile.header,
-                                  icon: joinTile.icon,
-                                  iconColor: White,
-                                  function: () async {
-                                    Navigator.of(context).push(
-                                        MaterialPageRoute(builder: (context) {
-                                          return JoinGroupPage();
-                                        }));
-                                  },
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                        ListButton(
-                          color: TransWhite,
-                          text: "Recent Group",
-                        ),
-                        Padding(
-                          padding: spacer.y.xs,
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: DashboardButton(
-                                    color: settingsTile.color,
-                                    text: settingsTile.header,
-                                    icon: settingsTile.icon,
-                                    iconColor: White,
-                                    function: () async {
-                                      Navigator.of(context).push(
-                                          MaterialPageRoute(builder: (context) {
-                                            return null;
-                                          }));
-                                    }),
-                              ),
-                              Padding(
-                                padding: spacer.left.xs,
-                              ),
-                              Expanded(
-                                child: DashboardButton(
-                                  color: groupsTile.color,
-                                  text: groupsTile.header,
-                                  icon: groupsTile.icon,
-                                  iconColor: White,
-                                  function: () {
-                                    groups();
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),

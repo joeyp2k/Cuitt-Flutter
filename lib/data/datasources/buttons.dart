@@ -10,11 +10,11 @@ class ButtonData {
 }
 
 //DashTiles
-var settingsTile = ButtonData("Settings", Icons.settings, Green);
+var settingsTile = ButtonData("Settings", Icons.settings, Red);
 
 var groupsTile = ButtonData("Groups", Icons.list, Green);
 
-var createTile = ButtonData("New Group", Icons.add, LightBlue);
+var createTile = ButtonData("New Group", Icons.add, DarkBlue);
 
 var joinTile = ButtonData("Join Group", Icons.link, LightBlue);
 

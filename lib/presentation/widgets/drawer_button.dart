@@ -1,5 +1,8 @@
 import 'package:cuitt/presentation/design_system/colors.dart';
+import 'package:cuitt/presentation/pages/drawer.dart';
 import 'package:flutter/material.dart';
+
+bool drawer = false;
 
 class DrawerButton extends StatefulWidget {
   @override
@@ -9,12 +12,12 @@ class DrawerButton extends StatefulWidget {
 class _DrawerButtonState extends State<DrawerButton>
     with SingleTickerProviderStateMixin {
   AnimationController _controller;
-  bool isPlaying = false;
 
   @override
   void initState() {
     _controller =
         AnimationController(vsync: this, duration: Duration(milliseconds: 450));
+    drawer ? _controller.forward() : _controller.reverse();
     super.initState();
   }
 
@@ -26,9 +29,22 @@ class _DrawerButtonState extends State<DrawerButton>
 
   @override
   void _handleOnPressed() {
+    drawer = !drawer;
     setState(() {
-      isPlaying = !isPlaying;
-      isPlaying ? _controller.forward() : _controller.reverse();
+      if (drawer == true) {
+        Navigator.of(context).push(
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) {
+              return DrawerPage(
+                transitionAnimation: animation,
+              );
+            },
+            transitionDuration: Duration(seconds: 1),
+          ),
+        );
+      } else {
+        Navigator.pop(context);
+      }
     });
   }
 

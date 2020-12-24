@@ -23,9 +23,7 @@ class DashboardButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: color,
-      borderRadius: BorderRadius.all(Radius.circular(30)),
       child: InkWell(
-        borderRadius: BorderRadius.all(Radius.circular(30)),
         splashColor: Colors.transparent,
         highlightColor: DarkBlue,
         onTap: (() {

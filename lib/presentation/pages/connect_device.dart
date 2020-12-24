@@ -188,10 +188,16 @@ class _ConnectPageState extends State<ConnectPage> {
               backgroundColor: Green,
               onPressed: () {
                 _scanForDevice();
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (context) {
-                  return Dashboardb();
-                }));
+                Navigator.of(context).push(
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) {
+                      return Dashboardb(
+                        opacityAnimation: animation,
+                      );
+                    },
+                    transitionDuration: Duration(seconds: 1),
+                  ),
+                );
               },
               tooltip: 'Increment',
               child: Icon(Icons.bluetooth_searching),
