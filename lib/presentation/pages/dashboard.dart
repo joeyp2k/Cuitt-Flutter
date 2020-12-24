@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cuitt/bloc/dashboard_bloc.dart';
 import 'package:cuitt/data/datasources/buttons.dart';
 import 'package:cuitt/data/datasources/dash_tiles.dart';
-import 'package:cuitt/data/datasources/my_chart_data.dart';
 import 'package:cuitt/data/datasources/user.dart';
 import 'package:cuitt/presentation/design_system/colors.dart';
 import 'package:cuitt/presentation/design_system/dimensions.dart';
@@ -12,12 +11,13 @@ import 'package:cuitt/presentation/pages/group_list.dart';
 import 'package:cuitt/presentation/pages/group_list_empty.dart';
 import 'package:cuitt/presentation/pages/join_group.dart';
 import 'package:cuitt/presentation/widgets/dashboard_button.dart';
+import 'package:cuitt/presentation/widgets/dashboard_chart.dart';
 import 'package:cuitt/presentation/widgets/dashboard_tile_large.dart';
-import 'package:cuitt/presentation/widgets/dashboard_tile_square.dart';
-import 'package:cuitt/presentation/widgets/dmwy_bar.dart';
+import 'package:cuitt/presentation/widgets/drawer_button.dart';
+import 'package:cuitt/presentation/widgets/draws_tile.dart';
 import 'package:cuitt/presentation/widgets/list_button.dart';
 import 'package:cuitt/presentation/widgets/radial_chart.dart';
-import 'package:cuitt/presentation/widgets/usage_graph.dart';
+import 'package:cuitt/presentation/widgets/radial_chart_back.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -85,7 +85,7 @@ class _DashboardbState extends State<Dashboardb> {
               backgroundColor: White,
               onPressed: () {
                 print(drawLengthTotal.toString());
-                print(usage.toString());
+                usage += 10;
               },
             ),
             backgroundColor: Background,
@@ -97,188 +97,19 @@ class _DashboardbState extends State<Dashboardb> {
                     child: Column(
                       children: [
                         Padding(
-                          padding: spacer.y.xs,
-                          child: Stack(
-                            children: [
-                              AnimatedPadding(
-                                curve: Curves.easeOut,
-                                duration: const Duration(milliseconds: 300),
-                                padding: EdgeInsets.only(left: padValue),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: TransWhite,
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(10)),
-                                  ),
-                                  height: gridSpacer * 4,
-                                  width: MediaQuery.of(context).size.width / 4 -
-                                      gridSpacer,
-                                ),
-                              ),
-                              Container(
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  children: [
-                                    Expanded(
-                                      child: GestureDetector(
-                                        behavior: HitTestBehavior.translucent,
-                                        child: Container(
-                                          child: Center(
-                                            child: RichText(
-                                              text: TextSpan(
-                                                text: 'D',
-                                                style: ButtonRegular,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        onTap: () {
-                                          setState(() {
-                                            padValue = 0;
-                                            dataSelection = dayData;
-                                            viewportSelectionStart =
-                                                viewportHour.subtract(
-                                                    Duration(hours: 11));
-                                            viewportSelectionEnd = viewportHour
-                                                .add(Duration(hours: 1));
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: GestureDetector(
-                                        behavior: HitTestBehavior.translucent,
-                                        child: Container(
-                                          child: Center(
-                                            child: RichText(
-                                              text: TextSpan(
-                                                text: 'M',
-                                                style: ButtonRegular,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        onTap: () {
-                                          setState(() {
-                                            padValue = MediaQuery
-                                                .of(context)
-                                                .size
-                                                .width /
-                                                4 -
-                                                gridSpacer;
-                                            dataSelection = weekData;
-                                            viewportSelectionStart =
-                                                viewportDay.subtract(
-                                                    Duration(days: 6));
-                                            viewportSelectionEnd =
-                                                viewportDay.add(
-                                                    Duration(days: 1));
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: GestureDetector(
-                                        behavior: HitTestBehavior.translucent,
-                                        child: Container(
-                                          child: Center(
-                                            child: RichText(
-                                              text: TextSpan(
-                                                text: 'W',
-                                                style: ButtonRegular,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        onTap: () {
-                                          setState(() {
-                                            padValue = (MediaQuery
-                                                .of(context)
-                                                .size
-                                                .width /
-                                                4 -
-                                                gridSpacer) *
-                                                2;
-                                            dataSelection = weekData;
-                                            viewportSelectionStart =
-                                                viewportDay.subtract(
-                                                    Duration(days: 29));
-                                            viewportSelectionEnd =
-                                                viewportDay.add(
-                                                    Duration(days: 1));
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: GestureDetector(
-                                        behavior: HitTestBehavior.translucent,
-                                        child: Container(
-                                          child: Center(
-                                            child: RichText(
-                                              text: TextSpan(
-                                                text: 'Y',
-                                                style: ButtonRegular,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        onTap: () {
-                                          setState(() {
-                                            padValue = (MediaQuery.of(context)
-                                                            .size
-                                                            .width /
-                                                        4 -
-                                                    gridSpacer) *
-                                                3;
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                decoration: BoxDecoration(
-                                  color: TransWhite,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
-                                ),
-                                height: gridSpacer * 4,
-                              ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: spacer.bottom.xs,
-                          child: BarChart(),
-                        ),
-                        Row(
-                          children: [
-                            DashboardTile(
-                              header: drawTile.header,
-                              data: (state as DataState)
-                                  .newDrawCountValue
-                                  .toString(),
-                            ),
-                            Padding(
-                              padding: spacer.left.sm,
-                            ),
-                            DashboardTile(
-                              header: seshTile.header,
-                              data: (state as DataState)
-                                  .newSeshCountValue
-                                  .toString(),
-                            ),
-                          ],
-                        ),
-                        Padding(
-                          padding: spacer.top.xs,
+                          padding: spacer.left.xxs * 1.25 + spacer.top.xxs,
                           child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              DashboardTileLarge(
-                                header: timeUntilTile.header,
-                                textData: timeUntilTile.textData,
+                              DrawerButton(),
+                              RichText(
+                                text: TextSpan(
+                                    style: TileHeader, text: 'My Activity'),
                               ),
+                              IconButton(
+                                  color: White,
+                                  icon: Icon(Icons.person),
+                                  onPressed: () => {}),
                             ],
                           ),
                         ),
@@ -289,48 +120,69 @@ class _DashboardbState extends State<Dashboardb> {
                               AnimatedRadialChart(),
                             ],
                           ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              RadialChartBack(),
+                            ],
+                          ),
                           Center(
                             child: Padding(
-                              padding: spacer.y.xxl * 1.75,
+                              padding: spacer.y.xxl * 2,
                               child: Column(
                                 children: [
                                   RichText(
                                     text: TextSpan(
-                                      style: TileHeader,
+                                      style: Radial,
                                       text: "Week Goal",
                                     ),
                                   ),
                                   RichText(
                                     text: TextSpan(
-                                      style: TileDataLarge,
-                                      text: (state as DataState)
+                                      style: RadialLarge,
+                                          text: (state as DataState)
                                               .newAverageDrawLengthTotalYestValue
                                               .toString() +
-                                          's',
+                                              's',
                                     ),
                                   ),
                                   RichText(
                                     text: TextSpan(
-                                      style: TileHeader,
+                                      style: Radial,
                                       text: "Current: " +
                                           (state as DataState)
                                               .newDrawLengthTotalValue
                                               .toString() + 's',
                                     ),
                                   ),
-                                ],
+                                    ],
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                        ]),
+                            ]),
                         Row(
                           children: [
                             DashboardTileLarge(
+                              header: timeUntilTile.header,
+                              textData: timeUntilTile.textData,
+                              color: Red,
+                            ),
+                          ],
+                        ),
+                        DashboardChart(),
+                        Row(
+                          children: [
+                            DrawsTile(
+                              color: TransWhite,
                               header: avgDrawTile.header,
+                              header2: drawTile.header,
                               textData: (state as DataState)
                                   .newAverageDrawLengthValue
                                   .toString() +
                                   ' seconds',
+                              textData2: (state as DataState)
+                                  .newDrawCountValue
+                                  .toString(),
                             ),
                           ],
                         ),
@@ -340,9 +192,8 @@ class _DashboardbState extends State<Dashboardb> {
                             children: [
                               DashboardTileLarge(
                                 header: avgWaitTile.header,
-                                textData: (state as DataState)
-                                    .newAverageWaitPeriodValue
-                                    .toString(),
+                                textData: avgWaitTile.textData,
+                                color: TransWhite,
                               ),
                             ],
                           ),

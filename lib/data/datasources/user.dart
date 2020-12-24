@@ -35,6 +35,7 @@ var drawCountYest = 0;
 var seshCountYest = 0;
 var suggestion;
 double usage = 0;
+double overUsage = 0;
 
 var userList = [];
 var userIDList = [];

@@ -1,56 +1,36 @@
-import 'dart:async';
-
-import 'package:cuitt/data/datasources/user.dart';
 import 'package:cuitt/presentation/design_system/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_circular_chart/flutter_circular_chart.dart';
 
-class AnimatedRadialChart extends StatefulWidget {
-  @override
-  _AnimatedRadialChartState createState() => new _AnimatedRadialChartState();
-}
-
-class _AnimatedRadialChartState extends State<AnimatedRadialChart> {
+class RadialChartBack extends StatelessWidget {
   final GlobalKey<AnimatedCircularChartState> _chartKey =
       new GlobalKey<AnimatedCircularChartState>();
   final _chartSize = const Size(325.0, 325.0);
+  final fill = 200.0;
 
-  Timer timer;
-
-  void initState() {
-    super.initState();
-    timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
-      setState(() {
-        List<CircularStackEntry> data = _generateChartData(usage);
-        _chartKey.currentState.updateData(data);
-      });
-    });
-  }
-
-  List<CircularStackEntry> _generateChartData(double usage) {
-    Color dialColor = Green;
+  List<CircularStackEntry> _generateChartData(double fill) {
+    Color dialColor = TransGreen;
 
     List<CircularStackEntry> data = <CircularStackEntry>[
       new CircularStackEntry(
         <CircularSegmentEntry>[
           new CircularSegmentEntry(
-            usage,
+            fill,
             dialColor,
-          )
-        ],
-      ),
-      new CircularStackEntry(
-        <CircularSegmentEntry>[
-          new CircularSegmentEntry(
-            overUsage,
-            Red,
           )
         ],
       ),
     ];
 
-    if (usage > 100) {
-      overUsage = usage - 100;
+    if (fill > 100) {
+      data.add(new CircularStackEntry(
+        <CircularSegmentEntry>[
+          new CircularSegmentEntry(
+            fill - 100,
+            TransRed,
+          ),
+        ],
+      ));
     }
 
     return data;
@@ -64,7 +44,7 @@ class _AnimatedRadialChartState extends State<AnimatedRadialChart> {
           child: new AnimatedCircularChart(
             key: _chartKey,
             size: _chartSize,
-            initialChartData: _generateChartData(usage),
+            initialChartData: _generateChartData(fill),
             chartType: CircularChartType.Radial,
             edgeStyle: SegmentEdgeStyle.round,
             percentageValues: true,

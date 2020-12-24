@@ -66,6 +66,13 @@ const TileHeader = const TextStyle(
     fontWeight: FontWeight.w400,
     fontFamily: 'Open Sans',
     fontStyle: FontStyle.normal,
+    fontSize: 18.0);
+
+const TileButton = const TextStyle(
+    color: White,
+    fontWeight: FontWeight.w400,
+    fontFamily: 'Open Sans',
+    fontStyle: FontStyle.normal,
     fontSize: 24.0);
 
 const TileData = const TextStyle(
@@ -73,7 +80,7 @@ const TileData = const TextStyle(
     fontWeight: FontWeight.w600,
     fontFamily: 'Source Sans Open',
     fontStyle: FontStyle.normal,
-    fontSize: 32.0);
+    fontSize: 24.0);
 
 const TileDataLarge = const TextStyle(
     color: White,
@@ -82,12 +89,33 @@ const TileDataLarge = const TextStyle(
     fontStyle: FontStyle.normal,
     fontSize: 52.0);
 
+const RadialLarge = const TextStyle(
+    color: White,
+    fontWeight: FontWeight.w700,
+    fontFamily: 'Source Sans Open',
+    fontStyle: FontStyle.normal,
+    fontSize: 52.0);
+
+const Radial = const TextStyle(
+    color: White,
+    fontWeight: FontWeight.w400,
+    fontFamily: 'Source Sans Open',
+    fontStyle: FontStyle.normal,
+    fontSize: 24.0);
+
 const ButtonRegular = const TextStyle(
     color: White,
     fontWeight: FontWeight.w400,
     fontFamily: 'Open Sans',
     fontStyle: FontStyle.normal,
     fontSize: 20.0);
+
+const DWMY = const TextStyle(
+    color: White,
+    fontWeight: FontWeight.w400,
+    fontFamily: 'Open Sans',
+    fontStyle: FontStyle.normal,
+    fontSize: 16.0);
 
 const primaryEntry = const TextStyle(
     color: Colors.white70,

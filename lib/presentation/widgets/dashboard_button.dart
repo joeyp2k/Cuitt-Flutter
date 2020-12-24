@@ -45,7 +45,7 @@ class DashboardButton extends StatelessWidget {
                   textAlign: TextAlign.center,
                   text: TextSpan(
                     text: text,
-                    style: TileHeader,
+                    style: TileButton,
                   ),
                 ),
               ),

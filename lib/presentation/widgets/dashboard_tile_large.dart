@@ -1,4 +1,3 @@
-import 'package:cuitt/presentation/design_system/colors.dart';
 import 'package:cuitt/presentation/design_system/dimensions.dart';
 import 'package:cuitt/presentation/design_system/texts.dart';
 import 'package:flutter/material.dart';
@@ -6,8 +5,10 @@ import 'package:flutter/material.dart';
 class DashboardTileLarge extends StatefulWidget {
   final String header;
   final String textData;
+  final Color color;
 
-  DashboardTileLarge({Key key, this.header, this.textData}) : super(key: key);
+  DashboardTileLarge({Key key, this.header, this.textData, this.color})
+      : super(key: key);
 
   @override
   _DashboardTileLargeState createState() => _DashboardTileLargeState();
@@ -19,12 +20,13 @@ class _DashboardTileLargeState extends State<DashboardTileLarge> {
     return Expanded(
       child: Container(
         decoration: BoxDecoration(
-          color: TransWhite,
+          color: widget.color,
           borderRadius: BorderRadius.all(Radius.circular(30)),
         ),
         padding: spacer.all.sm,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             RichText(
               text: TextSpan(
