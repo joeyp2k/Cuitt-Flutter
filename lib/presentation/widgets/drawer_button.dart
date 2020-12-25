@@ -1,48 +1,11 @@
 import 'package:cuitt/presentation/design_system/colors.dart';
+import 'package:cuitt/presentation/design_system/dimensions.dart';
 import 'package:cuitt/presentation/pages/dashboard.dart';
 import 'package:cuitt/presentation/pages/drawer.dart';
+import 'package:cuitt/presentation/routes/fade.dart';
 import 'package:flutter/material.dart';
 
 bool drawer = false;
-
-class EnterExitRoute extends PageRouteBuilder {
-  final Widget enterPage;
-  final Widget exitPage;
-
-  EnterExitRoute({this.exitPage, this.enterPage})
-      : super(
-          pageBuilder: (
-            BuildContext context,
-            Animation<double> animation,
-            Animation<double> secondaryAnimation,
-          ) =>
-              enterPage,
-          transitionsBuilder: (
-            BuildContext context,
-            Animation<double> animation,
-            Animation<double> secondaryAnimation,
-            Widget child,
-          ) =>
-              Stack(
-            children: <Widget>[
-              SlideTransition(
-                position: new Tween<Offset>(
-                  begin: const Offset(0.0, 0.0),
-                  end: const Offset(0.0, 0.0),
-                ).animate(animation),
-                child: exitPage,
-              ),
-              FadeTransition(
-                opacity: new Tween<double>(
-                  begin: 0.0,
-                  end: 1.0,
-                ).animate(animation),
-                child: enterPage,
-              ),
-            ],
-          ),
-        );
-}
 
 class DrawerButton extends StatefulWidget {
   @override
@@ -74,13 +37,14 @@ class _DrawerButtonState extends State<DrawerButton>
     setState(() {
       if (drawer == true) {
         _controller.reverse();
-        Navigator.push(context,
-          EnterExitRoute(exitPage: Dashboardb(), enterPage: DrawerPage()),
+        Navigator.push(
+          context,
+          FadeRoute(exitPage: Dashboardb(), enterPage: DrawerPage()),
         );
       } else {
         _controller.reverse();
         Navigator.push(context,
-          EnterExitRoute(enterPage: Dashboardb(), exitPage: DrawerPage()),
+          FadeRoute(enterPage: Dashboardb(), exitPage: DrawerPage()),
         );
       }
     });
@@ -92,6 +56,7 @@ class _DrawerButtonState extends State<DrawerButton>
       behavior: HitTestBehavior.translucent,
       onTap: () => _handleOnPressed(),
       child: Container(
+        padding: spacer.all.xs - spacer.left.xxs * 0.9,
         child: AnimatedIcon(
           color: White,
           icon: AnimatedIcons.menu_close,

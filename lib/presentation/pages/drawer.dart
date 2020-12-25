@@ -7,11 +7,11 @@ import 'package:cuitt/presentation/pages/create_group.dart';
 import 'package:cuitt/presentation/pages/group_list.dart';
 import 'package:cuitt/presentation/pages/group_list_empty.dart';
 import 'package:cuitt/presentation/pages/join_group.dart';
+import 'package:cuitt/presentation/routes/slide.dart';
 import 'package:cuitt/presentation/widgets/dashboard_button.dart';
 import 'package:cuitt/presentation/widgets/drawer_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
 final firestoreInstance = FirebaseFirestore.instance;
 var firebaseUser;
 
@@ -54,13 +54,13 @@ class _DrawerPageState extends State<DrawerPage> {
     _loadGroupData();
 
     if (groupNameList.isEmpty) {
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-        return GroupListEmpty();
-      }));
+      Navigator.of(context).push(SlideRoute(
+        enterPage: GroupListEmpty(),
+        exitPage: DrawerPage(),
+      ));
     } else {
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-        return GroupsList();
-      }));
+      Navigator.of(context)
+          .push(SlideRoute(enterPage: GroupsList(), exitPage: DrawerPage(),));
     }
   }
 
@@ -73,7 +73,7 @@ class _DrawerPageState extends State<DrawerPage> {
           children: [
             Padding(
               padding:
-                  spacer.left.xxs * 1.25 + spacer.y.xxs * 0.45 + spacer.x.xs,
+              spacer.y.xxs * 0.45 + spacer.x.xs,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -96,9 +96,8 @@ class _DrawerPageState extends State<DrawerPage> {
                       iconColor: White,
                       function: () async {
                         Navigator.of(context)
-                            .push(MaterialPageRoute(builder: (context) {
-                          return CreateGroupPage();
-                        }));
+                            .push(SlideRoute(enterPage: CreateGroupPage(),
+                          exitPage: DrawerPage(),));
                       },
                     ),
                   ),
@@ -110,9 +109,8 @@ class _DrawerPageState extends State<DrawerPage> {
                       iconColor: White,
                       function: () async {
                         Navigator.of(context)
-                            .push(MaterialPageRoute(builder: (context) {
-                          return JoinGroupPage();
-                        }));
+                            .push(SlideRoute(
+                          enterPage: JoinGroupPage(), exitPage: DrawerPage(),));
                       },
                     ),
                   ),
@@ -135,9 +133,8 @@ class _DrawerPageState extends State<DrawerPage> {
                       iconColor: White,
                       function: () async {
                         Navigator.of(context)
-                            .push(MaterialPageRoute(builder: (context) {
-                          return null;
-                        }));
+                            .push(SlideRoute(
+                          enterPage: null, exitPage: DrawerPage(),));
                       },
                     ),
                   ),

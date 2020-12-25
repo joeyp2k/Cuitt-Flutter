@@ -3,6 +3,7 @@ import 'package:cuitt/presentation/design_system/colors.dart';
 import 'package:cuitt/presentation/design_system/dimensions.dart';
 import 'package:cuitt/presentation/design_system/texts.dart';
 import 'package:cuitt/presentation/pages/connect_device.dart';
+import 'package:cuitt/presentation/routes/slide.dart';
 import 'package:cuitt/presentation/widgets/animated_button.dart';
 import 'package:cuitt/presentation/widgets/text_entry_box.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -170,10 +171,10 @@ class _CreateAccountState extends State<CreateAccount>
                       GestureDetector(
                         behavior: HitTestBehavior.translucent,
                         onTap: () {
-                          Navigator.of(context)
-                              .push(MaterialPageRoute(builder: (context) {
-                            return introPagesB;
-                          }));
+                          Navigator.of(context).push(SlideRoute(
+                            enterPage: introPagesB,
+                            exitPage: CreateAccount(),
+                          ));
                         },
                         child: Container(
                           margin: spacer.y.xs + spacer.left.xs,

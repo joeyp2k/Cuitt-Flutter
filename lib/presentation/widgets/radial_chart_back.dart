@@ -44,6 +44,7 @@ class RadialChartBack extends StatelessWidget {
           child: new AnimatedCircularChart(
             key: _chartKey,
             size: _chartSize,
+            duration: Duration(seconds: 0),
             initialChartData: _generateChartData(fill),
             chartType: CircularChartType.Radial,
             edgeStyle: SegmentEdgeStyle.round,

@@ -98,8 +98,7 @@ class _DashboardbState extends State<Dashboardb> {
                       child: Column(
                         children: [
                           Padding(
-                            padding:
-                                spacer.left.xxs * 1.25 + spacer.y.xxs * 0.5,
+                            padding: spacer.y.xxs * 0.5,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -110,6 +109,7 @@ class _DashboardbState extends State<Dashboardb> {
                                 ),
                                 IconButton(
                                     color: White,
+                                    splashColor: Colors.transparent,
                                     icon: Icon(Icons.person),
                                     onPressed: () => {}),
                               ],

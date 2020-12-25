@@ -25,7 +25,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
             children: [
               Container(
                 width: double.maxFinite,
-                padding: spacer.y.xs,
+                padding: spacer.y.xs * 1.2,
                 alignment: Alignment.center,
                 child: Padding(
                   padding: spacer.x.sm,
