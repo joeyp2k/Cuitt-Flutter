@@ -3,7 +3,7 @@ import 'package:cuitt/presentation/design_system/colors.dart';
 import 'package:cuitt/presentation/design_system/dimensions.dart';
 import 'package:cuitt/presentation/design_system/texts.dart';
 import 'package:cuitt/presentation/pages/connect_device.dart';
-import 'package:cuitt/presentation/widgets/button.dart';
+import 'package:cuitt/presentation/widgets/animated_button.dart';
 import 'package:cuitt/presentation/widgets/text_entry_box.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -150,12 +150,11 @@ class _CreateAccountState extends State<CreateAccount>
                     ),
                   ],
                 ),
-                Padding(
-                  padding: spacer.x.xxl * 1.5 + spacer.y.xs,
-                  child: Button(
-                    text: "Create Account",
-                    function: _register,
-                  ),
+                AnimatedButton(
+                  paddingStart: spacer.x.xxl * 1.5,
+                  success: _success,
+                  function: _register,
+                  text: 'Create Account',
                 ),
                 Padding(
                   padding: spacer.x.md,

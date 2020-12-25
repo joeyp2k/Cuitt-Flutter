@@ -1,21 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cuitt/bloc/dashboard_bloc.dart';
-import 'package:cuitt/data/datasources/buttons.dart';
 import 'package:cuitt/data/datasources/dash_tiles.dart';
 import 'package:cuitt/data/datasources/user.dart';
 import 'package:cuitt/presentation/design_system/colors.dart';
 import 'package:cuitt/presentation/design_system/dimensions.dart';
 import 'package:cuitt/presentation/design_system/texts.dart';
-import 'package:cuitt/presentation/pages/create_group.dart';
 import 'package:cuitt/presentation/pages/group_list.dart';
 import 'package:cuitt/presentation/pages/group_list_empty.dart';
-import 'package:cuitt/presentation/pages/join_group.dart';
-import 'package:cuitt/presentation/widgets/dashboard_button.dart';
 import 'package:cuitt/presentation/widgets/dashboard_chart.dart';
 import 'package:cuitt/presentation/widgets/dashboard_tile_large.dart';
 import 'package:cuitt/presentation/widgets/drawer_button.dart';
 import 'package:cuitt/presentation/widgets/draws_tile.dart';
-import 'package:cuitt/presentation/widgets/list_button.dart';
 import 'package:cuitt/presentation/widgets/radial_chart.dart';
 import 'package:cuitt/presentation/widgets/radial_chart_back.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -79,38 +74,23 @@ class _DashboardbState extends State<Dashboardb> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<DashBloc>(
-      create: (BuildContext context) => DashBloc(),
-      child: BlocBuilder<DashBloc, DashBlocState>(
-        builder: (context, state) {
-          counterBlocSink = BlocProvider.of<DashBloc>(context);
-          return Scaffold(
-            floatingActionButton: FloatingActionButton(
-              backgroundColor: White,
-              onPressed: () {
-                print(drawLengthTotal.toString());
-                usage += 10;
-              },
-            ),
-            backgroundColor: Background,
-            body: AnimatedBuilder(
-              builder: (context, child) {
-                return FadeTransition(
-                  child: child,
-                  opacity: Tween<double>(begin: 0, end: 1.0).animate(
-                    CurvedAnimation(
-                      parent: widget.opacityAnimation,
-                      curve: Interval(
-                        0,
-                        0.5,
-                        curve: Curves.easeIn,
-                      ),
-                    ),
-                  ),
-                );
-              },
-              animation: widget.opacityAnimation,
-              child: SafeArea(
+    return WillPopScope(
+      onWillPop: () => Future.value(false),
+      child: BlocProvider<DashBloc>(
+        create: (BuildContext context) => DashBloc(),
+        child: BlocBuilder<DashBloc, DashBlocState>(
+          builder: (context, state) {
+            counterBlocSink = BlocProvider.of<DashBloc>(context);
+            return Scaffold(
+              floatingActionButton: FloatingActionButton(
+                backgroundColor: White,
+                onPressed: () {
+                  print(drawLengthTotal.toString());
+                  usage += 10;
+                },
+              ),
+              backgroundColor: Background,
+              body: SafeArea(
                 child: SingleChildScrollView(
                   child: Center(
                     child: Padding(
@@ -118,7 +98,8 @@ class _DashboardbState extends State<Dashboardb> {
                       child: Column(
                         children: [
                           Padding(
-                            padding: spacer.left.xxs * 1.25 + spacer.top.xxs,
+                            padding:
+                                spacer.left.xxs * 1.25 + spacer.y.xxs * 0.5,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -226,9 +207,9 @@ class _DashboardbState extends State<Dashboardb> {
                   ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

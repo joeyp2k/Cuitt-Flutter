@@ -1,20 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cuitt/data/datasources/buttons.dart';
 import 'package:cuitt/data/datasources/keys.dart';
 import 'package:cuitt/data/datasources/user.dart';
 import 'package:cuitt/presentation/design_system/colors.dart';
 import 'package:cuitt/presentation/design_system/dimensions.dart';
-import 'package:cuitt/presentation/design_system/texts.dart';
 import 'package:cuitt/presentation/pages/group_list.dart';
 import 'package:cuitt/presentation/pages/group_list_empty.dart';
-import 'package:cuitt/presentation/widgets/button.dart';
+import 'package:cuitt/presentation/widgets/animated_button.dart';
+import 'package:cuitt/presentation/widgets/dashboard_button.dart';
 import 'package:cuitt/presentation/widgets/group_id_box.dart';
 import 'package:cuitt/presentation/widgets/text_entry_box.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-final FirebaseAuth _auth = FirebaseAuth.instance;
-final firestoreInstance = Firestore.instance;
+final firestoreInstance = FirebaseFirestore.instance;
 var firebaseUser;
 
 class CreateCasualPage extends StatefulWidget {
@@ -29,6 +29,7 @@ class _CreateCasualPageState extends State<CreateCasualPage> {
   final TextEditingController _verifyGroupPasswordController =
       TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  bool _success = false;
 
   void _createCasualGroup() async {
     firebaseUser = (await FirebaseAuth.instance.currentUser);
@@ -39,6 +40,7 @@ class _CreateCasualPageState extends State<CreateCasualPage> {
       "admins": firebaseUser.uid,
       "members": FieldValue.arrayUnion([firebaseUser.uid]),
     });
+    _success = true;
   }
 
   void groups() async {
@@ -70,24 +72,21 @@ class _CreateCasualPageState extends State<CreateCasualPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: LightBlue,
+      backgroundColor: Background,
       body: SafeArea(
         child: Column(
           children: [
-            Container(
-              width: double.maxFinite,
-              height: gridSpacer * 15,
-              color: LightBlue,
-              alignment: Alignment.bottomLeft,
-              child: Padding(
-                padding: spacer.x.sm + spacer.bottom.xs,
-                child: RichText(
-                  text: TextSpan(
-                    text: "Create Casual Group",
-                    style: TileData,
-                  ),
-                ),
-              ),
+            DashboardButton(
+              color: casualTile.color,
+              text: casualTile.header,
+              icon: casualTile.icon,
+              iconColor: White,
+              function: () {
+                return null;
+              },
+            ),
+            GroupIDBox(
+              color: Green,
             ),
             Expanded(
               child: SingleChildScrollView(
@@ -99,8 +98,7 @@ class _CreateCasualPageState extends State<CreateCasualPage> {
                       child: Column(
                         children: [
                           Padding(
-                            padding: spacer.top.sm + spacer.bottom.md,
-                            child: GroupIDBox(),
+                            padding: spacer.top.sm,
                           ),
                           Form(
                             key: _formKey,
@@ -125,21 +123,20 @@ class _CreateCasualPageState extends State<CreateCasualPage> {
                                     text: "Verify Password",
                                     obscureText: true,
                                     textController:
-                                        _verifyGroupPasswordController,
+                                    _verifyGroupPasswordController,
                                   ),
                                 ],
                               ),
                             ),
                           ),
-                          Padding(
-                            padding: spacer.x.xl + spacer.y.lg,
-                            child: Button(
-                              text: "Create Casual Group",
-                              function: () async {
-                                _createCasualGroup();
-                                groups();
-                              },
-                            ),
+                          AnimatedButton(
+                            success: _success,
+                            paddingStart: spacer.x.xl + spacer.top.xxs,
+                            text: "Create Casual Group",
+                            function: () async {
+                              _createCasualGroup();
+                              groups();
+                            },
                           ),
                         ],
                       ),

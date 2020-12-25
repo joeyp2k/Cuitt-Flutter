@@ -19,72 +19,58 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        backgroundColor: LightBlue,
+        backgroundColor: Background,
         body: SafeArea(
           child: Column(
             children: [
               Container(
                 width: double.maxFinite,
-                height: gridSpacer * 15,
-                color: LightBlue,
-                alignment: Alignment.bottomLeft,
+                padding: spacer.y.xs,
+                alignment: Alignment.center,
                 child: Padding(
-                  padding: spacer.x.sm + spacer.bottom.xs,
+                  padding: spacer.x.sm,
                   child: RichText(
                     text: TextSpan(
                       text: "Create Group",
-                      style: TileData,
+                      style: TileHeader,
                     ),
                   ),
                 ),
               ),
               Expanded(
-                child: Container(
-                  color: Background,
-                  child: Center(
-                    child: Padding(
-                      padding: spacer.x.xs,
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: spacer.y.sm,
-                            child: DashboardButton(
-                              color: adminTile.color,
-                              text: adminTile.header,
-                              icon: adminTile.icon,
-                              iconColor: White,
-                              function: () async {
-                                randID = secureRandom.nextString(
-                                    length: 5,
-                                    charset:
-                                        '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
-                                Navigator.of(context)
-                                    .push(MaterialPageRoute(builder: (context) {
-                                  return CreateAdminPage();
-                                }));
-                              },
-                            ),
-                          ),
-                          DashboardButton(
-                            color: casualTile.color,
-                            text: casualTile.header,
-                            iconColor: White,
-                            icon: casualTile.icon,
-                            function: () {
-                              randID = secureRandom.nextString(
-                                  length: 5,
-                                  charset:
-                                      '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
-                              Navigator.of(context)
-                                  .push(MaterialPageRoute(builder: (context) {
-                                return CreateCasualPage();
-                              }));
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                child: DashboardButton(
+                  color: adminTile.color,
+                  text: adminTile.header,
+                  icon: adminTile.icon,
+                  iconColor: White,
+                  function: () async {
+                    randID = secureRandom.nextString(
+                        length: 5,
+                        charset:
+                            '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+                    Navigator.of(context)
+                        .push(MaterialPageRoute(builder: (context) {
+                      return CreateAdminPage();
+                    }));
+                  },
+                ),
+              ),
+              Expanded(
+                child: DashboardButton(
+                  color: casualTile.color,
+                  text: casualTile.header,
+                  iconColor: White,
+                  icon: casualTile.icon,
+                  function: () {
+                    randID = secureRandom.nextString(
+                        length: 5,
+                        charset:
+                            '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+                    Navigator.of(context)
+                        .push(MaterialPageRoute(builder: (context) {
+                      return CreateCasualPage();
+                    }));
+                  },
                 ),
               ),
             ],

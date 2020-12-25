@@ -25,13 +25,14 @@ class DashboardButton extends StatelessWidget {
       color: color,
       child: InkWell(
         splashColor: Colors.transparent,
-        highlightColor: DarkBlue,
+        highlightColor: TransWhite,
         onTap: (() {
           function();
         }),
         child: Container(
           padding: spacer.all.sm,
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
                 icon,

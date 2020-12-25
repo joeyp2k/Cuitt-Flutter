@@ -27,6 +27,12 @@ class _AnimatedRadialChartState extends State<AnimatedRadialChart> {
     });
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    timer.cancel();
+  }
+
   List<CircularStackEntry> _generateChartData(double usage) {
     Color dialColor = Green;
 

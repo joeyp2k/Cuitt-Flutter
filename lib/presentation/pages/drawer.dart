@@ -1,12 +1,19 @@
-import 'package:flutter/material.dart';
-import 'package:cuitt/presentation/design_system/colors.dart';
-import 'package:cuitt/presentation/widgets/drawer_button.dart';
-import 'package:cuitt/presentation/design_system/dimensions.dart';
-import 'package:cuitt/presentation/design_system/texts.dart';
-import 'package:cuitt/presentation/widgets/dashboard_button.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cuitt/data/datasources/buttons.dart';
+import 'package:cuitt/data/datasources/user.dart';
+import 'package:cuitt/presentation/design_system/colors.dart';
+import 'package:cuitt/presentation/design_system/dimensions.dart';
 import 'package:cuitt/presentation/pages/create_group.dart';
-import 'package:provider/provider.dart';
+import 'package:cuitt/presentation/pages/group_list.dart';
+import 'package:cuitt/presentation/pages/group_list_empty.dart';
+import 'package:cuitt/presentation/pages/join_group.dart';
+import 'package:cuitt/presentation/widgets/dashboard_button.dart';
+import 'package:cuitt/presentation/widgets/drawer_button.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+
+final firestoreInstance = FirebaseFirestore.instance;
+var firebaseUser;
 
 class DrawerPage extends StatefulWidget {
   final Animation<double> transitionAnimation;
@@ -18,6 +25,45 @@ class DrawerPage extends StatefulWidget {
 }
 
 class _DrawerPageState extends State<DrawerPage> {
+  int arrayIndex;
+  var value;
+
+  void _getGroupsWithUser() async {
+    arrayIndex = 0;
+
+    var firebaseUser = await FirebaseAuth.instance.currentUser;
+    value = await firestoreInstance
+        .collection("groups")
+        .where("members", arrayContains: firebaseUser.uid)
+        .get();
+  }
+
+  void _loadGroupData() {
+    groupNameList.clear();
+    groupIDList.clear();
+
+    value.docs.forEach((element) {
+      groupNameList.insert(arrayIndex, element.get("group name"));
+      groupIDList.insert(arrayIndex, element.id);
+      arrayIndex++;
+    });
+  }
+
+  void groups() async {
+    _getGroupsWithUser();
+    _loadGroupData();
+
+    if (groupNameList.isEmpty) {
+      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+        return GroupListEmpty();
+      }));
+    } else {
+      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+        return GroupsList();
+      }));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,14 +72,12 @@ class _DrawerPageState extends State<DrawerPage> {
         child: Column(
           children: [
             Padding(
-              padding: spacer.left.xxs * 1.25 + spacer.top.xxs + spacer.x.xs,
+              padding:
+                  spacer.left.xxs * 1.25 + spacer.y.xxs * 0.45 + spacer.x.xs,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   DrawerButton(),
-                  RichText(
-                    text: TextSpan(style: TileHeader, text: 'My Activity'),
-                  ),
                   IconButton(
                       color: White,
                       icon: Icon(Icons.person),
@@ -42,82 +86,62 @@ class _DrawerPageState extends State<DrawerPage> {
               ),
             ),
             Expanded(
-              child: AnimatedBuilder(
-                animation: widget.transitionAnimation,
-                builder: (context, child) {
-                  return SlideTransition(
-                    position: Tween<Offset>(
-                      begin: Offset(-1, 0),
-                      end: Offset(0, 0),
-                    ).animate(
-                      CurvedAnimation(
-                        curve: Interval(0, 0.5, curve: Curves.easeIn),
-                        parent: widget.transitionAnimation,
-                      ),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: DashboardButton(
+                      color: createTile.color,
+                      text: createTile.header,
+                      icon: Icons.add,
+                      iconColor: White,
+                      function: () async {
+                        Navigator.of(context)
+                            .push(MaterialPageRoute(builder: (context) {
+                          return CreateGroupPage();
+                        }));
+                      },
                     ),
-                    child: child,
-                  );
-                },
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: DashboardButton(
-                        color: createTile.color,
-                        text: createTile.header,
-                        icon: Icons.add,
-                        iconColor: White,
-                        function: () async {
-                          Navigator.of(context)
-                              .push(MaterialPageRoute(builder: (context) {
-                            return CreateGroupPage();
-                          }));
-                        },
-                      ),
+                  ),
+                  Expanded(
+                    child: DashboardButton(
+                      color: joinTile.color,
+                      text: joinTile.header,
+                      icon: Icons.link,
+                      iconColor: White,
+                      function: () async {
+                        Navigator.of(context)
+                            .push(MaterialPageRoute(builder: (context) {
+                          return JoinGroupPage();
+                        }));
+                      },
                     ),
-                    Expanded(
-                      child: DashboardButton(
-                        color: joinTile.color,
-                        text: joinTile.header,
-                        icon: Icons.link,
-                        iconColor: White,
-                        function: () async {
-                          Navigator.of(context)
-                              .push(MaterialPageRoute(builder: (context) {
-                            return CreateGroupPage();
-                          }));
-                        },
-                      ),
+                  ),
+                  Expanded(
+                    child: DashboardButton(
+                      color: groupsTile.color,
+                      text: groupsTile.header,
+                      icon: Icons.list,
+                      iconColor: White,
+                      function: () async {
+                        groups();
+                      },
                     ),
-                    Expanded(
-                      child: DashboardButton(
-                        color: groupsTile.color,
-                        text: groupsTile.header,
-                        icon: Icons.list,
-                        iconColor: White,
-                        function: () async {
-                          Navigator.of(context)
-                              .push(MaterialPageRoute(builder: (context) {
-                            return CreateGroupPage();
-                          }));
-                        },
-                      ),
+                  ),
+                  Expanded(
+                    child: DashboardButton(
+                      color: settingsTile.color,
+                      text: settingsTile.header,
+                      icon: Icons.settings,
+                      iconColor: White,
+                      function: () async {
+                        Navigator.of(context)
+                            .push(MaterialPageRoute(builder: (context) {
+                          return null;
+                        }));
+                      },
                     ),
-                    Expanded(
-                      child: DashboardButton(
-                        color: settingsTile.color,
-                        text: settingsTile.header,
-                        icon: Icons.settings,
-                        iconColor: White,
-                        function: () async {
-                          Navigator.of(context)
-                              .push(MaterialPageRoute(builder: (context) {
-                            return CreateGroupPage();
-                          }));
-                        },
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ],

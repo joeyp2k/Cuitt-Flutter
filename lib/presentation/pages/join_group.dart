@@ -1,14 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cuitt/data/datasources/buttons.dart';
 import 'package:cuitt/presentation/design_system/colors.dart';
 import 'package:cuitt/presentation/design_system/dimensions.dart';
-import 'package:cuitt/presentation/design_system/texts.dart';
-import 'package:cuitt/presentation/widgets/button.dart';
+import 'package:cuitt/presentation/widgets/animated_button.dart';
+import 'package:cuitt/presentation/widgets/dashboard_button.dart';
 import 'package:cuitt/presentation/widgets/text_entry_box.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-final FirebaseAuth _auth = FirebaseAuth.instance;
 final firestoreInstance = FirebaseFirestore.instance;
 var firebaseUser;
 
@@ -22,35 +22,31 @@ class _JoinGroupPageState extends State<JoinGroupPage> {
   final TextEditingController _groupPasswordController =
       TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  bool _success = false;
 
   void _joinGroup() async {
     firebaseUser = (await FirebaseAuth.instance.currentUser);
     firestoreInstance.collection("groups").doc(_groupIDController.text).update({
       "members": FieldValue.arrayUnion([firebaseUser.uid]),
     });
+    _success = true;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: LightBlue,
+      backgroundColor: Background,
       body: SafeArea(
         child: Column(
           children: [
-            Container(
-              width: double.maxFinite,
-              height: gridSpacer * 15,
-              color: LightBlue,
-              alignment: Alignment.bottomLeft,
-              child: Padding(
-                padding: spacer.x.sm + spacer.bottom.xs,
-                child: RichText(
-                  text: TextSpan(
-                    text: "Join Group",
-                    style: TileData,
-                  ),
-                ),
-              ),
+            DashboardButton(
+              color: joinTile.color,
+              text: joinTile.header,
+              icon: Icons.link,
+              iconColor: White,
+              function: () {
+                return null;
+              },
             ),
             Expanded(
               child: Container(
@@ -83,18 +79,17 @@ class _JoinGroupPageState extends State<JoinGroupPage> {
                             ),
                           ),
                         ),
-                        Padding(
-                          padding: spacer.x.xxl * 1.3 + spacer.top.xl,
-                          child: Button(
-                            text: "Join Group",
-                            function: () async {
-                              _joinGroup();
-                              Navigator.of(context)
-                                  .push(MaterialPageRoute(builder: (context) {
-                                return null;
-                              }));
-                            },
-                          ),
+                        AnimatedButton(
+                          paddingStart: spacer.x.xxl * 1.3 + spacer.top.xl,
+                          success: _success,
+                          text: "Join Group",
+                          function: () async {
+                            _joinGroup();
+                            Navigator.of(context)
+                                .push(MaterialPageRoute(builder: (context) {
+                              return null;
+                            }));
+                          },
                         ),
                       ],
                     ),

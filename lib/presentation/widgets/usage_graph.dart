@@ -94,7 +94,6 @@ class _BarChartState extends State<BarChart> {
     super.dispose();
     //Stop Timer
     timer?.cancel();
-    super.dispose();
   }
 
   @override

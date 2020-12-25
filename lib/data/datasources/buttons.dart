@@ -18,10 +18,10 @@ var createTile = ButtonData("New Group", Icons.add, DarkBlue);
 
 var joinTile = ButtonData("Join Group", Icons.link, LightBlue);
 
-var adminTile =
-    ButtonData("Create Administrative Group", Icons.add, TransWhite);
+var adminTile = ButtonData(
+    "Create Administrative Group", Icons.supervisor_account, DarkBlue);
 
-var casualTile = ButtonData("Create Casual Group", Icons.add, TransWhite);
+var casualTile = ButtonData("Create Casual Group", Icons.people, LightBlue);
 
 //Action Buttons
 var continueButton = ButtonData("Continue", null, Green);

@@ -1,8 +1,48 @@
 import 'package:cuitt/presentation/design_system/colors.dart';
+import 'package:cuitt/presentation/pages/dashboard.dart';
 import 'package:cuitt/presentation/pages/drawer.dart';
 import 'package:flutter/material.dart';
 
 bool drawer = false;
+
+class EnterExitRoute extends PageRouteBuilder {
+  final Widget enterPage;
+  final Widget exitPage;
+
+  EnterExitRoute({this.exitPage, this.enterPage})
+      : super(
+          pageBuilder: (
+            BuildContext context,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+          ) =>
+              enterPage,
+          transitionsBuilder: (
+            BuildContext context,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+            Widget child,
+          ) =>
+              Stack(
+            children: <Widget>[
+              SlideTransition(
+                position: new Tween<Offset>(
+                  begin: const Offset(0.0, 0.0),
+                  end: const Offset(0.0, 0.0),
+                ).animate(animation),
+                child: exitPage,
+              ),
+              FadeTransition(
+                opacity: new Tween<double>(
+                  begin: 0.0,
+                  end: 1.0,
+                ).animate(animation),
+                child: enterPage,
+              ),
+            ],
+          ),
+        );
+}
 
 class DrawerButton extends StatefulWidget {
   @override
@@ -23,6 +63,7 @@ class _DrawerButtonState extends State<DrawerButton>
 
   @override
   void dispose() {
+    print('dispose');
     _controller.dispose();
     super.dispose();
   }
@@ -32,18 +73,15 @@ class _DrawerButtonState extends State<DrawerButton>
     drawer = !drawer;
     setState(() {
       if (drawer == true) {
-        Navigator.of(context).push(
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) {
-              return DrawerPage(
-                transitionAnimation: animation,
-              );
-            },
-            transitionDuration: Duration(seconds: 1),
-          ),
+        _controller.reverse();
+        Navigator.push(context,
+          EnterExitRoute(exitPage: Dashboardb(), enterPage: DrawerPage()),
         );
       } else {
-        Navigator.pop(context);
+        _controller.reverse();
+        Navigator.push(context,
+          EnterExitRoute(enterPage: Dashboardb(), exitPage: DrawerPage()),
+        );
       }
     });
   }
