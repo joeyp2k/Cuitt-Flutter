@@ -1,5 +1,5 @@
-import 'package:charts_flutter/flutter.dart' as charts;
-import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 class UsageData {
   final DateTime time;
@@ -15,9 +15,11 @@ var i = 0;
 int firstRun = 1;
 int n = 1;
 
+var dateFormat = DateFormat.j();
+
 DateTime viewport = DateTime.now();
 DateTime timeData;
-
+DateTimeIntervalType transitionLabel = DateTimeIntervalType.hours;
 DateTime viewportHour =
     DateTime(viewport.year, viewport.month, viewport.day, viewport.hour)
         .toLocal();
@@ -29,9 +31,6 @@ DateTime viewportMonth = DateTime(viewport.year, viewport.month).toLocal();
 
 DateTime viewportSelectionStart = viewportHour;
 DateTime viewportSelectionEnd = viewportHour.add(Duration(hours: 11));
-
-String Label = 'HH';
-String transitionLabel = 'dd MMM';
 
 var dataSelection = dayData;
 
@@ -82,17 +81,4 @@ var yearData = [
   UsageData(DateTime(viewport.year, 10), 0),
   UsageData(DateTime(viewport.year, 11), 0),
   UsageData(DateTime(viewport.year, 12), 0),
-];
-
-var overviewSeries = [
-  new charts.Series(
-    id: 'Overview',
-    domainFn: (UsageData uData, _) => uData.time,
-    measureFn: (UsageData uData, _) => uData.seconds,
-    // ignore: top_level_function_literal_block
-    colorFn: (UsageData uData, _) {
-      return charts.ColorUtil.fromDartColor(Colors.greenAccent);
-    },
-    data: dataSelection,
-  ),
 ];

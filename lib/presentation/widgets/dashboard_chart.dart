@@ -2,8 +2,10 @@ import 'package:cuitt/data/datasources/my_chart_data.dart';
 import 'package:cuitt/presentation/design_system/colors.dart';
 import 'package:cuitt/presentation/design_system/dimensions.dart';
 import 'package:cuitt/presentation/design_system/texts.dart';
-import 'package:cuitt/presentation/widgets/usage_graph.dart';
+import 'package:cuitt/presentation/widgets/syncfusion_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 double padValue = 0;
 
@@ -54,8 +56,8 @@ class _DashboardChartState extends State<DashboardChart> {
                           ),
                           onTap: () {
                             setState(() {
-                              Label = 'HH';
-                              transitionLabel = 'HH';
+                              dateFormat = DateFormat.j();
+                              labelInterval = DateTimeIntervalType.hours;
                               padValue = 0;
                               dataSelection = dayData;
                               viewportSelectionStart = viewportHour;
@@ -80,16 +82,12 @@ class _DashboardChartState extends State<DashboardChart> {
                           ),
                           onTap: () {
                             setState(() {
-                              Label = 'dd';
-                              transitionLabel = 'dd MMM';
-                              padValue = MediaQuery
-                                  .of(context)
-                                  .size
-                                  .width / 4 -
+                              dateFormat = DateFormat.EEEE();
+                              labelInterval = DateTimeIntervalType.days;
+                              padValue = MediaQuery.of(context).size.width / 4 -
                                   gridSpacer;
                               dataSelection = weekData;
-                              viewportSelectionStart =
-                                  viewportDay;
+                              viewportSelectionStart = viewportDay;
                               viewportSelectionEnd =
                                   viewportDay.add(Duration(days: 6));
                             });
@@ -111,8 +109,8 @@ class _DashboardChartState extends State<DashboardChart> {
                           ),
                           onTap: () {
                             setState(() {
-                              Label = 'dd';
-                              transitionLabel = 'dd MMM';
+                              dateFormat = DateFormat.Md();
+                              labelInterval = DateTimeIntervalType.days;
                               padValue =
                                   (MediaQuery
                                       .of(context)
@@ -163,10 +161,9 @@ class _DashboardChartState extends State<DashboardChart> {
               ],
             ),
           ),
-          Padding(
-            padding: spacer.bottom.xs,
-            child: BarChart(),
-          ),
+          SizedBox(
+              height: gridSpacer * 30,
+              child: ChartApp()),
         ],
       ),
     );

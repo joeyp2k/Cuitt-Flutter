@@ -161,10 +161,6 @@ class _BarChartState extends State<BarChart> {
       defaultRenderer: new charts.BarRendererConfig<DateTime>(),
       domainAxis: new charts.DateTimeAxisSpec(
           tickProviderSpec: charts.AutoDateTimeTickProviderSpec(),
-          tickFormatterSpec: new charts.AutoDateTimeTickFormatterSpec(
-            day: new charts.TimeFormatterSpec(
-                format: Label, transitionFormat: transitionLabel),
-          ),
           viewport: new charts.DateTimeExtents(
               start: viewportSelectionStart, end: viewportSelectionEnd),
           renderSpec: new charts.SmallTickRendererSpec(
