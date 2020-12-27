@@ -54,38 +54,13 @@ class _DashboardChartState extends State<DashboardChart> {
                           ),
                           onTap: () {
                             setState(() {
+                              Label = 'HH';
+                              transitionLabel = 'HH';
                               padValue = 0;
                               dataSelection = dayData;
-                              viewportSelectionStart =
-                                  viewportHour.subtract(Duration(hours: 11));
+                              viewportSelectionStart = viewportHour;
                               viewportSelectionEnd =
-                                  viewportHour.add(Duration(hours: 1));
-                            });
-                          },
-                        ),
-                      ),
-                      Expanded(
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.translucent,
-                          child: Container(
-                            child: Center(
-                              child: RichText(
-                                text: TextSpan(
-                                  text: 'M',
-                                  style: DWMY,
-                                ),
-                              ),
-                            ),
-                          ),
-                          onTap: () {
-                            setState(() {
-                              padValue = MediaQuery.of(context).size.width / 4 -
-                                  gridSpacer;
-                              dataSelection = weekData;
-                              viewportSelectionStart =
-                                  viewportDay.subtract(Duration(days: 6));
-                              viewportSelectionEnd =
-                                  viewportDay.add(Duration(days: 1));
+                                  viewportHour.add(Duration(hours: 11));
                             });
                           },
                         ),
@@ -105,15 +80,51 @@ class _DashboardChartState extends State<DashboardChart> {
                           ),
                           onTap: () {
                             setState(() {
+                              Label = 'dd';
+                              transitionLabel = 'dd MMM';
+                              padValue = MediaQuery
+                                  .of(context)
+                                  .size
+                                  .width / 4 -
+                                  gridSpacer;
+                              dataSelection = weekData;
+                              viewportSelectionStart =
+                                  viewportDay;
+                              viewportSelectionEnd =
+                                  viewportDay.add(Duration(days: 6));
+                            });
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.translucent,
+                          child: Container(
+                            child: Center(
+                              child: RichText(
+                                text: TextSpan(
+                                  text: 'M',
+                                  style: DWMY,
+                                ),
+                              ),
+                            ),
+                          ),
+                          onTap: () {
+                            setState(() {
+                              Label = 'dd';
+                              transitionLabel = 'dd MMM';
                               padValue =
-                                  (MediaQuery.of(context).size.width / 4 -
-                                          gridSpacer) *
+                                  (MediaQuery
+                                      .of(context)
+                                      .size
+                                      .width / 4 -
+                                      gridSpacer) *
                                       2;
                               dataSelection = weekData;
                               viewportSelectionStart =
-                                  viewportDay.subtract(Duration(days: 29));
+                                  viewportDay;
                               viewportSelectionEnd =
-                                  viewportDay.add(Duration(days: 1));
+                                  viewportDay.add(Duration(days: 29));
                             });
                           },
                         ),

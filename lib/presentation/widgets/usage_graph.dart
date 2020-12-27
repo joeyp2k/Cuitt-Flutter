@@ -160,14 +160,15 @@ class _BarChartState extends State<BarChart> {
       ],
       defaultRenderer: new charts.BarRendererConfig<DateTime>(),
       domainAxis: new charts.DateTimeAxisSpec(
+          tickProviderSpec: charts.AutoDateTimeTickProviderSpec(),
           tickFormatterSpec: new charts.AutoDateTimeTickFormatterSpec(
-              day: new charts.TimeFormatterSpec(
-                  format: 'HH', transitionFormat: 'HH')),
+            day: new charts.TimeFormatterSpec(
+                format: Label, transitionFormat: transitionLabel),
+          ),
           viewport: new charts.DateTimeExtents(
-              start: viewportSelectionStart,
-              end: viewportSelectionEnd),
+              start: viewportSelectionStart, end: viewportSelectionEnd),
           renderSpec: new charts.SmallTickRendererSpec(
-            // Tick and Label styling here.
+              // Tick and Label styling here.
               labelStyle: new charts.TextStyleSpec(
                   fontSize: 12, // size in Pts.
                   color: charts.MaterialPalette.white),
@@ -184,7 +185,7 @@ class _BarChartState extends State<BarChart> {
 
             // Tick and Label styling here.
               labelStyle: new charts.TextStyleSpec(
-                  fontSize: 18, // size in Pts.
+                  fontSize: 16, // size in Pts.
                   color: charts.MaterialPalette.white),
 
               // Change the line colors to match text color.

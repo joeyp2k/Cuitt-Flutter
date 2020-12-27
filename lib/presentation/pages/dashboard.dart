@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cuitt/bloc/dashboard_bloc.dart';
 import 'package:cuitt/data/datasources/dash_tiles.dart';
@@ -7,6 +9,7 @@ import 'package:cuitt/presentation/design_system/dimensions.dart';
 import 'package:cuitt/presentation/design_system/texts.dart';
 import 'package:cuitt/presentation/pages/group_list.dart';
 import 'package:cuitt/presentation/pages/group_list_empty.dart';
+import 'package:cuitt/presentation/widgets/average_waitperiod_tile.dart';
 import 'package:cuitt/presentation/widgets/dashboard_chart.dart';
 import 'package:cuitt/presentation/widgets/dashboard_tile_large.dart';
 import 'package:cuitt/presentation/widgets/drawer_button.dart';
@@ -46,6 +49,8 @@ class _DashboardbState extends State<Dashboardb> {
         .get();
   }
 
+  Timer timer;
+
   void _loadGroupData() {
     groupNameList.clear();
     groupIDList.clear();
@@ -82,14 +87,15 @@ class _DashboardbState extends State<Dashboardb> {
           builder: (context, state) {
             counterBlocSink = BlocProvider.of<DashBloc>(context);
             return Scaffold(
+              backgroundColor: Background,
               floatingActionButton: FloatingActionButton(
-                backgroundColor: White,
                 onPressed: () {
-                  print(drawLengthTotal.toString());
-                  usage += 10;
+                  print('Draw Count: ' + drawCount.toString());
+                  print('Draw Length: ' + drawLength.toString());
+                  print('Draw Length Total: ' + drawLengthTotal.toString());
+                  print('Draw Length Average: ' + drawLengthAverage.toString());
                 },
               ),
-              backgroundColor: Background,
               body: SafeArea(
                 child: SingleChildScrollView(
                   child: Center(
@@ -98,7 +104,7 @@ class _DashboardbState extends State<Dashboardb> {
                       child: Column(
                         children: [
                           Padding(
-                            padding: spacer.y.xxs * 0.5,
+                            padding: spacer.top.xxs * 0.5,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -143,8 +149,8 @@ class _DashboardbState extends State<Dashboardb> {
                                       text: TextSpan(
                                         style: RadialLarge,
                                         text: (state as DataState)
-                                                .newAverageDrawLengthTotalYestValue
-                                                .toString() +
+                                            .newAverageDrawLengthTotalYestValue
+                                            .toString() +
                                             's',
                                       ),
                                     ),
@@ -169,6 +175,7 @@ class _DashboardbState extends State<Dashboardb> {
                                 header: timeUntilTile.header,
                                 textData: timeUntilTile.textData,
                                 color: Red,
+                                timeUntilNext: timeUntilNext,
                               ),
                             ],
                           ),
@@ -180,8 +187,8 @@ class _DashboardbState extends State<Dashboardb> {
                                 header: avgDrawTile.header,
                                 header2: drawTile.header,
                                 textData: (state as DataState)
-                                        .newAverageDrawLengthValue
-                                        .toString() +
+                                    .newAverageDrawLengthValue
+                                    .toString() +
                                     ' seconds',
                                 textData2: (state as DataState)
                                     .newDrawCountValue
@@ -193,7 +200,7 @@ class _DashboardbState extends State<Dashboardb> {
                             padding: spacer.y.xs,
                             child: Row(
                               children: [
-                                DashboardTileLarge(
+                                AverageTimeBetweenTile(
                                   header: avgWaitTile.header,
                                   textData: avgWaitTile.textData,
                                   color: TransWhite,

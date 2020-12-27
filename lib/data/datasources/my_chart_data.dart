@@ -27,8 +27,11 @@ DateTime viewportDay =
 
 DateTime viewportMonth = DateTime(viewport.year, viewport.month).toLocal();
 
-DateTime viewportSelectionStart = viewportHour.subtract(Duration(hours: 11));
-DateTime viewportSelectionEnd = viewportHour.add(Duration(hours: 1));
+DateTime viewportSelectionStart = viewportHour;
+DateTime viewportSelectionEnd = viewportHour.add(Duration(hours: 11));
+
+String Label = 'HH';
+String transitionLabel = 'dd MMM';
 
 var dataSelection = dayData;
 

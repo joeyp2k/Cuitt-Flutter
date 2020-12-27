@@ -48,11 +48,11 @@ class DashBloc extends Bloc<DashBlocEvent, DashBlocState> {
       int newDrawCountValue = drawCount;
       int newSeshCountValue = seshCount;
       double newDrawLengthValue = drawLength;
-      int newDrawLengthTotalValue = drawLengthTotal.truncate();
+      int newDrawLengthTotalValue = drawLengthTotal.round();
       int newAverageDrawLengthValue = drawLengthAverage.round();
       int newDrawLengthTotalAverageValue = drawLengthTotalAverage.round();
-      int newAverageDrawLengthTotalYestValue = drawLengthTotalAverageYest
-          .truncate();
+      int newAverageDrawLengthTotalYestValue =
+          drawLengthTotalAverageYest.round();
       int newAverageWaitPeriodValue;
 
       //Adding new state to the Stream, yield is used to add state to the stream

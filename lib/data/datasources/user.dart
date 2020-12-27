@@ -11,16 +11,16 @@ class User {
 List<double> hitLengthArray = [];
 List<int> timestampArray = [];
 var drawCountIndex = 0;
-var hitTimeNow;
+int hitTimeNow = 0;
 var hitTimeThen;
-var timeUntilNext;
+int timeUntilNext = 0;
 var decay = 0.95;
 var dayNum = 1;
 double drawLength = 0;
-var currentTime;
-var waitPeriod;
-var timeBetween;
-var timeBetweenAverage;
+var currentTime = 0;
+int waitPeriod;
+int timeBetween = 0;
+var timeBetweenAverage = 0.0;
 var drawCountAverage;
 double drawLengthTotal = 0;
 double drawLengthTotalYest = 0;
@@ -36,6 +36,12 @@ var seshCountYest = 0;
 var suggestion;
 double usage = 0;
 double overUsage = 0;
+
+int transmitPointer = 0;
+
+bool sugLockValue = false;
+bool limLockValue = false;
+bool dataShareValue = false;
 
 var userList = [];
 var userIDList = [];

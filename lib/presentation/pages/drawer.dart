@@ -7,6 +7,7 @@ import 'package:cuitt/presentation/pages/create_group.dart';
 import 'package:cuitt/presentation/pages/group_list.dart';
 import 'package:cuitt/presentation/pages/group_list_empty.dart';
 import 'package:cuitt/presentation/pages/join_group.dart';
+import 'package:cuitt/presentation/pages/settings_home.dart';
 import 'package:cuitt/presentation/routes/slide.dart';
 import 'package:cuitt/presentation/widgets/dashboard_button.dart';
 import 'package:cuitt/presentation/widgets/drawer_button.dart';
@@ -50,8 +51,8 @@ class _DrawerPageState extends State<DrawerPage> {
   }
 
   void groups() async {
-    _getGroupsWithUser();
-    _loadGroupData();
+    await _getGroupsWithUser();
+    await _loadGroupData();
 
     if (groupNameList.isEmpty) {
       Navigator.of(context).push(SlideRoute(
@@ -59,8 +60,10 @@ class _DrawerPageState extends State<DrawerPage> {
         exitPage: DrawerPage(),
       ));
     } else {
-      Navigator.of(context)
-          .push(SlideRoute(enterPage: GroupsList(), exitPage: DrawerPage(),));
+      Navigator.of(context).push(SlideRoute(
+        enterPage: GroupsList(),
+        exitPage: DrawerPage(),
+      ));
     }
   }
 
@@ -134,7 +137,7 @@ class _DrawerPageState extends State<DrawerPage> {
                       function: () async {
                         Navigator.of(context)
                             .push(SlideRoute(
-                          enterPage: null, exitPage: DrawerPage(),));
+                          enterPage: SettingsPage(), exitPage: DrawerPage(),));
                       },
                     ),
                   ),

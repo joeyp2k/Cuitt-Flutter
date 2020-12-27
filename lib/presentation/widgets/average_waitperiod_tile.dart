@@ -5,25 +5,19 @@ import 'package:cuitt/presentation/design_system/dimensions.dart';
 import 'package:cuitt/presentation/design_system/texts.dart';
 import 'package:flutter/material.dart';
 
-bool firstRun;
-int timeUntilLast = 0;
-Duration timeUntil = Duration(seconds: 0);
-
-class DashboardTileLarge extends StatefulWidget {
+class AverageTimeBetweenTile extends StatefulWidget {
   final String header;
   final String textData;
   final Color color;
-  final int timeUntilNext;
 
-  DashboardTileLarge(
-      {Key key, this.header, this.textData, this.color, this.timeUntilNext})
+  AverageTimeBetweenTile({Key key, this.header, this.textData, this.color})
       : super(key: key);
 
   @override
-  _DashboardTileLargeState createState() => _DashboardTileLargeState();
+  _AverageWaitPeriodTile createState() => _AverageWaitPeriodTile();
 }
 
-class _DashboardTileLargeState extends State<DashboardTileLarge> {
+class _AverageWaitPeriodTile extends State<AverageTimeBetweenTile> {
   Timer refreshTimer;
 
   //DS3231Time + 946684800 = UnixTime
@@ -31,23 +25,7 @@ class _DashboardTileLargeState extends State<DashboardTileLarge> {
   void initState() {
     // TODO: implement initState
     refreshTimer = Timer.periodic(Duration(seconds: 1), (Timer t) {
-      if (timeUntilNext == timeUntilLast) {
-        print('Time Until Next: ' + timeUntilNext.toString());
-        print('Time Until Last: ' + timeUntilLast.toString());
-        if (timeUntilNext != 0) {
-          print('Time Until Next != 0');
-          print('Time Until Next: ' + timeUntilNext.toString());
-          setState(() {
-            timeUntil = timeUntil - Duration(seconds: 1);
-          });
-        }
-      } else {
-        print('Time Until Next != Time Until Last');
-        print('Time Until Next: ' + timeUntilNext.toString());
-        print('Time Until Last: ' + timeUntilLast.toString());
-        timeUntil = Duration(seconds: timeUntilNext);
-        timeUntilLast = timeUntilNext;
-      }
+      setState(() {});
     });
     super.initState();
   }
@@ -68,7 +46,7 @@ class _DashboardTileLargeState extends State<DashboardTileLarge> {
         padding: spacer.all.sm,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             RichText(
               text: TextSpan(
@@ -81,7 +59,19 @@ class _DashboardTileLargeState extends State<DashboardTileLarge> {
               child: RichText(
                 text: TextSpan(
                   style: TileData,
-                  text: timeUntil.toString().split('.')[0],
+                  text:
+                      Duration(seconds: timeBetweenAverage.round())
+                              .inHours
+                              .toString() +
+                          ' hrs ' +
+                          Duration(seconds: timeBetweenAverage.round())
+                              .inMinutes
+                              .toString() +
+                          ' min ' +
+                          Duration(seconds: timeBetweenAverage.round())
+                              .inSeconds
+                              .toString() +
+                          ' secs',
                 ),
               ),
             ),

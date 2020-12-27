@@ -5,6 +5,7 @@ import 'package:cuitt/presentation/design_system/texts.dart';
 import 'package:cuitt/presentation/pages/create_account.dart';
 import 'package:cuitt/presentation/pages/sign_in.dart';
 import 'package:flutter/material.dart';
+import 'package:preload_page_view/preload_page_view.dart';
 
 //move skip button to stack with page view to maintain between screens
 
@@ -13,18 +14,19 @@ class Welcome extends StatefulWidget {
   _WelcomeState createState() => _WelcomeState();
 }
 
-final controller = PageController(
+final controller = PreloadPageController(
   initialPage: 0,
   viewportFraction: 1,
 );
 
-final controllerB = PageController(
+final controllerB = PreloadPageController(
   initialPage: 4,
   viewportFraction: 1,
 );
 
-final introPages = PageView(
+final introPages = PreloadPageView(
   controller: controller,
+  preloadPagesCount: 5,
   children: [
     Welcome(),
     Intro(),
@@ -34,8 +36,9 @@ final introPages = PageView(
   ],
 );
 
-final introPagesB = PageView(
+final introPagesB = PreloadPageView(
   controller: controllerB,
+  preloadPagesCount: 5,
   children: [
     Welcome(),
     Intro(),
@@ -45,8 +48,9 @@ final introPagesB = PageView(
   ],
 );
 
-final introPagesC = PageView(
+final introPagesC = PreloadPageView(
   controller: controllerB,
+  preloadPagesCount: 5,
   children: [
     Welcome(),
     Intro(),

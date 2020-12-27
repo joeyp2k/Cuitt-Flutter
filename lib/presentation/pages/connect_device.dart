@@ -1,9 +1,13 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:convert/convert.dart';
 import 'package:cuitt/bloc/dashboard_bloc.dart';
+import 'package:cuitt/data/datasources/my_chart_data.dart';
 import 'package:cuitt/presentation/design_system/colors.dart';
 import 'package:cuitt/presentation/pages/dashboard.dart';
+import 'package:data_connection_checker/data_connection_checker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_blue/flutter_blue.dart';
@@ -94,8 +98,10 @@ class _ConnectPageState extends State<ConnectPage> {
   }
 
   void _calculateA() {
+    print('Draw Length Total (CALC A) pre calculation: ' +
+        drawLengthTotal.toString());
     drawLengthTotal += drawLength;
-    print(drawLengthTotal.toString());
+    print('Draw Length Total (CALC A): ' + drawLengthTotal.toString());
     drawLengthAverage = drawLengthTotal / drawCount;
     drawLengthTotalAverage =
         drawLengthTotal / dayNum; //CHANGE TO CALCULATION ARRAY FOR DLT BY DAY
@@ -107,18 +113,37 @@ class _ConnectPageState extends State<ConnectPage> {
   }
 
   void _checkTime() {
-    if (hitTimeNow == null) {
+    // subFromInteger called on null
+    if (hitTimeNow == 0) {
+      print(
+          'Hit Time Now = 0, Check for Updated Current Time to Load Into Hit Time Now and Hit Time Then');
       hitTimeNow = currentTime;
+      hitTimeThen = hitTimeNow;
+      print('Hit Time Now = ' +
+          hitTimeNow.toString() +
+          ' and Hit Time Then = ' +
+          hitTimeThen.toString());
     } else {
+      print(
+          'Hit Time Now != 0, Update Hit Time Then and Load Current Time into Hit Time Now');
       hitTimeThen = hitTimeNow;
       hitTimeNow = currentTime;
+      print('Hit Time Now = ' +
+          hitTimeNow.toString() +
+          ' and Hit Time Then = ' +
+          hitTimeThen.toString());
     }
   }
 
   void _calculateB() {
-    waitPeriod = 16 / seshCountAverage * 60 * 60;
+    waitPeriod = (16 / seshCountAverage * 60 * 60).round();
     timeBetween = hitTimeNow - hitTimeThen;
     timeUntilNext = waitPeriod - timeBetween;
+    if (seshCount > 1) {
+      timeBetweenAverage = (timeBetweenAverage + timeBetween) / (seshCount - 1);
+    } else {
+      timeBetweenAverage = 0;
+    }
     hitLengthArray.add(drawLength);
     timestampArray.add(currentTime);
     if (drawLengthTotal == 0) {
@@ -129,7 +154,145 @@ class _ConnectPageState extends State<ConnectPage> {
     }
   }
 
+  void _sendData() async {
+    bool result = await DataConnectionChecker().hasConnection;
+    if (result == true) {
+      if (transmitPointer < i) {
+        while (transmitPointer < i) {
+          firebaseUser = (await FirebaseAuth.instance.currentUser);
+
+          firestoreInstance.collection("users").doc(firebaseUser.uid)
+              .collection("data").doc('stats')
+              .set({
+            "draws": drawCount,
+            "draw length average": drawLengthAverage,
+            "draw length total": drawLengthTotal,
+            "draw length average yesterday": drawLengthTotalAverageYest,
+          });
+
+          firestoreInstance
+              .collection("users")
+              .doc(firebaseUser.uid)
+              .collection('data')
+              .doc('day data')
+              .get()
+              .then((doc) {
+            if (doc.exists) {
+              firestoreInstance.collection("users").doc(firebaseUser.uid)
+                  .collection("data").doc('day data')
+                  .set({
+                "time": FieldValue.arrayUnion([dayData[transmitPointer].time]),
+                "draw length": FieldValue.arrayUnion(
+                    [dayData[transmitPointer].seconds]),
+              }, SetOptions(merge: true));
+            } else {
+              firestoreInstance.collection("users").doc(firebaseUser.uid)
+                  .collection("data").doc('day data')
+                  .set({
+                "time": FieldValue.arrayUnion([dayData[transmitPointer].time]),
+                "draw length": FieldValue.arrayUnion(
+                    [dayData[transmitPointer].seconds]),
+              });
+            }
+          });
+
+          firestoreInstance
+              .collection("users")
+              .doc(firebaseUser.uid)
+              .collection('data')
+              .doc('week data')
+              .get()
+              .then((doc) {
+            if (doc.exists) {
+              firestoreInstance.collection("users").doc(firebaseUser.uid)
+                  .collection("data").doc('week data')
+                  .set({
+                "date": FieldValue.arrayUnion([weekData[transmitPointer].time]),
+                "draw length": FieldValue.arrayUnion(
+                    [weekData[transmitPointer].seconds]),
+              }, SetOptions(merge: true));
+            } else {
+              firestoreInstance.collection("users").doc(firebaseUser.uid)
+                  .collection("data").doc('week data')
+                  .set({
+                "date": FieldValue.arrayUnion([weekData[transmitPointer].time]),
+                "draw length": FieldValue.arrayUnion(
+                    [weekData[transmitPointer].seconds]),
+              });
+            }
+          });
+
+          transmitPointer++;
+        }
+      }
+      if (transmitPointer == i) {
+        firebaseUser = (await FirebaseAuth.instance.currentUser);
+
+        firestoreInstance.collection("users").doc(firebaseUser.uid).collection(
+            "data").doc('stats').set({
+          "draws": drawCount,
+          "draw length average": drawLengthAverage,
+          "draw length total": drawLengthTotal,
+          "draw length average yesterday": drawLengthTotalAverageYest,
+        });
+
+        firestoreInstance
+            .collection("users")
+            .doc(firebaseUser.uid)
+            .collection('data')
+            .doc('day data')
+            .get()
+            .then((doc) {
+          if (doc.exists) {
+            firestoreInstance.collection("users").doc(firebaseUser.uid)
+                .collection("data").doc('day data')
+                .set({
+              "time": FieldValue.arrayUnion([dayData[transmitPointer].time]),
+              "draw length": FieldValue.arrayUnion(
+                  [dayData[transmitPointer].seconds]),
+            }, SetOptions(merge: true));
+          } else {
+            firestoreInstance.collection("users").doc(firebaseUser.uid)
+                .collection("data").doc('day data')
+                .set({
+              "time": FieldValue.arrayUnion([dayData[transmitPointer].time]),
+              "draw length": FieldValue.arrayUnion(
+                  [dayData[transmitPointer].seconds]),
+            });
+          }
+        });
+
+        firestoreInstance
+            .collection("users")
+            .doc(firebaseUser.uid)
+            .collection('data')
+            .doc('week data')
+            .get()
+            .then((doc) {
+          if (doc.exists) {
+            firestoreInstance.collection("users").doc(firebaseUser.uid)
+                .collection("data").doc('week data')
+                .set({
+              "date": FieldValue.arrayUnion([weekData[transmitPointer].time]),
+              "draw length": FieldValue.arrayUnion(
+                  [weekData[transmitPointer].seconds]),
+            }, SetOptions(merge: true));
+          } else {
+            firestoreInstance.collection("users").doc(firebaseUser.uid)
+                .collection("data").doc('week data')
+                .set({
+              "date": FieldValue.arrayUnion([weekData[transmitPointer].time]),
+              "draw length": FieldValue.arrayUnion(
+                  [weekData[transmitPointer].seconds]),
+            });
+          }
+        });
+      }
+    }
+  }
+
   void _listener() {
+    //LISTENER RUNNING TWICE PER CHANGE
     _ledChar.setNotifyValue(true);
     _ledChar.value.listen((event) async {
       if (_ledChar == null) {
@@ -137,6 +300,7 @@ class _ConnectPageState extends State<ConnectPage> {
       } else {
         _readval = await _ledChar.read();
         if (_readval.toString() == _lastval.toString()) {
+
         } else {
           _copyData();
           _calculateA();
@@ -144,6 +308,7 @@ class _ConnectPageState extends State<ConnectPage> {
           _calculateB();
           counterBlocSink.add(UpdateDataEvent());
           _lastval = _readval;
+          _sendData();
           refresh = 1;
         }
       }
