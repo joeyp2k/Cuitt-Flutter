@@ -78,6 +78,15 @@ class _DashboardbState extends State<Dashboardb> {
     }
   }
 
+  void initState() {
+    counterBlocSink.add(UpdateDataEvent());
+    super.initState();
+  }
+
+  void dispose() {
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(

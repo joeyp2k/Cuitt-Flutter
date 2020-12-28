@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 bool firstRun;
 int timeUntilLast = 0;
 Duration timeUntil = Duration(seconds: 0);
+Timer refreshTimer;
 
 class DashboardTileLarge extends StatefulWidget {
   final String header;
@@ -24,36 +25,35 @@ class DashboardTileLarge extends StatefulWidget {
 }
 
 class _DashboardTileLargeState extends State<DashboardTileLarge> {
-  Timer refreshTimer;
-
   //DS3231Time + 946684800 = UnixTime
   @override
   void initState() {
     // TODO: implement initState
-    refreshTimer = Timer.periodic(Duration(seconds: 1), (Timer t) {
-      if (timeUntilNext == timeUntilLast) {
-        print('Time Until Next: ' + timeUntilNext.toString());
-        print('Time Until Last: ' + timeUntilLast.toString());
-        if (timeUntilNext != 0) {
-          print('Time Until Next != 0');
+    if (refreshTimer == null) {
+      refreshTimer = Timer.periodic(Duration(seconds: 1), (Timer t) {
+        if (timeUntilNext == timeUntilLast) {
           print('Time Until Next: ' + timeUntilNext.toString());
-          setState(() {
-            timeUntil = timeUntil - Duration(seconds: 1);
-          });
+          print('Time Until Last: ' + timeUntilLast.toString());
+          if (timeUntilNext != 0) {
+            print('Time Until Next != 0');
+            print('Time Until Next: ' + timeUntilNext.toString());
+            setState(() {
+              timeUntil = timeUntil - Duration(seconds: 1);
+            });
+          }
+        } else {
+          print('Time Until Next != Time Until Last');
+          print('Time Until Next: ' + timeUntilNext.toString());
+          print('Time Until Last: ' + timeUntilLast.toString());
+          timeUntil = Duration(seconds: timeUntilNext);
+          timeUntilLast = timeUntilNext;
         }
-      } else {
-        print('Time Until Next != Time Until Last');
-        print('Time Until Next: ' + timeUntilNext.toString());
-        print('Time Until Last: ' + timeUntilLast.toString());
-        timeUntil = Duration(seconds: timeUntilNext);
-        timeUntilLast = timeUntilNext;
-      }
-    });
+      });
+    }
     super.initState();
   }
 
   void dispose() {
-    refreshTimer.cancel();
     super.dispose();
   }
 

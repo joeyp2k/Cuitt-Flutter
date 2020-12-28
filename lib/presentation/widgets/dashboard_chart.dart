@@ -81,16 +81,15 @@ class _DashboardChartState extends State<DashboardChart> {
                             ),
                           ),
                           onTap: () {
-                            setState(() {
-                              dateFormat = DateFormat.EEEE();
-                              labelInterval = DateTimeIntervalType.days;
-                              padValue = MediaQuery.of(context).size.width / 4 -
-                                  gridSpacer;
-                              dataSelection = weekData;
-                              viewportSelectionStart = viewportDay;
-                              viewportSelectionEnd =
-                                  viewportDay.add(Duration(days: 6));
-                            });
+                            dateFormat = DateFormat.EEEE();
+                            labelInterval = DateTimeIntervalType.days;
+                            padValue = MediaQuery.of(context).size.width / 4 -
+                                gridSpacer;
+                            dataSelection = weekData;
+                            viewportSelectionStart = viewportDay;
+                            viewportSelectionEnd =
+                                viewportDay.add(Duration(days: 6));
+                            setState(() {});
                           },
                         ),
                       ),
@@ -108,21 +107,22 @@ class _DashboardChartState extends State<DashboardChart> {
                             ),
                           ),
                           onTap: () {
+                            dateFormat = DateFormat.Md();
+                            labelInterval = DateTimeIntervalType.days;
+                            padValue =
+                                (MediaQuery
+                                    .of(context)
+                                    .size
+                                    .width / 4 -
+                                    gridSpacer) *
+                                    2;
+                            dataSelection = weekData;
+                            viewportSelectionStart =
+                                viewportDay;
+                            viewportSelectionEnd =
+                                viewportDay.add(Duration(days: 29));
                             setState(() {
-                              dateFormat = DateFormat.Md();
-                              labelInterval = DateTimeIntervalType.days;
-                              padValue =
-                                  (MediaQuery
-                                      .of(context)
-                                      .size
-                                      .width / 4 -
-                                      gridSpacer) *
-                                      2;
-                              dataSelection = weekData;
-                              viewportSelectionStart =
-                                  viewportDay;
-                              viewportSelectionEnd =
-                                  viewportDay.add(Duration(days: 29));
+
                             });
                           },
                         ),

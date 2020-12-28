@@ -24,6 +24,7 @@ class _CuittState extends State<Cuitt> {
       DeviceOrientation.portraitDown,
     ]);
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: introPages,
     );
   }
