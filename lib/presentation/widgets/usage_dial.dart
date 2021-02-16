@@ -78,7 +78,6 @@ class _DialChartState extends State<DialChart> {
 
   void dispose() {
     // TODO: implement dispose
-    super.dispose();
     //Stop Timer
     timer?.cancel();
     super.dispose();

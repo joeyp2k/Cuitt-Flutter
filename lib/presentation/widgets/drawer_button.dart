@@ -43,9 +43,7 @@ class _DrawerButtonState extends State<DrawerButton>
         );
       } else {
         _controller.reverse();
-        Navigator.push(context,
-          FadeRoute(enterPage: Dashboardb(), exitPage: DrawerPage()),
-        );
+        Navigator.pop(context);
       }
     });
   }

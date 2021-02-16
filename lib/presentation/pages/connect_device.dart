@@ -5,12 +5,16 @@ import 'package:convert/convert.dart';
 import 'package:cuitt/bloc/dashboard_bloc.dart';
 import 'package:cuitt/data/datasources/my_chart_data.dart';
 import 'package:cuitt/presentation/design_system/colors.dart';
+import 'package:cuitt/presentation/design_system/dimensions.dart';
 import 'package:cuitt/presentation/pages/dashboard.dart';
+import 'package:cuitt/presentation/widgets/animated_button.dart';
 import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+
+var firebaseUser;
 
 class ConnectPage extends StatefulWidget {
   ConnectPage({Key key, this.title}) : super(key: key);
@@ -21,7 +25,6 @@ class ConnectPage extends StatefulWidget {
 }
 
 class _ConnectPageState extends State<ConnectPage> {
-
   @override
   Timer timer;
 
@@ -32,7 +35,7 @@ class _ConnectPageState extends State<ConnectPage> {
   void initState() {
     super.initState();
     timer = Timer.periodic(Duration(hours: 24), (Timer t) {
-      //TODO send all current stats before daily reset
+      //TODO send all current stats before daily reset using different timer that works by date not 24 hour cycles
       drawLengthTotalAverageYest = drawLengthTotalAverage;
       drawLengthTotal = 0;
       dayNum++;
@@ -207,17 +210,19 @@ class _ConnectPageState extends State<ConnectPage> {
               firestoreInstance.collection("users").doc(firebaseUser.uid)
                   .collection("data").doc('week data')
                   .set({
-                "date": FieldValue.arrayUnion([weekData[transmitPointer].time]),
-                "draw length": FieldValue.arrayUnion(
-                    [weekData[transmitPointer].seconds]),
+                "date":
+                    FieldValue.arrayUnion([monthData[transmitPointer].time]),
+                "draw length":
+                    FieldValue.arrayUnion([monthData[transmitPointer].seconds]),
               }, SetOptions(merge: true));
             } else {
               firestoreInstance.collection("users").doc(firebaseUser.uid)
                   .collection("data").doc('week data')
                   .set({
-                "date": FieldValue.arrayUnion([weekData[transmitPointer].time]),
+                "date": FieldValue.arrayUnion(
+                    [monthData[transmitPointer].time]),
                 "draw length": FieldValue.arrayUnion(
-                    [weekData[transmitPointer].seconds]),
+                    [monthData[transmitPointer].seconds]),
               });
             }
           });
@@ -273,17 +278,17 @@ class _ConnectPageState extends State<ConnectPage> {
             firestoreInstance.collection("users").doc(firebaseUser.uid)
                 .collection("data").doc('week data')
                 .set({
-              "date": FieldValue.arrayUnion([weekData[transmitPointer].time]),
+              "date": FieldValue.arrayUnion([monthData[transmitPointer].time]),
               "draw length": FieldValue.arrayUnion(
-                  [weekData[transmitPointer].seconds]),
+                  [monthData[transmitPointer].seconds]),
             }, SetOptions(merge: true));
           } else {
             firestoreInstance.collection("users").doc(firebaseUser.uid)
                 .collection("data").doc('week data')
                 .set({
-              "date": FieldValue.arrayUnion([weekData[transmitPointer].time]),
+              "date": FieldValue.arrayUnion([monthData[transmitPointer].time]),
               "draw length": FieldValue.arrayUnion(
-                  [weekData[transmitPointer].seconds]),
+                  [monthData[transmitPointer].seconds]),
             });
           }
         });
@@ -319,6 +324,8 @@ class _ConnectPageState extends State<ConnectPage> {
     flutterBlue.scanResults.listen((List<ScanResult> results) {
       for (ScanResult result in results) {
         if (result.device.name == "Cuitt") {
+          //disconnect to any device already connected when you attempt a new connection
+          //result.device.disconnect();
           _connectDevice(result.device);
         }
       }
@@ -326,6 +333,11 @@ class _ConnectPageState extends State<ConnectPage> {
 
     flutterBlue.startScan();
   }
+
+  AnimationController _controller;
+  Animation<double> _animOpac;
+  Animation<double> _animTextOpac;
+  bool processing = false;
 
   @override
   Widget build(BuildContext context) {
@@ -338,34 +350,46 @@ class _ConnectPageState extends State<ConnectPage> {
             floatingActionButtonLocation:
                 FloatingActionButtonLocation.centerFloat,
             backgroundColor: Background,
-            body: Container(
-              width: double.infinity,
+            body: SafeArea(
               child: Center(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text("Draws: ${(state as DataState).newDrawCountValue}"),
+                  children: [
+                    AnimatedButton(
+                      paddingStart: spacer.x.sm + spacer.y.xl,
+                      paddingEnd: spacer.x.sm + spacer.y.sm,
+                      text: "Connect Your Cuitt",
+                      function: () {
+                        _scanForDevice();
+                        Navigator.of(context).push(
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation,
+                                secondaryAnimation) {
+                              return Dashboardb(
+                                opacityAnimation: animation,
+                              );
+                            },
+                            transitionDuration: Duration(seconds: 1),
+                          ),
+                        );
+                      },
+                    ),
+                    GestureDetector(
+                      onTap: () {
+
+                      },
+                      child: Container(
+                        child: RichText(
+                          text: TextSpan(
+                            text: "I'm a Partner",
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
-            ),
-            floatingActionButton: FloatingActionButton(
-              backgroundColor: Green,
-              onPressed: () {
-                _scanForDevice();
-                Navigator.of(context).push(
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) {
-                      return Dashboardb(
-                        opacityAnimation: animation,
-                      );
-                    },
-                    transitionDuration: Duration(seconds: 1),
-                  ),
-                );
-              },
-              tooltip: 'Increment',
-              child: Icon(Icons.bluetooth_searching),
             ),
           );
         },

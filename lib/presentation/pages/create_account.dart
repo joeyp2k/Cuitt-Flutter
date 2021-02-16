@@ -74,6 +74,7 @@ class _CreateAccountState extends State<CreateAccount>
         });
         _success = true;
         _userEmail = user.email;
+        //TODO: if device already connected, route to dashboard
         Navigator.of(context).push(MaterialPageRoute(builder: (context) {
           return ConnectPage();
         }));

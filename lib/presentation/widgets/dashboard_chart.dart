@@ -56,6 +56,7 @@ class _DashboardChartState extends State<DashboardChart> {
                           ),
                           onTap: () {
                             setState(() {
+                              tooltipFormat = 'j';
                               dateFormat = DateFormat.j();
                               labelInterval = DateTimeIntervalType.hours;
                               padValue = 0;
@@ -81,6 +82,7 @@ class _DashboardChartState extends State<DashboardChart> {
                             ),
                           ),
                           onTap: () {
+                            tooltipFormat = 'EEEE';
                             dateFormat = DateFormat.EEEE();
                             labelInterval = DateTimeIntervalType.days;
                             padValue = MediaQuery.of(context).size.width / 4 -
@@ -107,6 +109,7 @@ class _DashboardChartState extends State<DashboardChart> {
                             ),
                           ),
                           onTap: () {
+                            tooltipFormat = 'Md';
                             dateFormat = DateFormat.Md();
                             labelInterval = DateTimeIntervalType.days;
                             padValue =
@@ -116,7 +119,7 @@ class _DashboardChartState extends State<DashboardChart> {
                                     .width / 4 -
                                     gridSpacer) *
                                     2;
-                            dataSelection = weekData;
+                            dataSelection = monthData;
                             viewportSelectionStart =
                                 viewportDay;
                             viewportSelectionEnd =

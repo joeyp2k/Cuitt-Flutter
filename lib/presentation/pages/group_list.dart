@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cuitt/data/datasources/buttons.dart';
 import 'package:cuitt/data/datasources/user.dart';
 import 'package:cuitt/presentation/design_system/colors.dart';
@@ -7,12 +6,7 @@ import 'package:cuitt/presentation/design_system/texts.dart';
 import 'package:cuitt/presentation/pages/user_list.dart';
 import 'package:cuitt/presentation/pages/user_list_empty.dart';
 import 'package:cuitt/presentation/widgets/dashboard_button.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
-final FirebaseAuth _auth = FirebaseAuth.instance;
-final firestoreInstance = FirebaseFirestore.instance;
-var firebaseUser;
 
 class GroupsList extends StatefulWidget {
   @override

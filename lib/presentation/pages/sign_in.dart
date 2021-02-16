@@ -60,6 +60,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
         } else {
           _success = true;
           _userEmail = user.email;
+          //TODO: if device already connected, route to dashboard
           Navigator.of(context).push(MaterialPageRoute(builder: (context) {
             return ConnectPage();
           }));

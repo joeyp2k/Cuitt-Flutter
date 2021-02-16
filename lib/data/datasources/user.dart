@@ -24,7 +24,7 @@ var timeBetweenAverage = 0.0;
 var drawCountAverage;
 double drawLengthTotal = 0;
 double drawLengthTotalYest = 0;
-double drawLengthTotalAverageYest = 50.0;
+double drawLengthTotalAverageYest = 73.0;
 double drawLengthTotalAverage = 0;
 double drawLengthAverage = 0;
 double drawLengthAverageYest = 0;

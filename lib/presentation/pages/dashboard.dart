@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cuitt/bloc/dashboard_bloc.dart';
 import 'package:cuitt/data/datasources/dash_tiles.dart';
+import 'package:cuitt/data/datasources/my_chart_data.dart';
 import 'package:cuitt/data/datasources/user.dart';
 import 'package:cuitt/presentation/design_system/colors.dart';
 import 'package:cuitt/presentation/design_system/dimensions.dart';
@@ -22,7 +23,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 final firestoreInstance = FirebaseFirestore.instance;
-var firebaseUser;
 
 int refresh = 0;
 
@@ -78,15 +78,6 @@ class _DashboardbState extends State<Dashboardb> {
     }
   }
 
-  void initState() {
-    counterBlocSink.add(UpdateDataEvent());
-    super.initState();
-  }
-
-  void dispose() {
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -104,6 +95,9 @@ class _DashboardbState extends State<Dashboardb> {
                   print('Draw Length: ' + drawLength.toString());
                   print('Draw Length Total: ' + drawLengthTotal.toString());
                   print('Draw Length Average: ' + drawLengthAverage.toString());
+                  print(viewportSelectionStart.toString());
+                  print(viewportSelectionEnd.toString());
+                  timeData = timeData.add(Duration(hours: 1));
                 },
               ),
               body: SafeArea(
@@ -121,7 +115,8 @@ class _DashboardbState extends State<Dashboardb> {
                                 DrawerButton(),
                                 RichText(
                                   text: TextSpan(
-                                      style: TileHeader, text: 'My Activity'),
+                                      style: TileHeader,
+                                      text: 'Today\'s Activity'),
                                 ),
                                 IconButton(
                                     color: White,
@@ -152,7 +147,7 @@ class _DashboardbState extends State<Dashboardb> {
                                     RichText(
                                       text: TextSpan(
                                         style: Radial,
-                                        text: "Week Goal",
+                                        text: "Goal",
                                       ),
                                     ),
                                     RichText(

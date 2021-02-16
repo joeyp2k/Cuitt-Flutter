@@ -36,12 +36,6 @@ class _AnimatedButtonState extends State<AnimatedButton>
   bool processing = false;
 
   @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   void initState() {
     _controller =
         AnimationController(vsync: this, duration: Duration(seconds: 1));
@@ -58,22 +52,24 @@ class _AnimatedButtonState extends State<AnimatedButton>
   }
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: (() async {
         processing = true;
         _controller.forward();
-        setState(() {
-
-        });
+        setState(() {});
         await widget.function();
         if (widget.success != true) {
           processing = false;
           _controller.reverse();
         }
-        setState(() {
-
-        });
+        setState(() {});
       }),
       child: AnimatedPadding(
         duration: Duration(milliseconds: 750),

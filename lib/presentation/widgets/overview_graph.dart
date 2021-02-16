@@ -7,12 +7,12 @@ import 'package:cuitt/presentation/design_system/colors.dart';
 import 'package:cuitt/presentation/pages/dashboard.dart';
 import 'package:flutter/material.dart';
 
-class BarChart extends StatefulWidget {
+class OverviewChart extends StatefulWidget {
   @override
-  _BarChartState createState() => _BarChartState();
+  _OverviewChartState createState() => _OverviewChartState();
 }
 
-class _BarChartState extends State<BarChart> {
+class _OverviewChartState extends State<OverviewChart> {
   Timer timer;
 
   void _timeUpdate() {
@@ -33,8 +33,8 @@ class _BarChartState extends State<BarChart> {
   void _ifNoData() {
     if (time.isEmpty) {
       time.add(timeData);
-      timeDay.add(DateTime(timeData.year, timeData.month, timeData.day)
-          .toLocal());
+      timeDay
+          .add(DateTime(timeData.year, timeData.month, timeData.day).toLocal());
     }
 
     if (sec.isEmpty) {
@@ -105,62 +105,49 @@ class _BarChartState extends State<BarChart> {
         domainFn: (UsageData uData, _) => uData.time,
         measureFn: (UsageData uData, _) => uData.seconds,
         colorFn: (UsageData uData, _) {
-          return charts.ColorUtil.fromDartColor(Green);
+          return charts.ColorUtil.fromDartColor(White);
         },
         data: dataSelection,
       ),
     ];
 
-    var dayViewChart = new charts.TimeSeriesChart(
+    var overviewChart = new charts.TimeSeriesChart(
       overviewSeries,
       animate: true,
-      animationDuration: Duration(milliseconds: 250),
+      animationDuration: Duration(milliseconds: 500),
       behaviors: [
         // Add the sliding viewport behavior to have the viewport center on the
         // domain that is currently selected.
-        new charts.SlidingViewport(charts.SelectionModelType.action),
+        new charts.SlidingViewport(),
+        new charts.LinePointHighlighter(
+            showHorizontalFollowLine:
+                charts.LinePointHighlighterFollowLineType.none,
+            showVerticalFollowLine:
+                charts.LinePointHighlighterFollowLineType.none),
         // A pan and zoom behavior helps demonstrate the sliding viewport
         // behavior by allowing the data visible in the viewport to be adjusted
         // dynamically.
-        new charts.PanAndZoomBehavior(),
-        new charts.SelectNearest(),
-        new charts.DomainHighlighter(),
       ],
       defaultRenderer: new charts.BarRendererConfig<DateTime>(),
       domainAxis: new charts.DateTimeAxisSpec(
-          tickProviderSpec: charts.AutoDateTimeTickProviderSpec(),
+          showAxisLine: true,
+          tickFormatterSpec: new charts.AutoDateTimeTickFormatterSpec(
+              day: new charts.TimeFormatterSpec(
+                  format: 'HH', transitionFormat: 'HH')),
           viewport: new charts.DateTimeExtents(
-              start: viewportSelectionStart, end: viewportSelectionEnd),
-          renderSpec: new charts.SmallTickRendererSpec(
-              // Tick and Label styling here.
-              labelStyle: new charts.TextStyleSpec(
-                  fontSize: 12, // size in Pts.
-                  color: charts.MaterialPalette.white),
-
-              // Change the line colors to match text color.
-              lineStyle: new charts.LineStyleSpec(
-                  color: charts.MaterialPalette.white))),
+              start: viewportHour.subtract(Duration(hours: 23)),
+              end: viewportHour.add(Duration(hours: 1))),
+          renderSpec: new charts.NoneRenderSpec()),
 
       /// Assign a custom style for the measure axis.
-      primaryMeasureAxis: new charts.NumericAxisSpec(
-          tickProviderSpec:
-          new charts.BasicNumericTickProviderSpec(desiredTickCount: 4),
-          renderSpec: new charts.GridlineRendererSpec(
-
-            // Tick and Label styling here.
-              labelStyle: new charts.TextStyleSpec(
-                  fontSize: 16, // size in Pts.
-                  color: charts.MaterialPalette.white),
-
-              // Change the line colors to match text color.
-              lineStyle: new charts.LineStyleSpec(
-                  color: charts.MaterialPalette.white))),
+      primaryMeasureAxis:
+          new charts.NumericAxisSpec(renderSpec: new charts.NoneRenderSpec()),
     );
 
-    var dayViewChartWidget = Container(
+    var overviewChartWidget = Container(
       height: 200,
-      child: dayViewChart,
+      child: AbsorbPointer(absorbing: true, child: overviewChart),
     );
-    return dayViewChartWidget;
+    return overviewChartWidget;
   }
 }
