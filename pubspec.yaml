@@ -35,7 +35,7 @@ dependencies:
   flutter_bloc: ^6.0.0
   flutter_circular_chart: ^0.1.0
   flutter_neumorphic: ^3.0.3
-  data_connection_checker: ^0.3.4
+  connectivity: ^2.0.2
   preload_page_view: ^0.1.4
   syncfusion_flutter_charts: ^18.4.31
 
@@ -90,11 +90,11 @@ flutter:
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
   assets:
-    - lib/presentation/graphics/adapter_light_off.svg
-    - lib/presentation/graphics/adapter_light_on.svg
-    - lib/presentation/graphics/cuitt_logo.svg
-    - lib/presentation/graphics/location.svg
-    - lib/presentation/graphics/partner_mode.svg
+    - lib/core/graphics/adapter_light_off.svg
+    - lib/core/graphics/adapter_light_on.svg
+    - lib/core/graphics/cuitt_logo.svg
+    - lib/core/graphics/location.svg
+    - lib/core/graphics/partner_mode.svg
 
   fonts:
     - family: Montserrat

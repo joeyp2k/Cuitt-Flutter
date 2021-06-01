@@ -1,16 +1,15 @@
 // Copyright 2018 The Flutter team. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
-
-import 'package:cuitt/presentation/pages/introduction.dart';
+import 'package:cuitt/features/user_auth/presentation/bloc/user_auth_bloc.dart';
+import 'package:cuitt/features/user_auth/presentation/pages/introduction.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-//TODO: organize imports
-
-
+//TODO: organize imports, make exit button constant across all menu functions, fix top bar when scrolling on dashboard screen, update UI for create/join/view group pages, and settings
 class Cuitt extends StatefulWidget {
   @override
   _CuittState createState() => _CuittState();
@@ -25,7 +24,14 @@ class _CuittState extends State<Cuitt> {
     ]);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: introPages,
+      home: MultiBlocProvider(
+        providers: [
+          BlocProvider<UserAuthBloc>(
+            create: (BuildContext context) => UserAuthBloc(),
+          ),
+        ],
+        child: IntroPagesCreate(),
+      ),
     );
   }
 }
