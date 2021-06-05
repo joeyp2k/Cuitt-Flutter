@@ -24,12 +24,8 @@ class _CuittState extends State<Cuitt> {
     ]);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: MultiBlocProvider(
-        providers: [
-          BlocProvider<UserAuthBloc>(
-            create: (BuildContext context) => UserAuthBloc(),
-          ),
-        ],
+      home: BlocProvider<UserAuthBloc>(
+        create: (BuildContext context) => UserAuthBloc(),
         child: IntroPagesCreate(),
       ),
     );
