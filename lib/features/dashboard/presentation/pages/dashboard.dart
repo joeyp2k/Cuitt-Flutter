@@ -190,17 +190,22 @@ class _DashboardbState extends State<Dashboardb> {
                     padding: spacer.x.xs,
                     child: Column(
                       children: [
-                        Stack(children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              RadialChart(),
-                            ],
-                          ),
-                          Padding(
-                            padding: spacer.y.xxl * 1.8,
-                            child: Center(
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.width -
+                              gridSpacer * 8,
+                          child: Stack(children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                RadialChart(),
+                              ],
+                            ),
+                            Container(
+                              width: double.infinity,
+                              height: double.infinity,
                               child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   RichText(
                                     text: TextSpan(
@@ -212,8 +217,8 @@ class _DashboardbState extends State<Dashboardb> {
                                     text: TextSpan(
                                       style: RadialLarge,
                                       text: (state as DataState)
-                                              .newAverageDrawLengthTotalYestValue
-                                              .toString() +
+                                          .newAverageDrawLengthTotalYestValue
+                                          .toString() +
                                           's',
                                     ),
                                   ),
@@ -230,8 +235,9 @@ class _DashboardbState extends State<Dashboardb> {
                                 ],
                               ),
                             ),
+                          ]
                           ),
-                        ]),
+                        ),
                         Row(
                           children: [
                             DashboardTileLarge(

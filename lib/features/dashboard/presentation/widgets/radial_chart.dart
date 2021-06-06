@@ -46,6 +46,7 @@ class _RadialChartState extends State<RadialChart> {
           innerRadius: '70%',
           radius: '100%',
           gap: '10%',
+          trackColor: White,
           trackOpacity: 0.15,
           opacity: 1,
           maximumValue: drawLengthTotalAverageYest,

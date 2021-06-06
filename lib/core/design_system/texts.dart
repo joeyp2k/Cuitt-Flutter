@@ -116,6 +116,13 @@ const DWMY = const TextStyle(
     fontStyle: FontStyle.normal,
     fontSize: 16.0);
 
+const Description = const TextStyle(
+    color: Colors.black,
+    fontWeight: FontWeight.w400,
+    fontFamily: 'Montserrat',
+    fontStyle: FontStyle.normal,
+    fontSize: 16.0);
+
 const primaryEntry = const TextStyle(
     color: Colors.white70,
     fontWeight: FontWeight.w400,

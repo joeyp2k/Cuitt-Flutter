@@ -26,7 +26,7 @@ class _CuittState extends State<Cuitt> {
       debugShowCheckedModeBanner: false,
       home: BlocProvider<UserAuthBloc>(
         create: (BuildContext context) => UserAuthBloc(),
-        child: IntroPagesCreate(),
+        child: IntroPages(),
       ),
     );
   }

@@ -1,3 +1,4 @@
+import 'package:connectivity/connectivity.dart';
 import 'package:cuitt/core/design_system/design_system.dart';
 import 'package:cuitt/core/routes/slide_vert.dart';
 import 'package:cuitt/features/connect_device/presentation/pages/connect_device.dart';
@@ -66,7 +67,7 @@ class _CreateAccountState extends State<CreateAccount>
                                       text: "First Name",
                                       obscureText: false,
                                       textController:
-                                          userAuth.firstNameController,
+                                      userAuth.firstNameController,
                                     ),
                                   ),
                                   Padding(
@@ -77,7 +78,7 @@ class _CreateAccountState extends State<CreateAccount>
                                       text: "Last Name",
                                       obscureText: false,
                                       textController:
-                                          userAuth.lastNameController,
+                                      userAuth.lastNameController,
                                     ),
                                   ),
                                 ],
@@ -117,36 +118,44 @@ class _CreateAccountState extends State<CreateAccount>
                 ),
                 BlocConsumer<UserAuthBloc, UserAuthState>(
                     listener: (context, state) {
-                  if (state is NavigationState) {
-                    if (state.navigate) {
-                      Navigator.of(context)
-                          .push(MaterialPageRoute(builder: (context) {
-                        return ConnectPage();
-                      }));
-                    } else {
-                      _success = false;
-                    }
-                  } else if (state is SignInState) {
-                    Navigator.of(context).push(
-                      SlideVertRoute(
-                        exitPage: BlocProvider.value(
-                          value: BlocProvider.of<UserAuthBloc>(context),
-                          child: CreateAccount(),
-                        ),
-                        enterPage: BlocProvider.value(
-                          value: BlocProvider.of<UserAuthBloc>(context),
-                          child: Login(),
-                        ),
-                      ),
-                    );
-                  }
-                }, builder: (context, state) {
+                      if (state is NavigationState) {
+                        if (state.navigate) {
+                          Navigator.of(context)
+                              .push(MaterialPageRoute(builder: (context) {
+                            return ConnectPage();
+                          }));
+                        } else {
+                          _success = false;
+                        }
+                      } else if (state is SignInState) {
+                        Navigator.of(context).push(
+                          SlideVertRoute(
+                            exitPage: BlocProvider.value(
+                              value: BlocProvider.of<UserAuthBloc>(context),
+                              child: CreateAccount(),
+                            ),
+                            enterPage: BlocProvider.value(
+                              value: BlocProvider.of<UserAuthBloc>(context),
+                              child: Login(),
+                            ),
+                          ),
+                        );
+                      }
+                    }, builder: (context, state) {
                   return AnimatedButton(
                     paddingStart: spacer.x.xxl * 1.5,
                     processing: _success,
                     function: () async {
-                      BlocProvider.of<UserAuthBloc>(context)
-                          .add(CreateAccountEvent());
+                      var connectivityResult =
+                          await (Connectivity().checkConnectivity());
+                      print(connectivityResult);
+                      if (connectivityResult == ConnectivityResult.none) {
+                        print("not connected to the internet");
+                        //TODO show snackbar
+                      } else {
+                        BlocProvider.of<UserAuthBloc>(context)
+                            .add(CreateAccountEvent());
+                      }
                     },
                     text: 'Create Account',
                   );

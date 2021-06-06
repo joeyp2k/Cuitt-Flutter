@@ -12,7 +12,7 @@ class FadeRoute extends PageRouteBuilder {
             Animation<double> secondaryAnimation,
           ) =>
               enterPage,
-          transitionDuration: Duration(milliseconds: 400),
+          transitionDuration: Duration(milliseconds: 150),
           transitionsBuilder: (
             BuildContext context,
             Animation<double> animation,
@@ -21,19 +21,12 @@ class FadeRoute extends PageRouteBuilder {
           ) =>
               Stack(
             children: <Widget>[
-              SlideTransition(
-                position: new Tween<Offset>(
-                  begin: const Offset(0.0, 0.0),
-                  end: const Offset(0.0, 0.0),
-                ).animate(animation),
-                child: exitPage,
-              ),
               FadeTransition(
                 opacity: new Tween<double>(
                   begin: 0.0,
                   end: 1.0,
                 ).animate(animation),
-                child: enterPage,
+                child: child,
               ),
             ],
           ),

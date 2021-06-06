@@ -7,53 +7,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:preload_page_view/preload_page_view.dart';
 
 import 'create_account.dart';
-import 'sign_in.dart';
 
 //move skip button to stack with page view to maintain between screens
 
 final controller = PreloadPageController(
   initialPage: 0,
   viewportFraction: 1,
-);
-
-final controllerB = PreloadPageController(
-  initialPage: 4,
-  viewportFraction: 1,
-);
-
-Widget introPages = PreloadPageView(
-  controller: controller,
-  preloadPagesCount: 4,
-  children: [
-    Welcome(),
-    Intro(),
-    Partner(),
-    Location(),
-  ],
-);
-
-Widget introPagesB = PreloadPageView(
-  controller: controllerB,
-  preloadPagesCount: 5,
-  children: [
-    Welcome(),
-    Intro(),
-    Partner(),
-    Location(),
-    Login(),
-  ],
-);
-
-final introPagesC = PreloadPageView(
-  controller: controllerB,
-  preloadPagesCount: 5,
-  children: [
-    Welcome(),
-    Intro(),
-    Partner(),
-    Location(),
-    CreateAccount(),
-  ],
 );
 
 class Welcome extends StatefulWidget {
@@ -107,20 +66,18 @@ class _WelcomeState extends State<Welcome> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     gridSpacer = MediaQuery.of(context).size.width * 0.02;
-    return Scaffold(
-      backgroundColor: Green,
-      body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Padding(
-              padding: spacer.bottom.xxl,
-              child: cuittLogo,
-            ),
-            FadeTransition(
-              child: SlideTransition(
-                position: _animOffset,
+    return SafeArea(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Padding(
+            padding: spacer.bottom.xxl,
+            child: cuittLogo,
+          ),
+          FadeTransition(
+            child: SlideTransition(
+              position: _animOffset,
                 child: RichText(
                   text: TextSpan(
                     text: "Welcome to Cuitt",
@@ -149,7 +106,6 @@ class _WelcomeState extends State<Welcome> with SingleTickerProviderStateMixin {
             ),
           ],
         ),
-      ),
     );
   }
 }
@@ -157,19 +113,17 @@ class _WelcomeState extends State<Welcome> with SingleTickerProviderStateMixin {
 class Intro extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Green,
-      body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Padding(
-              padding: spacer.bottom.xxl,
-              child: adapterLightOn,
-            ),
-            RichText(
-              text: TextSpan(
+    return SafeArea(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Padding(
+            padding: spacer.bottom.xxl,
+            child: adapterLightOn,
+          ),
+          RichText(
+            text: TextSpan(
                 text: "Suggestions",
                 style: primaryH1Bold,
               ),
@@ -187,7 +141,6 @@ class Intro extends StatelessWidget {
             ),
           ],
         ),
-      ),
     );
   }
 }
@@ -195,19 +148,17 @@ class Intro extends StatelessWidget {
 class Partner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Green,
-      body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Padding(
-              padding: spacer.bottom.xxl,
-              child: partnerMode,
-            ),
-            RichText(
-              text: TextSpan(
+    return SafeArea(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Padding(
+            padding: spacer.bottom.xxl,
+            child: partnerMode,
+          ),
+          RichText(
+            text: TextSpan(
                 text: "Partner Mode",
                 style: primaryH1Bold,
               ),
@@ -225,7 +176,6 @@ class Partner extends StatelessWidget {
             ),
           ],
         ),
-      ),
     );
   }
 }
@@ -233,9 +183,8 @@ class Partner extends StatelessWidget {
 class Location extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Green,
-      body: SafeArea(
+    return
+      SafeArea(
         child: Stack(
           children: [
             Column(
@@ -279,7 +228,7 @@ class Location extends StatelessWidget {
                         FadeRoute(
                           exitPage: BlocProvider.value(
                             value: BlocProvider.of<UserAuthBloc>(context),
-                            child: IntroPagesCreate(),
+                            child: IntroPages(),
                           ),
                           enterPage: BlocProvider.value(
                             value: BlocProvider.of<UserAuthBloc>(context),
@@ -314,43 +263,26 @@ class Location extends StatelessWidget {
             ),
           ],
         ),
+    );
+  }
+}
+
+class IntroPages extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    //BlocProvider.of<UserAuthBloc>(context);
+    return Scaffold(
+      backgroundColor: Green,
+      body: PreloadPageView(
+        controller: controller,
+        preloadPagesCount: 4,
+        children: [
+          Welcome(),
+          Intro(),
+          Partner(),
+          Location(),
+        ],
       ),
     );
-  }
-}
-
-class IntroPagesCreate extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    //BlocProvider.of<UserAuthBloc>(context);
-    return PreloadPageView(
-      controller: controller,
-      preloadPagesCount: 4,
-      children: [
-        Welcome(),
-        Intro(),
-        Partner(),
-        Location(),
-      ],
-    );
-  }
-}
-
-class IntroPagesSignIn extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    //BlocProvider.of<UserAuthBloc>(context);
-    return PreloadPageView(
-      controller: controllerB,
-      preloadPagesCount: 5,
-      children: [
-        Welcome(),
-        Intro(),
-        Partner(),
-        Location(),
-        Login(),
-      ],
-    );
-    ;
   }
 }

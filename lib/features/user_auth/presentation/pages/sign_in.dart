@@ -1,3 +1,4 @@
+import 'package:connectivity/connectivity.dart';
 import 'package:cuitt/core/design_system/design_system.dart';
 import 'package:cuitt/features/connect_device/presentation/pages/connect_device.dart';
 import 'package:cuitt/features/user_auth/domain/usecases/user_auth.dart';
@@ -69,38 +70,46 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                 ),
                 BlocConsumer<UserAuthBloc, UserAuthState>(
                     listener: (context, state) {
-                  if (state is NavigationState) {
-                    if (state.navigate) {
-                      Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(builder: (context) {
-                        return ConnectPage();
-                      }));
-                    }
-                  } else if (state is CreateAccountState) {
-                    Navigator.of(context).pop();
-                  }
-                },
+                      if (state is NavigationState) {
+                        if (state.navigate) {
+                          Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(builder: (context) {
+                                return ConnectPage();
+                              }));
+                        }
+                      } else if (state is CreateAccountState) {
+                        Navigator.of(context).pop();
+                      }
+                    },
                     // ignore: missing_return
                     builder: (context, state) {
-                  if (state is LoadingState) {
-                    return AnimatedButton(
-                      paddingStart: spacer.x.xxl * 1.5,
-                      processing: true,
-                      function: null,
-                      text: 'Sign In',
-                    );
-                  } else {
-                    return AnimatedButton(
-                      paddingStart: spacer.x.xxl * 1.5,
-                      processing: false,
-                      function: () async {
-                        BlocProvider.of<UserAuthBloc>(context)
-                            .add(SignInEvent());
+                      if (state is LoadingState) {
+                        return AnimatedButton(
+                          paddingStart: spacer.x.xxl * 1.5,
+                          processing: true,
+                          function: null,
+                          text: 'Sign In',
+                        );
+                      } else {
+                        return AnimatedButton(
+                          paddingStart: spacer.x.xxl * 1.5,
+                          processing: false,
+                          function: () async {
+                        var connectivityResult =
+                            await (Connectivity().checkConnectivity());
+                        print(connectivityResult);
+                        if (connectivityResult == ConnectivityResult.none) {
+                          print("not connected to the internet");
+                          //TODO show snackbar
+                        } else {
+                          BlocProvider.of<UserAuthBloc>(context)
+                              .add(SignInEvent());
+                        }
                       },
-                      text: 'Sign In',
-                    );
-                  }
-                }),
+                          text: 'Sign In',
+                        );
+                      }
+                    }),
                 Padding(
                   padding: spacer.x.md,
                   child: Row(

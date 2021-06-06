@@ -5,15 +5,17 @@ class TextEntryBox extends StatelessWidget {
   final String text;
   final TextEditingController textController;
   final bool obscureText;
+  final Color color;
 
-  TextEntryBox({Key key, this.text, this.textController, this.obscureText})
+  TextEntryBox(
+      {Key key, this.text, this.textController, this.obscureText, this.color})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: TransWhite,
+        color: color,
         borderRadius: BorderRadius.all(Radius.circular(15)),
       ),
       padding: spacer.top.xs + spacer.x.xs,
