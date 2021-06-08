@@ -21,7 +21,6 @@ class GroupsList extends StatefulWidget {
 class _GroupsListState extends State<GroupsList> {
   var userNameIndex;
   var value;
-  int stack = 0;
 
   Future<void> _getUsers() async {
     userNameIndex = 0;

@@ -37,37 +37,102 @@ class Dashboardb extends StatefulWidget {
 
 class _DashboardbState extends State<Dashboardb> {
   @override
-  int arrayIndex;
   var value;
   bool update = false;
 
   Future<void> _getGroupsWithUser() async {
-    arrayIndex = 0;
-
     var firebaseUser = FirebaseAuth.instance.currentUser;
 
     value = await firestoreInstance
         .collection("groups")
         .where("members", arrayContains: firebaseUser.uid)
-        .get();
-    print(value);
+        .get()
+        .then((value) => groupIDList);
   }
 
-  Future<void> _loadGroupData() async {
-    groupNameList.clear();
-    groupIDList.clear();
+  void _groupDataCalculations() {
+    double sum = 0;
+    int sumi = 0;
 
-    value.docs.forEach((element) {
-      groupNameList.insert(arrayIndex, element.get("group name"));
-      groupIDList.insert(arrayIndex, element.id);
-      arrayIndex++;
+    userSeconds.forEach((element) {
+      sum += element;
     });
-    print(groupNameList);
+    groupSeconds.add(sum);
+    sum = 0;
+
+    userAverage.forEach((element) {
+      sum += element;
+    });
+    groupAverage.add(sum);
+    sum = 0;
+
+    userAverageYest.forEach((element) {
+      sum += element;
+    });
+    groupAverageYest.add(sum);
+    sum = 0;
+
+    userDraws.forEach((element) {
+      sumi += element;
+    });
+    groupDraws.add(sumi);
+    sumi = 0;
+  }
+
+  Future<void> _loadUserData() async {
+    print(userIDList);
+    userIDList.forEach((element) async {
+      value = await firestoreInstance
+          .collection("users")
+          .doc(element)
+          .collection("data")
+          .doc("stats")
+          .get()
+          .then((value) {
+        if (value.data() != null) {
+          userSeconds.clear();
+          userAverage.clear();
+          userAverageYest.clear();
+          userDraws.clear();
+
+          userSeconds.add(value["draw length total"]);
+          userDraws.add(value["draws"]);
+          userAverageYest.add(value["draw length average yesterday"]);
+          userAverage.add(value["draw length average"]);
+
+          _groupDataCalculations();
+
+          print(element.toString());
+          print(userSeconds);
+          print(userDraws);
+          print(userAverage);
+          print(userAverageYest);
+          print("\n");
+
+          print("GROUPS DATA");
+          print(groupSeconds);
+          print(groupAverage);
+          print(groupAverageYest);
+          print(groupDraws);
+          print("\n");
+        }
+      });
+    });
+  }
+
+  Future<void> _loadGroupUsers() async {
+    groupIDList.forEach((element) async {
+      value = await firestoreInstance.collection("groups").doc(element).get();
+
+      userIDList = await value["members"];
+
+      await _loadUserData();
+    });
   }
 
   void groups() async {
     await _getGroupsWithUser();
-    await _loadGroupData();
+    await _loadGroupUsers();
     if (groupNameList.isEmpty) {
       Navigator.of(context).push(MaterialPageRoute(builder: (context) {
         return GroupListEmpty();
