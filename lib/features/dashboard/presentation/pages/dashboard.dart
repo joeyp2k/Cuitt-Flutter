@@ -96,12 +96,12 @@ class _DashboardbState extends State<Dashboardb> {
     sumi = 0;
   }
 
-  Future<bool> _loadUserData() async {
+  Future<void> _loadUserData() async {
     //print(userIDList);
-    userIDList.forEach((element) async {
+    for (int i = 0; i < userIDList.length; i++) {
       value = await firestoreInstance
           .collection("users")
-          .doc(element)
+          .doc(userIDList[i])
           .collection("data")
           .doc("stats")
           .get()
@@ -120,7 +120,7 @@ class _DashboardbState extends State<Dashboardb> {
 
           _groupDataCalculations();
 
-          print(element.toString());
+          print(userIDList[i].toString());
           print(userSeconds);
           print(userDraws);
           print(userAverage);
@@ -137,15 +137,18 @@ class _DashboardbState extends State<Dashboardb> {
           print("\n");
         }
       });
-    });
+    }
   }
 
   Future<void> _loadGroupUsers() async {
-    groupIDList.forEach((element) async {
-      value = await firestoreInstance.collection("groups").doc(element).get();
+    for (int i = 0; i < groupIDList.length; i++) {
+      value = await firestoreInstance
+          .collection("groups")
+          .doc(groupIDList[i])
+          .get();
       userIDList = value["members"];
       await _loadUserData();
-    });
+    }
   }
 
   void _navigate() {
@@ -179,10 +182,10 @@ class _DashboardbState extends State<Dashboardb> {
     groupAverage.clear();
     groupAverageYest.clear();
     groupIDList.clear();
-    //loadGroupUsers() runs after groups() closes
-    //https://stackoverflow.com/questions/63719374/dartflutter-how-to-wait-map-foreach-to-complete-in-futurevoid-function
+
     await _getGroupsWithUser();
     await _loadGroupUsers();
+    _navigate();
   }
 
   @override
