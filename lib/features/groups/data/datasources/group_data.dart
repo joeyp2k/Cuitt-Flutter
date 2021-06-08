@@ -10,11 +10,12 @@ var userAverageYest = [];
 var userPlots;
 var username;
 
-var groupIDList = [];
+List<String> groupIDList = [];
 var groupNameList = [];
 var groupSeconds = [];
 var groupSecondsYest = [];
 var groupSecondsChange = [];
+var groupChangeSymbol = [];
 var groupAverage = [];
 var groupAverageYest = [];
 var groupDraws = [];

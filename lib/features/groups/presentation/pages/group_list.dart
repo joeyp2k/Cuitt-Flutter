@@ -250,11 +250,42 @@ class _GroupsListState extends State<GroupsList> {
                         color: TransWhitePlus,
                         borderRadius: BorderRadius.all(Radius.circular(10)),
                       ),
-                      child: Row(
+                      child: Column(
                         children: [
+                          Row(
+                            children: [
+                              RichText(
+                                text: TextSpan(
+                                  text: '${groupNameList[index]}',
+                                  style: TileHeader,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              RichText(
+                                text: TextSpan(
+                                  text:
+                                      '${groupSeconds[index].toStringAsFixed(1)}' +
+                                          's',
+                                  style: TileHeader,
+                                ),
+                              ),
+                              RichText(
+                                text: TextSpan(
+                                  text: ' (' +
+                                      '${groupChangeSymbol[index]}' +
+                                      '${groupSecondsChange[index].toStringAsFixed(1)}' +
+                                      ')',
+                                  style: TileHeader,
+                                ),
+                              ),
+                            ],
+                          ),
                           RichText(
                             text: TextSpan(
-                              text: '${groupNameList[index]}',
+                              text: '${groupDraws[index].toStringAsFixed(1)}',
                               style: TileHeader,
                             ),
                           ),

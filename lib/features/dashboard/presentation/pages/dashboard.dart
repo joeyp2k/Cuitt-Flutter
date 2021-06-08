@@ -47,7 +47,13 @@ class _DashboardbState extends State<Dashboardb> {
         .collection("groups")
         .where("members", arrayContains: firebaseUser.uid)
         .get()
-        .then((value) => groupIDList);
+        .then((value) {
+      value.docs.forEach((element) {
+        print(groupIDList.runtimeType);
+        groupIDList.add(element.id);
+        groupNameList.add(element["group name"]);
+      });
+    });
   }
 
   void _groupDataCalculations() {
@@ -72,6 +78,17 @@ class _DashboardbState extends State<Dashboardb> {
     groupAverageYest.add(sum);
     sum = 0;
 
+    double change;
+    for (int i = 0; i < groupAverageYest.length; i++) {
+      change = groupSeconds[i] - groupAverageYest[i];
+      if (change > 0) {
+        groupChangeSymbol.add("+");
+      } else {
+        groupChangeSymbol.add("");
+      }
+      groupSecondsChange.add(change);
+    }
+
     userDraws.forEach((element) {
       sumi += element;
     });
@@ -79,8 +96,8 @@ class _DashboardbState extends State<Dashboardb> {
     sumi = 0;
   }
 
-  Future<void> _loadUserData() async {
-    print(userIDList);
+  Future<bool> _loadUserData() async {
+    //print(userIDList);
     userIDList.forEach((element) async {
       value = await firestoreInstance
           .collection("users")
@@ -93,6 +110,7 @@ class _DashboardbState extends State<Dashboardb> {
           userSeconds.clear();
           userAverage.clear();
           userAverageYest.clear();
+          userSecondsChange.clear();
           userDraws.clear();
 
           userSeconds.add(value["draw length total"]);
@@ -114,6 +132,8 @@ class _DashboardbState extends State<Dashboardb> {
           print(groupAverage);
           print(groupAverageYest);
           print(groupDraws);
+          print(groupSecondsChange);
+          print(groupChangeSymbol);
           print("\n");
         }
       });
@@ -123,26 +143,46 @@ class _DashboardbState extends State<Dashboardb> {
   Future<void> _loadGroupUsers() async {
     groupIDList.forEach((element) async {
       value = await firestoreInstance.collection("groups").doc(element).get();
-
-      userIDList = await value["members"];
-
+      userIDList = value["members"];
       await _loadUserData();
     });
   }
 
-  void groups() async {
-    await _getGroupsWithUser();
-    await _loadGroupUsers();
+  void _navigate() {
+    print("GROUPS DATA FINAL");
+    print(groupIDList);
+    print(groupSeconds);
+    print(groupAverage);
+    print(groupAverageYest);
+    print(groupDraws);
+    print(groupSecondsChange);
+    print(groupChangeSymbol);
+
     if (groupNameList.isEmpty) {
       Navigator.of(context).push(MaterialPageRoute(builder: (context) {
         return GroupListEmpty();
       }));
     } else {
-      print("Navigating");
       Navigator.of(context).push(MaterialPageRoute(builder: (context) {
         return GroupsList();
       }));
     }
+  }
+
+  Future<void> groups() async {
+    print("CLEAR GROUP DATA");
+    groupSeconds.clear();
+    groupSecondsYest.clear();
+    groupDraws.clear();
+    groupSecondsChange.clear();
+    groupChangeSymbol.clear();
+    groupAverage.clear();
+    groupAverageYest.clear();
+    groupIDList.clear();
+    //loadGroupUsers() runs after groups() closes
+    //https://stackoverflow.com/questions/63719374/dartflutter-how-to-wait-map-foreach-to-complete-in-futurevoid-function
+    await _getGroupsWithUser();
+    await _loadGroupUsers();
   }
 
   @override
@@ -204,7 +244,7 @@ class _DashboardbState extends State<Dashboardb> {
                               icon: Icons.list,
                               iconColor: White,
                               function: () async {
-                                groups();
+                                await groups();
                               },
                             ),
                           ),
