@@ -7,10 +7,12 @@ import 'package:cuitt/features/dashboard/data/datasources/my_chart_data.dart';
 import 'package:cuitt/features/dashboard/data/datasources/my_data.dart';
 import 'package:cuitt/features/dashboard/presentation/bloc/dashboard_bloc.dart';
 import 'package:cuitt/features/dashboard/presentation/bloc/dashboard_event.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 
 class ConnectBLE {
   bool refresh = false;
+  bool firstTransmit = true;
   var _readval;
   var _lastval;
 
@@ -89,13 +91,217 @@ class ConnectBLE {
   }
 
   void _sendData() async {
+    DateTime plotTime;
+    var group;
+    var timeReciever = [];
+    var totalReciever = [];
+    int currentIndex = dayData.length - 1;
     var connectivityResult = await (Connectivity().checkConnectivity());
+    print("ATTEMPTING TRANSMISSION");
     if (connectivityResult == ConnectivityResult.mobile ||
         connectivityResult == ConnectivityResult.wifi) {
       try {
-        if (transmitPointer < i) {
-          while (transmitPointer < i) {
-            firebaseUser = (await FirebaseAuth.instance.currentUser);
+        if (buffer == 0) {
+          //proceed normally with one send
+          firebaseUser = FirebaseAuth.instance.currentUser;
+
+          await firestoreInstance
+              .collection("users")
+              .doc(firebaseUser.uid)
+              .collection("data")
+              .doc('stats')
+              .set({
+            "draws": drawCount,
+            "draw length average": drawLengthAverage,
+            "draw length total": drawLengthTotal,
+            "draw length average yesterday": drawLengthTotalAverageYest,
+          });
+
+          //check if current time exists
+          //if time does not exist already add new time and new plot total by pulling array, adding, and pushing new array
+          //if time exists, increment plot total
+
+          await firestoreInstance
+              .collection("groups")
+              .where("members", arrayContains: firebaseUser.uid)
+              .get().
+          then((value) =>
+              value.docs.forEach((element) async {
+                //get the last plot time from each group the user is in
+                plotTime = await element
+                    .get("plot time")
+                    .last;
+                //if the plot time is the same as the current day data time, increment the plot total
+                print(plotTime);
+                print(dayData.last.time)
+                if (plotTime == dayData.last.time) {
+                  print("INCREMENTING");
+                  group = await firestoreInstance.collection("groups")
+                      .doc(element.id)
+                      .get();
+
+                  totalReciever = group["plot total"];
+                  timeReciever = group["plot time"];
+                  totalReciever.last.increment(dayData.last.seconds);
+                  timeReciever.last.increment(dayData.last.time);
+
+                  firestoreInstance
+                      .collection("groups")
+                      .doc(element.id)
+                      .set({
+                    "plot total": totalReciever,
+                    "plot time": timeReciever,
+                  });
+
+                  //plot time and total field initialized when group created
+                  //if the last plot time is not the same as the current day data time
+                  //pull the plot total and plot time, add the new values, and push
+                } else if (plotTime != dayData.last.time) {
+                  print("ADDING");
+                  group = await firestoreInstance.collection("groups")
+                      .doc(element.id)
+                      .get();
+
+                  totalReciever = group["plot total"];
+                  timeReciever = group["plot time"];
+                  totalReciever.add(dayData.last.seconds);
+                  timeReciever.add(dayData.last.time);
+
+                  firestoreInstance
+                      .collection("groups")
+                      .doc(element.id)
+                      .set({
+                    "plot total": totalReciever,
+                    "plot time": timeReciever,
+                  });
+                }
+              }));
+
+          firestoreInstance
+              .collection("users")
+              .doc(firebaseUser.uid)
+              .collection('data')
+              .doc('day data')
+              .get()
+              .then((value) {
+            timeReciever = value["time"];
+            totalReciever = value["draw length"];
+
+            //TODO Fix first 12 dayData entries not being inserted into group chart and user chart
+
+            print(timeReciever);
+            print(totalReciever);
+            timeReciever.add(dayData.last.time);
+            totalReciever.add(dayData.last.seconds);
+            print(timeReciever);
+            print(totalReciever);
+            firestoreInstance
+                .collection("users")
+                .doc(firebaseUser.uid)
+                .collection("data")
+                .doc('day data')
+                .set({
+              "time": timeReciever,
+              "draw length": totalReciever,
+            });
+          }
+          );
+
+          /*
+          firestoreInstance
+              .collection("users")
+              .doc(firebaseUser.uid)
+              .collection('data')
+              .doc('day data')
+              .get()
+              .then((doc) {
+            if (doc.exists) {
+              firestoreInstance
+                  .collection("users")
+                  .doc(firebaseUser.uid)
+                  .collection("data")
+                  .doc('day data')
+                  .get().then((value) {
+                timeReciever = value["time"];
+                totalReciever = value["draw length"];
+                timeReciever.add(dayData.last.time);
+                totalReciever.add(dayData.last.seconds);
+
+                firestoreInstance
+                    .collection("users")
+                    .doc(firebaseUser.uid)
+                    .collection("data")
+                    .doc('day data')
+                    .set({
+                  "time" : timeReciever,
+                  "draw length" : totalReciever,
+                });
+              });
+            } else {
+              timeReciever.add(dayData.last.time);
+              totalReciever.add(dayData.last.seconds);
+
+              firestoreInstance
+                  .collection("users")
+                  .doc(firebaseUser.uid)
+                  .collection("data")
+                  .doc('day data')
+                  .set({
+                "time" : timeReciever,
+                "draw length" : totalReciever,
+              });
+            }
+          });
+          */
+
+          firestoreInstance
+              .collection("users")
+              .doc(firebaseUser.uid)
+              .collection('data')
+              .doc('week data')
+              .get()
+              .then((doc) {
+            if (doc.exists) {
+              firestoreInstance
+                  .collection("users")
+                  .doc(firebaseUser.uid)
+                  .collection("data")
+                  .doc('week data')
+                  .get().then((value) {
+                totalReciever = value["draw length"];
+                timeReciever = value["date"];
+                totalReciever.add(weekData.last.seconds);
+                timeReciever.add(weekData.last.time);
+
+                firestoreInstance
+                    .collection("users")
+                    .doc(firebaseUser.uid)
+                    .collection("data")
+                    .doc("week data")
+                    .set({
+                  "date": timeReciever,
+                  "draw length": totalReciever,
+                });
+              });
+            } else {
+              timeReciever.add(weekData.last.time);
+              totalReciever.add(weekData.last.seconds);
+
+              firestoreInstance
+                  .collection("users")
+                  .doc(firebaseUser.uid)
+                  .collection("data")
+                  .doc("week data")
+                  .set({
+                "date": timeReciever,
+                "draw length": totalReciever,
+              });
+            }
+          });
+        } else {
+          //proceed to increment down the last x amount of transmissions on the buffer
+          while (buffer > 0) {
+            firebaseUser = FirebaseAuth.instance.currentUser;
 
             firestoreInstance
                 .collection("users")
@@ -108,6 +314,63 @@ class ConnectBLE {
               "draw length total": drawLengthTotal,
               "draw length average yesterday": drawLengthTotalAverageYest,
             });
+
+            //check if current time exists
+            //if time does not exist already add new time and new plot total by pulling array, adding, and pushing new array
+            //if time exists, increment plot total
+
+            firestoreInstance
+                .collection("groups")
+                .where("members", arrayContains: firebaseUser.uid)
+                .get().
+            then((value) =>
+                value.docs.forEach((element) async {
+                  //get the last plot time from each group the user is in
+                  plotTime = await element
+                      .get("plot time")
+                      .last;
+                  //if the plot time is the same as the current day data time, increment the plot total
+                  if (plotTime == dayData[currentIndex].time) {
+                    group = await firestoreInstance.collection("groups")
+                        .doc(element.id)
+                        .get();
+
+                    totalReciever = group["plot total"];
+                    timeReciever = group["plot time"];
+                    totalReciever.last.increment(dayData[currentIndex].seconds);
+                    timeReciever.last.increment(dayData[currentIndex].time);
+
+                    firestoreInstance
+                        .collection("groups")
+                        .doc(element.id)
+                        .set({
+                      "plot total": totalReciever,
+                      "plot time": timeReciever,
+                    });
+                    //plot time and total field initialized when group created
+                    //if the last plot time is not the same as the current day data time
+                    //pull the plot total and plot time, add the new values, and push
+                  } else if (plotTime != dayData[currentIndex].time) {
+                    group = await firestoreInstance.collection("groups")
+                        .doc(element.id)
+                        .get();
+
+                    totalReciever = group["plot total"];
+                    timeReciever = group["plot time"];
+                    totalReciever.add(dayData[currentIndex].seconds);
+                    timeReciever.add(dayData[currentIndex].time);
+
+                    firestoreInstance
+                        .collection("groups")
+                        .doc(element.id)
+                        .set({
+                      "plot total": totalReciever,
+                      "plot time": timeReciever,
+                    });
+                  }
+                }));
+
+            //user data transmission
 
             firestoreInstance
                 .collection("users")
@@ -122,23 +385,34 @@ class ConnectBLE {
                     .doc(firebaseUser.uid)
                     .collection("data")
                     .doc('day data')
-                    .set({
-                  "time":
-                      FieldValue.arrayUnion([dayData[transmitPointer].time]),
-                  "draw length":
-                      FieldValue.arrayUnion([dayData[transmitPointer].seconds]),
-                }, SetOptions(merge: true));
+                    .get().then((value) {
+                  timeReciever = value["time"];
+                  totalReciever = value["draw length"];
+                  timeReciever.add(dayData[currentIndex].time);
+                  totalReciever.add(dayData[currentIndex].seconds);
+
+                  firestoreInstance
+                      .collection("users")
+                      .doc(firebaseUser.uid)
+                      .collection("data")
+                      .doc('day data')
+                      .set({
+                    "time": timeReciever,
+                    "draw length": totalReciever,
+                  });
+                });
               } else {
+                timeReciever.add(dayData[currentIndex].time);
+                totalReciever.add(dayData[currentIndex].seconds);
+
                 firestoreInstance
                     .collection("users")
                     .doc(firebaseUser.uid)
                     .collection("data")
                     .doc('day data')
                     .set({
-                  "time":
-                      FieldValue.arrayUnion([dayData[transmitPointer].time]),
-                  "draw length":
-                      FieldValue.arrayUnion([dayData[transmitPointer].seconds]),
+                  "time": timeReciever,
+                  "draw length": totalReciever,
                 });
               }
             });
@@ -156,116 +430,52 @@ class ConnectBLE {
                     .doc(firebaseUser.uid)
                     .collection("data")
                     .doc('week data')
-                    .set({
-                  "date":
-                      FieldValue.arrayUnion([monthData[transmitPointer].time]),
-                  "draw length": FieldValue.arrayUnion(
-                      [monthData[transmitPointer].seconds]),
-                }, SetOptions(merge: true));
+                    .get().then((value) {
+                  totalReciever = value["draw length"];
+                  timeReciever = value["date"];
+                  totalReciever.add(weekData[currentIndex].seconds);
+                  timeReciever.add(weekData[currentIndex].time);
+
+                  firestoreInstance
+                      .collection("users")
+                      .doc(firebaseUser.uid)
+                      .collection("data")
+                      .doc("week data")
+                      .set({
+                    "date": timeReciever,
+                    "draw length": totalReciever,
+                  });
+                });
               } else {
+                timeReciever.add(weekData[currentIndex].time);
+                totalReciever.add(weekData[currentIndex].seconds);
+
                 firestoreInstance
                     .collection("users")
                     .doc(firebaseUser.uid)
                     .collection("data")
-                    .doc('week data')
+                    .doc("week data")
                     .set({
-                  "date":
-                      FieldValue.arrayUnion([monthData[transmitPointer].time]),
-                  "draw length": FieldValue.arrayUnion(
-                      [monthData[transmitPointer].seconds]),
+                  "date": timeReciever,
+                  "draw length": totalReciever,
                 });
               }
             });
-
-            transmitPointer++;
+            currentIndex --;
+            buffer--;
+            print("BUFFER : " + buffer.toString());
           }
-        }
-        if (transmitPointer == i) {
-          firebaseUser = (await FirebaseAuth.instance.currentUser);
-
-          firestoreInstance
-              .collection("users")
-              .doc(firebaseUser.uid)
-              .collection("data")
-              .doc('stats')
-              .set({
-            "draws": drawCount,
-            "draw length average": drawLengthAverage,
-            "draw length total": drawLengthTotal,
-            "draw length average yesterday": drawLengthTotalAverageYest,
-          });
-
-          firestoreInstance
-              .collection("users")
-              .doc(firebaseUser.uid)
-              .collection('data')
-              .doc('day data')
-              .get()
-              .then((doc) {
-            if (doc.exists) {
-              firestoreInstance
-                  .collection("users")
-                  .doc(firebaseUser.uid)
-                  .collection("data")
-                  .doc('day data')
-                  .set({
-                "time": FieldValue.arrayUnion([dayData[transmitPointer].time]),
-                "draw length":
-                    FieldValue.arrayUnion([dayData[transmitPointer].seconds]),
-              }, SetOptions(merge: true));
-            } else {
-              firestoreInstance
-                  .collection("users")
-                  .doc(firebaseUser.uid)
-                  .collection("data")
-                  .doc('day data')
-                  .set({
-                "time": FieldValue.arrayUnion([dayData[transmitPointer].time]),
-                "draw length":
-                    FieldValue.arrayUnion([dayData[transmitPointer].seconds]),
-              });
-            }
-          });
-
-          firestoreInstance
-              .collection("users")
-              .doc(firebaseUser.uid)
-              .collection('data')
-              .doc('week data')
-              .get()
-              .then((doc) {
-            if (doc.exists) {
-              firestoreInstance
-                  .collection("users")
-                  .doc(firebaseUser.uid)
-                  .collection("data")
-                  .doc('week data')
-                  .set({
-                "date":
-                    FieldValue.arrayUnion([monthData[transmitPointer].time]),
-                "draw length":
-                    FieldValue.arrayUnion([monthData[transmitPointer].seconds]),
-              }, SetOptions(merge: true));
-            } else {
-              firestoreInstance
-                  .collection("users")
-                  .doc(firebaseUser.uid)
-                  .collection("data")
-                  .doc('week data')
-                  .set({
-                "date":
-                    FieldValue.arrayUnion([monthData[transmitPointer].time]),
-                "draw length":
-                    FieldValue.arrayUnion([monthData[transmitPointer].seconds]),
-              });
-            }
-          });
         }
       } catch (e) {
         //store data in buffer
+        buffer++;
+        print("BUFFER : " + buffer.toString() + "TRANSMISSION ERROR");
       }
-    } else if (connectivityResult == ConnectivityResult.none) {}
-    //store data in buffer
+    } else if (connectivityResult == ConnectivityResult.none) {
+      //store data in buffer
+      buffer++;
+      print("BUFFER : " + buffer.toString() + "NO CONNECTION");
+    }
   }
 
   void _listener() {

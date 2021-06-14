@@ -168,60 +168,64 @@ class _ActionButtonBlueState extends State<ActionButtonBlue>
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: (() async {
-        processing = true;
-        _controller.forward();
-        setState(() {});
-        await widget.function();
-        if (widget.success != true) {
-          processing = false;
-          _controller.reverse();
-        }
-        setState(() {});
-      }),
-      child: AnimatedPadding(
-        duration: Duration(milliseconds: 750),
-        curve: Curves.easeIn,
-        padding: processing
-            ? spacer.x.xxl * 2.8 + spacer.y.xs
-            : widget.paddingStart + spacer.y.xs,
-        child: AnimatedContainer(
-          padding: processing
-              ? spacer.y.xs * 1.3
-              : spacer.y.xxs + spacer.top.xs * 0.5,
-          decoration: BoxDecoration(
-            color: processing ? DarkBlue : LightBlue,
-            borderRadius:
-                BorderRadius.all(Radius.circular(processing ? 75 : 30)),
-          ),
-          duration: Duration(seconds: 2),
-          curve: Curves.fastOutSlowIn,
-          child: Stack(
-            children: [
-              FadeTransition(
-                opacity: _animOpac,
-                child: Center(
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(White),
-                  ),
-                ),
+    return Stack(
+      children: [
+        GestureDetector(
+          onTap: (() async {
+            processing = true;
+            _controller.forward();
+            setState(() {});
+            await widget.function();
+            if (widget.success != true) {
+              processing = false;
+              _controller.reverse();
+            }
+            setState(() {});
+          }),
+          child: AnimatedPadding(
+            duration: Duration(milliseconds: 750),
+            curve: Curves.easeIn,
+            padding: processing
+                ? widget.paddingEnd + spacer.y.xs
+                : widget.paddingStart + spacer.y.xs,
+            child: AnimatedContainer(
+              padding: processing ? spacer.y.md * 1.2 : spacer.y.md * 0.9,
+              decoration: BoxDecoration(
+                color: processing ? DarkBlue : LightBlue,
+                borderRadius:
+                    BorderRadius.all(Radius.circular(processing ? 75 : 30)),
               ),
-              FadeTransition(
-                opacity: _animTextOpac,
-                child: Center(
-                  child: RichText(
-                    text: TextSpan(
-                      style: ButtonRegular,
-                      text: widget.text,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+              duration: Duration(seconds: 2),
+              curve: Curves.fastOutSlowIn,
+            ),
           ),
         ),
-      ),
+        Padding(
+          padding: spacer.y.md * 1.15,
+          child: FadeTransition(
+            opacity: _animOpac,
+            child: Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(White),
+              ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: spacer.y.md * .97,
+          child: FadeTransition(
+            opacity: _animTextOpac,
+            child: Center(
+              child: RichText(
+                text: TextSpan(
+                  style: ButtonRegular,
+                  text: widget.text,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

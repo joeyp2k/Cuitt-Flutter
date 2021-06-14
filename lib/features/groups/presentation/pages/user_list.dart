@@ -9,6 +9,7 @@ import 'package:cuitt/features/groups/presentation/pages/create_group.dart';
 import 'package:cuitt/features/groups/presentation/pages/group_list.dart';
 import 'package:cuitt/features/groups/presentation/pages/join_group.dart';
 import 'package:cuitt/features/groups/presentation/widgets/dashboard_button.dart';
+import 'package:cuitt/features/groups/presentation/widgets/syncfusion_chart.dart';
 import 'package:cuitt/features/settings/presentation/pages/settings_home.dart';
 import 'package:flutter/material.dart';
 
@@ -28,6 +29,12 @@ class UserList extends StatelessWidget {
         backgroundColor: Green,
         onPressed: () {
           print(userNameList);
+          print(userSeconds);
+          print(userDraws);
+          print(userAverage);
+          print(userAverageYest);
+          print(userChangeSymbol);
+          print(userPlots);
         },
       ),
       backgroundColor: LightBlue,
@@ -222,13 +229,72 @@ class UserList extends StatelessWidget {
                           color: TransWhitePlus,
                           borderRadius: BorderRadius.all(Radius.circular(10)),
                         ),
-                        height: gridSpacer * 10,
-                        child: Row(
+                        child: Column(
                           children: [
-                            RichText(
-                              text: TextSpan(
-                                text: '${userNameList[index]}',
-                                style: primaryList,
+                            Padding(
+                              padding: spacer.x.xs + spacer.top.xs,
+                              child: Row(
+                                children: [
+                                  RichText(
+                                    text: TextSpan(
+                                      text: '${userNameList[index]}',
+                                      style: primaryList,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Builder(
+                              builder: (BuildContext context) {
+                                if (userPlots[index] == null) {
+                                  return Container();
+                                } else {
+                                  return Container(
+                                      height: 100,
+                                      width: double.infinity,
+                                      child: OverviewChart(
+                                        plots: userPlots[index],
+                                      ));
+                                }
+                              },
+                            ),
+                            Padding(
+                              padding: spacer.top.xs,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    color: Green,
+                                    borderRadius: BorderRadius.vertical(
+                                        bottom: Radius.circular(20))),
+                                child: Padding(
+                                  padding: spacer.all.xs,
+                                  child: Row(
+                                    children: [
+                                      RichText(
+                                        text: TextSpan(
+                                          text: 'Today\'s Total: ',
+                                          style: TileHeader,
+                                        ),
+                                      ),
+                                      RichText(
+                                        text: TextSpan(
+                                          text:
+                                              '${userSeconds[index].toStringAsFixed(1)}' +
+                                                  's',
+                                          style: TileHeader,
+                                        ),
+                                      ),
+                                      RichText(
+                                        text: TextSpan(
+                                          text: ' (' +
+                                              '${userChangeSymbol[index]}' +
+                                              '${userSecondsChange[index].toStringAsFixed(1)}' +
+                                              ')',
+                                          style: TileHeader,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
                             ),
                           ],

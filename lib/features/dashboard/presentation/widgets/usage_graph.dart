@@ -46,26 +46,26 @@ class _BarChartState extends State<BarChart> {
   }
 
   void _update() {
-    sec[i] += drawLength;
-    dayData[i] = UsageData(time[i], sec[i]);
-    monthData[i] = UsageData(timeDay[i], sec[i]);
+    sec[graphIndex] += drawLength;
+    dayData[graphIndex] = UsageData(time[graphIndex], sec[graphIndex]);
+    monthData[graphIndex] = UsageData(timeDay[graphIndex], sec[graphIndex]);
     //monthData using current month, not i
   }
 
   void _add() {
-    i++;
-    if (dayData.length <= i) {
+    graphIndex++;
+    if (dayData.length <= graphIndex) {
       sec.add(drawLength);
       time.add(timeData);
-      dayData.add(UsageData(time[i], sec[i]));
-      monthData.add(UsageData(timeDay[i], sec[i]));
+      dayData.add(UsageData(time[graphIndex], sec[graphIndex]));
+      monthData.add(UsageData(timeDay[graphIndex], sec[graphIndex]));
     } else {
       sec.add(drawLength);
       time.add(timeData);
       timeDay
           .add(DateTime(timeData.year, timeData.month, timeData.day).toLocal());
-      dayData[i] = UsageData(time[i], sec[i]);
-      monthData[i] = UsageData(timeDay[i], sec[i]);
+      dayData[graphIndex] = UsageData(time[graphIndex], sec[graphIndex]);
+      monthData[graphIndex] = UsageData(timeDay[graphIndex], sec[graphIndex]);
     }
   }
 
@@ -81,7 +81,7 @@ class _BarChartState extends State<BarChart> {
       if (widget.update) {
         _timeUpdate();
         _ifNoData();
-        if (timeData == time[i]) {
+        if (timeData == time[graphIndex]) {
           _update();
         } else {
           _add();

@@ -5,6 +5,7 @@ import 'package:cuitt/features/dashboard/presentation/pages/dashboard.dart';
 import 'package:cuitt/features/groups/data/datasources/buttons.dart';
 import 'package:cuitt/features/groups/data/datasources/group_data.dart';
 import 'package:cuitt/features/groups/data/datasources/keys.dart';
+import 'package:cuitt/features/groups/domain/usecases/write_group_data.dart';
 import 'package:cuitt/features/groups/presentation/bloc/groups_bloc.dart';
 import 'package:cuitt/features/groups/presentation/pages/group_list.dart';
 import 'package:cuitt/features/groups/presentation/pages/group_list_empty.dart';
@@ -81,9 +82,15 @@ class _CreateAdminPageState extends State<CreateAdminPage> {
       child: BlocConsumer<GroupBloc, GroupsState>(
         listener: (context, state) {
           if (state is Success) {
-          } else if (state is Fail) {}
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+              return GroupsList();
+            }));
+          } else if (state is Fail) {
+            _success = false;
+          }
         },
         builder: (context, state) {
+          groupBlocSink = BlocProvider.of<GroupBloc>(context);
           return Scaffold(
             backgroundColor: Green,
             appBar: AppBar(
@@ -98,80 +105,80 @@ class _CreateAdminPageState extends State<CreateAdminPage> {
               children: [
                 Expanded(
                     child: GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Container(
-                    color: Green,
-                    height: gridSpacer * 7.5,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.add,
-                          color: White,
+                      onTap: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Container(
+                        color: Green,
+                        height: gridSpacer * 7.5,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.add,
+                              color: White,
+                            ),
+                            RichText(
+                              text: TextSpan(style: DWMY, text: 'Create'),
+                            ),
+                          ],
                         ),
-                        RichText(
-                          text: TextSpan(style: DWMY, text: 'Create'),
-                        ),
-                      ],
-                    ),
-                  ),
-                )),
+                      ),
+                    )),
                 Expanded(
                     child: GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).pushReplacement(
-                      FadeRoute(
-                        enterPage: GroupsList(),
-                        exitPage: CreateAdminPage(),
+                      onTap: () {
+                        Navigator.of(context).pushReplacement(
+                          FadeRoute(
+                            enterPage: GroupsList(),
+                            exitPage: CreateAdminPage(),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        color: LightBlue,
+                        height: gridSpacer * 7.5,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.list,
+                              color: White,
+                            ),
+                            RichText(
+                              text: TextSpan(style: DWMY, text: 'Groups'),
+                            ),
+                          ],
+                        ),
                       ),
-                    );
-                  },
-                  child: Container(
-                    color: LightBlue,
-                    height: gridSpacer * 7.5,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.list,
-                          color: White,
-                        ),
-                        RichText(
-                          text: TextSpan(style: DWMY, text: 'Groups'),
-                        ),
-                      ],
-                    ),
-                  ),
-                )),
+                    )),
                 Expanded(
                     child: GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).pushReplacement(
-                      FadeRoute(
-                        enterPage: JoinGroupPage(),
-                        exitPage: CreateAdminPage(),
+                      onTap: () {
+                        Navigator.of(context).pushReplacement(
+                          FadeRoute(
+                            enterPage: JoinGroupPage(),
+                            exitPage: CreateAdminPage(),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        color: DarkBlue,
+                        height: gridSpacer * 7.5,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.link,
+                              color: White,
+                            ),
+                            RichText(
+                              text: TextSpan(style: DWMY, text: 'Join'),
+                            ),
+                          ],
+                        ),
                       ),
-                    );
-                  },
-                  child: Container(
-                    color: DarkBlue,
-                    height: gridSpacer * 7.5,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.link,
-                          color: White,
-                        ),
-                        RichText(
-                          text: TextSpan(style: DWMY, text: 'Join'),
-                        ),
-                      ],
-                    ),
-                  ),
-                )),
+                    )),
               ],
             ),
             drawer: SafeArea(
@@ -211,7 +218,7 @@ class _CreateAdminPageState extends State<CreateAdminPage> {
                                     exitPage: CreateAdminPage(),
                                     enterPage: Dashboardb(),
                                   ),
-                                  (Route<dynamic> route) => false,
+                                      (Route<dynamic> route) => false,
                                 );
                               },
                             ),
@@ -260,7 +267,8 @@ class _CreateAdminPageState extends State<CreateAdminPage> {
                                     TextEntryBox(
                                       text: "Group Name",
                                       obscureText: false,
-                                      textController: _groupNameController,
+                                      textController:
+                                          writeGroupData.groupNameController,
                                       color: TransWhitePlus,
                                     ),
                                     Padding(
@@ -269,7 +277,7 @@ class _CreateAdminPageState extends State<CreateAdminPage> {
                                         text: "Group Password",
                                         obscureText: true,
                                         textController:
-                                            _groupPasswordController,
+                                        writeGroupData.groupPasswordController,
                                         color: TransWhitePlus,
                                       ),
                                     ),
@@ -277,7 +285,8 @@ class _CreateAdminPageState extends State<CreateAdminPage> {
                                       text: "Verify Password",
                                       obscureText: true,
                                       textController:
-                                          _verifyGroupPasswordController,
+                                      writeGroupData
+                                          .verifyGroupPasswordController,
                                       color: TransWhitePlus,
                                     ),
                                   ],
@@ -285,7 +294,8 @@ class _CreateAdminPageState extends State<CreateAdminPage> {
                               ),
                             ),
                             ActionButtonBlue(
-                              paddingStart: spacer.x.sm + spacer.top.xxs,
+                              paddingStart: spacer.x.sm,
+                              paddingEnd: spacer.x.xxl * 2.86,
                               success: _success,
                               text: "Create Administrative Group",
                               function: () async {

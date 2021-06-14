@@ -37,4 +37,5 @@ var suggestion;
 double usage = 0;
 double overUsage = 0;
 
+int buffer = 0;
 int transmitPointer = 0;

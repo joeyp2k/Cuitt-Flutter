@@ -33,6 +33,7 @@ class UserAuthBloc extends Bloc<UserAuthEvent, UserAuthState> {
       yield CreateAccountState();
     } else if (event is SignInEvent) {
       yield LoadingState();
+
       final bool failOrNavigate = await userAuth.signInWithEmailAndPassword();
       if (failOrNavigate) {
         yield NavigationState(

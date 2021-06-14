@@ -39,6 +39,7 @@ class _DashboardbState extends State<Dashboardb> {
   @override
   var value;
   bool update = false;
+  List<UsageData> groupData = [];
 
   Future<void> _getGroupsWithUser() async {
     var firebaseUser = FirebaseAuth.instance.currentUser;
@@ -49,11 +50,22 @@ class _DashboardbState extends State<Dashboardb> {
         .get()
         .then((value) {
       value.docs.forEach((element) {
-        print(groupIDList.runtimeType);
         groupIDList.add(element.id);
         groupNameList.add(element["group name"]);
+
+        groupPlotTime = element["plot time"];
+        groupPlotTotal = element["plot total"];
+        if (groupPlotTime.isNotEmpty && groupPlotTotal.isNotEmpty) {
+          for (int i = 0; i < groupPlotTime.length; i++) {
+            groupData.add(UsageData(groupPlotTime[i], groupPlotTotal[i]));
+          }
+          groupPlots.add(groupData);
+        } else {
+          groupPlots.add(null);
+        }
       });
     });
+    print("GROUP PLOTS" + groupPlots.toString());
   }
 
   void _groupDataCalculations() {
@@ -96,9 +108,23 @@ class _DashboardbState extends State<Dashboardb> {
     sumi = 0;
   }
 
+  Future<void> _loadGroupUsers() async {
+    for (int i = 0; i < groupIDList.length; i++) {
+      print(groupIDList[i].toString());
+      value = await firestoreInstance
+          .collection("groups")
+          .doc(groupIDList[i])
+          .get();
+      print(value.data());
+      userIDList = value["members"];
+      print("Users: " + userIDList.toString());
+      await _loadUserData();
+    }
+  }
+
   Future<void> _loadUserData() async {
-    //print(userIDList);
     for (int i = 0; i < userIDList.length; i++) {
+      print(userIDList[i].toString());
       value = await firestoreInstance
           .collection("users")
           .doc(userIDList[i])
@@ -134,20 +160,11 @@ class _DashboardbState extends State<Dashboardb> {
           print(groupDraws);
           print(groupSecondsChange);
           print(groupChangeSymbol);
+          print(groupPlotTime);
+          print(groupPlotTotal);
           print("\n");
         }
       });
-    }
-  }
-
-  Future<void> _loadGroupUsers() async {
-    for (int i = 0; i < groupIDList.length; i++) {
-      value = await firestoreInstance
-          .collection("groups")
-          .doc(groupIDList[i])
-          .get();
-      userIDList = value["members"];
-      await _loadUserData();
     }
   }
 
@@ -160,8 +177,10 @@ class _DashboardbState extends State<Dashboardb> {
     print(groupDraws);
     print(groupSecondsChange);
     print(groupChangeSymbol);
+    print(groupPlotTime);
+    print(groupPlotTotal);
 
-    if (groupNameList.isEmpty) {
+    if (groupIDList.isEmpty) {
       Navigator.of(context).push(MaterialPageRoute(builder: (context) {
         return GroupListEmpty();
       }));
@@ -174,6 +193,7 @@ class _DashboardbState extends State<Dashboardb> {
 
   Future<void> groups() async {
     print("CLEAR GROUP DATA");
+    groupNameList.clear();
     groupSeconds.clear();
     groupSecondsYest.clear();
     groupDraws.clear();
@@ -182,6 +202,10 @@ class _DashboardbState extends State<Dashboardb> {
     groupAverage.clear();
     groupAverageYest.clear();
     groupIDList.clear();
+    groupPlotTime.clear();
+    groupPlotTotal.clear();
+    groupPlots.clear();
+    groupData.clear();
 
     await _getGroupsWithUser();
     await _loadGroupUsers();
@@ -274,15 +298,7 @@ class _DashboardbState extends State<Dashboardb> {
             ),
             backgroundColor: Background,
             floatingActionButton: FloatingActionButton(
-              onPressed: () {
-                print('Draw Count: ' + drawCount.toString());
-                print('Draw Length: ' + drawLength.toString());
-                print('Draw Length Total: ' + drawLengthTotal.toString());
-                print('Draw Length Average: ' + drawLengthAverage.toString());
-                print(viewportSelectionStart.toString());
-                print(viewportSelectionEnd.toString());
-                timeData = timeData.add(Duration(hours: 1));
-              },
+              onPressed: () {},
             ),
             appBar: AppBar(
               backgroundColor: Background,

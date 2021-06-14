@@ -8,6 +8,8 @@ class UsageData {
   UsageData(this.time, this.seconds);
 }
 
+bool progress;
+
 var time = [];
 var timeDay = [];
 List<double> sec = [];

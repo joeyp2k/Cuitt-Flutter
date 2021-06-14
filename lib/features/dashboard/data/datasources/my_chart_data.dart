@@ -11,7 +11,7 @@ class UsageData {
 var time = [];
 var timeDay = [];
 List<double> sec = [];
-var i = 0;
+var graphIndex = 0;
 int firstRun = 1;
 int n = 1;
 

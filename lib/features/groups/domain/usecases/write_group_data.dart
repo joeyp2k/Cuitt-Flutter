@@ -9,26 +9,41 @@ class WriteGroupData {
   TextEditingController groupNameController = TextEditingController();
   TextEditingController groupPasswordController = TextEditingController();
   TextEditingController verifyGroupPasswordController = TextEditingController();
+  final TextEditingController groupIDController = TextEditingController();
 
   //create admin group
   Future<bool> createAdminGroup() async {
+    TextEditingController();
     bool _success = false;
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.mobile ||
         connectivityResult == ConnectivityResult.wifi) {
       try {
+        var empty = [];
+        firebaseUser = FirebaseAuth.instance.currentUser;
+        firestoreInstance.collection("groups").doc(randID).set({
+          "administrative group": true,
+          "group name": groupNameController.text,
+          "group password": groupPasswordController.text,
+          "members": FieldValue.arrayUnion([firebaseUser.uid]),
+          "plot total": FieldValue.arrayUnion(empty),
+          "plot time": FieldValue.arrayUnion(empty),
+        });
+        print("Group: " + groupNameController.text + " created");
         return _success = true;
       } catch (e) {
+        print("ERROR");
         return _success;
       }
-    } else if (connectivityResult == ConnectivityResult.none) {}
+    } else {
+      print("NOT CONNECTED TO NETWORK");
+      return _success;
+    }
   }
 
   //create casual group
 
   Future<bool> createCasualGroup() async {
-    final TextEditingController _groupNameController = TextEditingController();
-    final TextEditingController _groupPasswordController =
         TextEditingController();
     bool _success = false;
     var connectivityResult = await (Connectivity().checkConnectivity());
@@ -36,64 +51,72 @@ class WriteGroupData {
         connectivityResult == ConnectivityResult.wifi) {
       // I am connected to a mobile network.
       try {
-        firebaseUser = (await FirebaseAuth.instance.currentUser);
+        var empty = [];
+        firebaseUser = FirebaseAuth.instance.currentUser;
         firestoreInstance.collection("groups").doc(randID).set({
           "administrative group": false,
-          "group name": _groupNameController.text,
-          "group password": _groupPasswordController.text,
+          "group name": groupNameController.text,
+          "group password": groupPasswordController.text,
           "admins": firebaseUser.uid,
           "members": FieldValue.arrayUnion([firebaseUser.uid]),
+          "plot total": FieldValue.arrayUnion(empty),
+          "plot time": FieldValue.arrayUnion(empty),
         });
+        print("Group: " + groupNameController.text + " created");
         return _success = true;
       } catch (e) {
+        print("ERROR");
         return _success;
       }
-    } else if (connectivityResult == ConnectivityResult.none) {
+    } else {
       // I am not connected to a wifi network.
+      print("NOT CONNECTED TO NETWORK");
       return _success;
     }
   }
 
-//join group
+  //join group
   Future<bool> joinGroup() async {
-    final TextEditingController _groupIDController = TextEditingController();
-    final TextEditingController _groupPasswordController =
-        TextEditingController();
-
     bool _success = false;
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.mobile ||
         connectivityResult == ConnectivityResult.wifi) {
       try {
-        firebaseUser = (await FirebaseAuth.instance.currentUser);
+        firebaseUser = FirebaseAuth.instance.currentUser;
         firestoreInstance
             .collection("groups")
-            .doc(_groupIDController.text)
+            .doc(groupIDController.text)
             .update({
           "members": FieldValue.arrayUnion([firebaseUser.uid]),
         });
+        print("Group ID: " + groupIDController.text + " joined");
         return _success = true;
       } catch (e) {
+        print("ERROR");
         return _success;
       }
-    } else if (connectivityResult == ConnectivityResult.none) {
+    } else {
+      print("NOT CONNECTED TO NETWORK");
       return _success;
     }
     //leave group
-    Future<bool> leaveGroup() async {
-      var connectivityResult = await (Connectivity().checkConnectivity());
-      if (connectivityResult == ConnectivityResult.mobile ||
-          connectivityResult == ConnectivityResult.wifi) {
-      } else if (connectivityResult == ConnectivityResult.none) {}
-    }
+  }
 
-    //transmit data
-    Future<bool> transmitData() async {
-      var connectivityResult = await (Connectivity().checkConnectivity());
-      if (connectivityResult == ConnectivityResult.mobile ||
-          connectivityResult == ConnectivityResult.wifi) {
-      } else if (connectivityResult == ConnectivityResult.none) {}
+  Future<void> leaveGroup() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.mobile ||
+        connectivityResult == ConnectivityResult.wifi) {
+    } else {
+      print("NOT CONNECTED TO NETWORK");
     }
+  }
+
+  //transmit data
+  Future<void> transmitData() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.mobile ||
+        connectivityResult == ConnectivityResult.wifi) {
+    } else {}
   }
 
   WriteGroupData();

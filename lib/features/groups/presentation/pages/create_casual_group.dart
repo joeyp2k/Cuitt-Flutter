@@ -43,6 +43,7 @@ class _CreateCasualPageState extends State<CreateCasualPage> {
           }
         },
         builder: (context, state) {
+          groupBlocSink = BlocProvider.of<GroupBloc>(context);
           return Scaffold(
             backgroundColor: Green,
             bottomSheet: Row(
@@ -54,75 +55,75 @@ class _CreateCasualPageState extends State<CreateCasualPage> {
                   },
                   child: Container(
                     color: Green,
-                    height: gridSpacer * 7.5,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.add,
-                          color: White,
+                        height: gridSpacer * 7.5,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.add,
+                              color: White,
+                            ),
+                            RichText(
+                              text: TextSpan(style: DWMY, text: 'Create'),
+                            ),
+                          ],
                         ),
-                        RichText(
-                          text: TextSpan(style: DWMY, text: 'Create'),
-                        ),
-                      ],
-                    ),
-                  ),
-                )),
+                      ),
+                    )),
                 Expanded(
                     child: GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).pushReplacement(
-                      FadeRoute(
-                        enterPage: GroupsList(),
-                        exitPage: CreateCasualPage(),
+                      onTap: () {
+                        Navigator.of(context).pushReplacement(
+                          FadeRoute(
+                            enterPage: GroupsList(),
+                            exitPage: CreateCasualPage(),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        color: LightBlue,
+                        height: gridSpacer * 7.5,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.list,
+                              color: White,
+                            ),
+                            RichText(
+                              text: TextSpan(style: DWMY, text: 'Groups'),
+                            ),
+                          ],
+                        ),
                       ),
-                    );
-                  },
-                  child: Container(
-                    color: LightBlue,
-                    height: gridSpacer * 7.5,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.list,
-                          color: White,
-                        ),
-                        RichText(
-                          text: TextSpan(style: DWMY, text: 'Groups'),
-                        ),
-                      ],
-                    ),
-                  ),
-                )),
+                    )),
                 Expanded(
                     child: GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).pushReplacement(
-                      FadeRoute(
-                        enterPage: JoinGroupPage(),
-                        exitPage: CreateCasualPage(),
+                      onTap: () {
+                        Navigator.of(context).pushReplacement(
+                          FadeRoute(
+                            enterPage: JoinGroupPage(),
+                            exitPage: CreateCasualPage(),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        color: DarkBlue,
+                        height: gridSpacer * 7.5,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.link,
+                              color: White,
+                            ),
+                            RichText(
+                              text: TextSpan(style: DWMY, text: 'Join'),
+                            ),
+                          ],
+                        ),
                       ),
-                    );
-                  },
-                  child: Container(
-                    color: DarkBlue,
-                    height: gridSpacer * 7.5,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.link,
-                          color: White,
-                        ),
-                        RichText(
-                          text: TextSpan(style: DWMY, text: 'Join'),
-                        ),
-                      ],
-                    ),
-                  ),
-                )),
+                    )),
               ],
             ),
             appBar: AppBar(
@@ -169,7 +170,7 @@ class _CreateCasualPageState extends State<CreateCasualPage> {
                                     exitPage: CreateCasualPage(),
                                     enterPage: Dashboardb(),
                                   ),
-                                  (Route<dynamic> route) => false,
+                                      (Route<dynamic> route) => false,
                                 );
                               },
                             ),
@@ -247,9 +248,11 @@ class _CreateCasualPageState extends State<CreateCasualPage> {
                               ),
                               ActionButtonBlue(
                                 success: _success,
-                                paddingStart: spacer.x.xl + spacer.top.xxs,
+                                paddingStart: spacer.x.xl,
+                                paddingEnd: spacer.x.xxl * 2.58,
                                 text: "Create Casual Group",
                                 function: () async {
+                                  print("tap");
                                   groupBlocSink.add(CreateCasualEvent());
                                 },
                               ),

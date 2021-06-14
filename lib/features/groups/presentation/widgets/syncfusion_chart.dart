@@ -1,37 +1,32 @@
 import 'dart:async';
 
 import 'package:cuitt/core/design_system/design_system.dart';
-import 'package:cuitt/features/dashboard/presentation/pages/dashboard.dart';
-import 'package:cuitt/features/groups/data/datasources/user_chart_data.dart';
+import 'package:cuitt/features/dashboard/data/datasources/my_chart_data.dart';
 import 'package:cuitt/features/groups/data/datasources/user_data.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-class ChartApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: _MyHomePage(),
-    );
-  }
-}
-
-class _MyHomePage extends StatefulWidget {
+class OverviewChart extends StatefulWidget {
   // ignore: prefer_const_constructors_in_immutables
-  _MyHomePage({Key key}) : super(key: key);
+
+  List<UsageData> plots;
+
+  OverviewChart({
+    Key key,
+    this.plots,
+  }) : super(key: key);
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _OverviewChartState createState() => _OverviewChartState();
 }
 
+int refresh = 0;
 DateTime viewport = DateTime.now();
 DateTime viewportVal =
     DateTime(viewport.year, viewport.month, viewport.day, viewport.hour);
 DateTimeIntervalType labelInterval = DateTimeIntervalType.hours;
 
-class _MyHomePageState extends State<_MyHomePage> {
+class _OverviewChartState extends State<OverviewChart> {
   Timer timer;
 
   void _timeUpdate() {
@@ -62,29 +57,29 @@ class _MyHomePageState extends State<_MyHomePage> {
   }
 
   void _update() {
-    sec[i] += drawLength;
-    dayData[i] = UsageData(time[i], sec[i]);
-    weekData[i] = UsageData(timeDay[i], sec[i]);
-    monthData[i] = UsageData(timeDay[i], sec[i]);
+    sec[graphIndex] += drawLength;
+    dayData[graphIndex] = UsageData(time[graphIndex], sec[graphIndex]);
+    weekData[graphIndex] = UsageData(timeDay[graphIndex], sec[graphIndex]);
+    monthData[graphIndex] = UsageData(timeDay[graphIndex], sec[graphIndex]);
     //monthData using current month, not i
   }
 
   void _add() {
-    i++;
-    if (dayData.length <= i) {
+    graphIndex++;
+    if (dayData.length <= graphIndex) {
       sec.add(drawLength);
       time.add(timeData);
-      dayData.add(UsageData(time[i], sec[i]));
-      weekData.add(UsageData(timeDay[i], sec[i]));
-      monthData.add(UsageData(timeDay[i], sec[i]));
+      dayData.add(UsageData(time[graphIndex], sec[graphIndex]));
+      weekData.add(UsageData(timeDay[graphIndex], sec[graphIndex]));
+      monthData.add(UsageData(timeDay[graphIndex], sec[graphIndex]));
     } else {
       sec.add(drawLength);
       time.add(timeData);
       timeDay
           .add(DateTime(timeData.year, timeData.month, timeData.day).toLocal());
-      dayData[i] = UsageData(time[i], sec[i]);
-      weekData[i] = UsageData(timeDay[i], sec[i]);
-      monthData[i] = UsageData(timeDay[i], sec[i]);
+      dayData[graphIndex] = UsageData(time[graphIndex], sec[graphIndex]);
+      weekData[graphIndex] = UsageData(timeDay[graphIndex], sec[graphIndex]);
+      monthData[graphIndex] = UsageData(timeDay[graphIndex], sec[graphIndex]);
     }
   }
 
@@ -94,7 +89,7 @@ class _MyHomePageState extends State<_MyHomePage> {
       if (refresh == 1) {
         _timeUpdate();
         _ifNoData();
-        if (timeData == time[i]) {
+        if (timeData == time[graphIndex]) {
           _update();
         } else {
           _add();
@@ -115,7 +110,7 @@ class _MyHomePageState extends State<_MyHomePage> {
   Widget build(BuildContext context) {
     var overviewData = <ChartSeries<UsageData, DateTime>>[
       ColumnSeries<UsageData, DateTime>(
-        dataSource: dataSelection,
+        dataSource: widget.plots,
         xValueMapper: (UsageData usage, _) => usage.time,
         yValueMapper: (UsageData usage, _) => usage.seconds,
 // Enable data label
@@ -129,7 +124,7 @@ class _MyHomePageState extends State<_MyHomePage> {
         labelStyle: TextStyle(
           color: White,
         ),
-        maximumLabels: 5,
+        maximumLabels: 0,
         visibleMinimum: viewportSelectionStart,
         visibleMaximum: viewportSelectionEnd,
         majorGridLines: MajorGridLines(width: 0),
@@ -138,43 +133,10 @@ class _MyHomePageState extends State<_MyHomePage> {
       ),
       // Enable tooltip
       zoomPanBehavior: ZoomPanBehavior(
-        enablePanning: true,
-      ),
-      tooltipBehavior: TooltipBehavior(
-        opacity: 0,
-        enable: true,
-        builder: (dynamic data, dynamic point, dynamic series, int pointIndex,
-            int seriesIndex) {
-          return Container(
-              padding: spacer.all.xxs,
-              decoration: BoxDecoration(
-                color: TransWhite,
-                borderRadius: BorderRadius.all(Radius.circular(6.0)),
-              ),
-              child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    RichText(
-                      text: TextSpan(
-                        text: (DateFormat("j").format(data.time).toString()),
-                        style: TextStyle(fontSize: 14, color: White),
-                      ),
-                      textScaleFactor: 1.0,
-                    ),
-                    RichText(
-                      text: TextSpan(
-                        text: (data.seconds.toStringAsFixed(1) + 's'),
-                        style: TextStyle(fontSize: 14, color: White),
-                      ),
-                      textScaleFactor: 1.0,
-                    ),
-                  ]));
-        },
+        enablePanning: false,
       ),
       primaryYAxis: NumericAxis(
-        maximumLabels: 3,
+        maximumLabels: 0,
         labelStyle: TextStyle(
           color: White,
         ),

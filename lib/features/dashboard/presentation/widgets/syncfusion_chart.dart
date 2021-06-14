@@ -62,29 +62,29 @@ class _MyHomePageState extends State<_MyHomePage> {
   }
 
   void _update() {
-    sec[i] += drawLength;
-    dayData[i] = UsageData(time[i], sec[i]);
-    weekData[i] = UsageData(timeDay[i], sec[i]);
-    monthData[i] = UsageData(timeDay[i], sec[i]);
+    sec[graphIndex] += drawLength;
+    dayData[graphIndex] = UsageData(time[graphIndex], sec[graphIndex]);
+    weekData[graphIndex] = UsageData(timeDay[graphIndex], sec[graphIndex]);
+    monthData[graphIndex] = UsageData(timeDay[graphIndex], sec[graphIndex]);
     //monthData using current month, not i
   }
 
   void _add() {
-    i++;
-    if (dayData.length <= i) {
+    graphIndex++;
+    if (dayData.length <= graphIndex) {
       sec.add(drawLength);
       time.add(timeData);
-      dayData.add(UsageData(time[i], sec[i]));
-      weekData.add(UsageData(timeDay[i], sec[i]));
-      monthData.add(UsageData(timeDay[i], sec[i]));
+      dayData.add(UsageData(time[graphIndex], sec[graphIndex]));
+      weekData.add(UsageData(timeDay[graphIndex], sec[graphIndex]));
+      monthData.add(UsageData(timeDay[graphIndex], sec[graphIndex]));
     } else {
       sec.add(drawLength);
       time.add(timeData);
       timeDay
           .add(DateTime(timeData.year, timeData.month, timeData.day).toLocal());
-      dayData[i] = UsageData(time[i], sec[i]);
-      weekData[i] = UsageData(timeDay[i], sec[i]);
-      monthData[i] = UsageData(timeDay[i], sec[i]);
+      dayData[graphIndex] = UsageData(time[graphIndex], sec[graphIndex]);
+      weekData[graphIndex] = UsageData(timeDay[graphIndex], sec[graphIndex]);
+      monthData[graphIndex] = UsageData(timeDay[graphIndex], sec[graphIndex]);
     }
     drawLengthLast = drawLength;
   }
@@ -100,6 +100,8 @@ class _MyHomePageState extends State<_MyHomePage> {
 
   void dispose() {
     // TODO: implement dispose
+    print("DISPOSING CHART TIMER");
+    timer.cancel();
     super.dispose();
   }
 
