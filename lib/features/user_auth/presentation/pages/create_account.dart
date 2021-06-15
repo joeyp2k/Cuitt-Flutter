@@ -1,5 +1,6 @@
 import 'package:connectivity/connectivity.dart';
 import 'package:cuitt/core/design_system/design_system.dart';
+import 'package:cuitt/core/routes/fade.dart';
 import 'package:cuitt/core/routes/slide_vert.dart';
 import 'package:cuitt/features/connect_device/presentation/pages/connect_device.dart';
 import 'package:cuitt/features/user_auth/domain/usecases/user_auth.dart';
@@ -120,11 +121,13 @@ class _CreateAccountState extends State<CreateAccount>
                     listener: (context, state) {
                       if (state is NavigationState) {
                         if (state.navigate) {
-                          Navigator.of(context)
-                              .push(MaterialPageRoute(builder: (context) {
-                            return ConnectPage();
-                          }));
-                        } else {
+                      Navigator.of(context).pushReplacement(
+                        FadeRoute(
+                          enterPage: ConnectPage(),
+                          exitPage: CreateAccount(),
+                        ),
+                      );
+                    } else {
                           _success = false;
                         }
                       } else if (state is SignInState) {

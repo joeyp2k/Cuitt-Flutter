@@ -1,5 +1,6 @@
 import 'package:connectivity/connectivity.dart';
 import 'package:cuitt/core/design_system/design_system.dart';
+import 'package:cuitt/core/routes/fade.dart';
 import 'package:cuitt/features/connect_device/presentation/pages/connect_device.dart';
 import 'package:cuitt/features/user_auth/domain/usecases/user_auth.dart';
 import 'package:cuitt/features/user_auth/presentation/bloc/user_auth_bloc.dart';
@@ -73,10 +74,12 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                       if (state is NavigationState) {
                         if (state.navigate) {
                           Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(builder: (context) {
-                                return ConnectPage();
-                              }));
-                        }
+                        FadeRoute(
+                          enterPage: ConnectPage(),
+                          exitPage: Login(),
+                        ),
+                      );
+                    }
                       } else if (state is CreateAccountState) {
                         Navigator.of(context).pop();
                       }

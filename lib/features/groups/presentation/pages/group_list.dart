@@ -154,6 +154,7 @@ class _GroupsListState extends State<GroupsList> {
           print(groupChangeSymbol);
           print(groupPlotTime);
           print(groupPlotTotal);
+          print(groupPlots);
         },
       ),
       bottomSheet: Row(

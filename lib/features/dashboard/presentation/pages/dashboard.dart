@@ -57,7 +57,8 @@ class _DashboardbState extends State<Dashboardb> {
         groupPlotTotal = element["plot total"];
         if (groupPlotTime.isNotEmpty && groupPlotTotal.isNotEmpty) {
           for (int i = 0; i < groupPlotTime.length; i++) {
-            groupData.add(UsageData(groupPlotTime[i], groupPlotTotal[i]));
+            groupData
+                .add(UsageData(groupPlotTime[i].toDate(), groupPlotTotal[i]));
           }
           groupPlots.add(groupData);
         } else {
@@ -298,7 +299,10 @@ class _DashboardbState extends State<Dashboardb> {
             ),
             backgroundColor: Background,
             floatingActionButton: FloatingActionButton(
-              onPressed: () {},
+              onPressed: () {
+                print("BUFFER RESET");
+                buffer = 0;
+              },
             ),
             appBar: AppBar(
               backgroundColor: Background,

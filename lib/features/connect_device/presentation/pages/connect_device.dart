@@ -1,4 +1,5 @@
 import 'package:cuitt/core/design_system/design_system.dart';
+import 'package:cuitt/core/routes/fade.dart';
 import 'package:cuitt/features/connect_device/presentation/bloc/connect_bloc.dart';
 import 'package:cuitt/features/connect_device/presentation/bloc/connect_event.dart';
 import 'package:cuitt/features/connect_device/presentation/bloc/connect_state.dart';
@@ -31,13 +32,9 @@ class _ConnectPageState extends State<ConnectPage> {
           } else if (state is Success) {
             _processing = false;
             Navigator.of(context).pushReplacement(
-              PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) {
-                  return Dashboardb(
-                    opacityAnimation: animation,
-                  );
-                },
-                transitionDuration: Duration(seconds: 1),
+              FadeRoute(
+                enterPage: Dashboardb(),
+                exitPage: ConnectPage(),
               ),
             );
           } else if (state is Idle) {

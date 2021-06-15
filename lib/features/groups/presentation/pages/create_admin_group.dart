@@ -3,12 +3,10 @@ import 'package:cuitt/core/design_system/design_system.dart';
 import 'package:cuitt/core/routes/fade.dart';
 import 'package:cuitt/features/dashboard/presentation/pages/dashboard.dart';
 import 'package:cuitt/features/groups/data/datasources/buttons.dart';
-import 'package:cuitt/features/groups/data/datasources/group_data.dart';
 import 'package:cuitt/features/groups/data/datasources/keys.dart';
 import 'package:cuitt/features/groups/domain/usecases/write_group_data.dart';
 import 'package:cuitt/features/groups/presentation/bloc/groups_bloc.dart';
 import 'package:cuitt/features/groups/presentation/pages/group_list.dart';
-import 'package:cuitt/features/groups/presentation/pages/group_list_empty.dart';
 import 'package:cuitt/features/groups/presentation/pages/join_group.dart';
 import 'package:cuitt/features/groups/presentation/widgets/action_button.dart';
 import 'package:cuitt/features/groups/presentation/widgets/dashboard_button.dart';
@@ -48,7 +46,7 @@ class _CreateAdminPageState extends State<CreateAdminPage> {
     });
     _success = true;
   }
-
+  /*
   void groups() async {
     int arrayindex = 0;
     var firebaseUser = await FirebaseAuth.instance.currentUser;
@@ -74,7 +72,7 @@ class _CreateAdminPageState extends State<CreateAdminPage> {
       }));
     }
   }
-
+  */
   @override
   Widget build(BuildContext context) {
     return BlocProvider<GroupBloc>(
@@ -82,9 +80,13 @@ class _CreateAdminPageState extends State<CreateAdminPage> {
       child: BlocConsumer<GroupBloc, GroupsState>(
         listener: (context, state) {
           if (state is Success) {
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-              return GroupsList();
-            }));
+            await groups();
+            Navigator.of(context).pushReplacement(
+              FadeRoute(
+                enterPage: GroupsList(),
+                exitPage: CreateAdminPage(),
+              ),
+            );
           } else if (state is Fail) {
             _success = false;
           }

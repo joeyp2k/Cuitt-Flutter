@@ -35,9 +35,13 @@ class _CreateCasualPageState extends State<CreateCasualPage> {
       child: BlocConsumer<GroupBloc, GroupsState>(
         listener: (context, state) {
           if (state is Success) {
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-              return GroupsList();
-            }));
+            await groups();
+            Navigator.of(context).pushReplacement(
+              FadeRoute(
+                enterPage: GroupsList(),
+                exitPage: CreateCasualPage(),
+              ),
+            );
           } else if (state is Fail) {
             _success = false;
           }
