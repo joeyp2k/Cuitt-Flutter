@@ -115,20 +115,18 @@ class _OverviewChartState extends State<OverviewChart> {
         yValueMapper: (UsageData usage, _) => usage.seconds,
 // Enable data label
         dataLabelSettings: DataLabelSettings(isVisible: false),
-        pointColorMapper: (UsageData data, _) => Green,
+        pointColorMapper: (UsageData data, _) => DarkBlue,
       ),
     ];
     return SfCartesianChart(
+      plotAreaBorderWidth: 0,
       enableAxisAnimation: true,
       primaryXAxis: DateTimeAxis(
-        labelStyle: TextStyle(
-          color: White,
-        ),
-        maximumLabels: 0,
+        //axisLine: AxisLine(width: 0),
+        isVisible: false,
         visibleMinimum: viewportSelectionStart,
         visibleMaximum: viewportSelectionEnd,
         majorGridLines: MajorGridLines(width: 0),
-        labelIntersectAction: AxisLabelIntersectAction.rotate45,
         dateFormat: dateFormat,
       ),
       // Enable tooltip
@@ -136,10 +134,8 @@ class _OverviewChartState extends State<OverviewChart> {
         enablePanning: false,
       ),
       primaryYAxis: NumericAxis(
-        maximumLabels: 0,
-        labelStyle: TextStyle(
-          color: White,
-        ),
+        //axisLine: AxisLine(width: 0),
+        isVisible: false,
         anchorRangeToVisiblePoints: false,
       ),
       series: overviewData,

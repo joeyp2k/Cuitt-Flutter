@@ -124,6 +124,7 @@ class _MyHomePageState extends State<_MyHomePage> {
           color: White,
         ),
         maximumLabels: 5,
+        //plotOffset: 20,
         visibleMinimum: viewportSelectionStart,
         visibleMaximum: viewportSelectionEnd,
         majorGridLines: MajorGridLines(width: 0),

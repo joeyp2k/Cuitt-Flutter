@@ -3,6 +3,7 @@ import 'package:cuitt/core/design_system/design_system.dart';
 import 'package:cuitt/core/routes/fade.dart';
 import 'package:cuitt/features/dashboard/presentation/pages/dashboard.dart';
 import 'package:cuitt/features/groups/data/datasources/buttons.dart';
+import 'package:cuitt/features/groups/domain/usecases/get_group_data.dart';
 import 'package:cuitt/features/groups/domain/usecases/write_group_data.dart';
 import 'package:cuitt/features/groups/presentation/bloc/groups_bloc.dart';
 import 'package:cuitt/features/groups/presentation/pages/group_list.dart';
@@ -33,9 +34,9 @@ class _CreateCasualPageState extends State<CreateCasualPage> {
     return BlocProvider<GroupBloc>(
       create: (BuildContext context) => GroupBloc(),
       child: BlocConsumer<GroupBloc, GroupsState>(
-        listener: (context, state) {
+        listener: (context, state) async {
           if (state is Success) {
-            await groups();
+            await getGroupData.groups();
             Navigator.of(context).pushReplacement(
               FadeRoute(
                 enterPage: GroupsList(),

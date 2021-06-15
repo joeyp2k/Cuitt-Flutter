@@ -1,99 +1,176 @@
 import 'package:cuitt/features/dashboard/data/datasources/cloud.dart';
+import 'package:cuitt/features/dashboard/data/datasources/my_chart_data.dart';
 import 'package:cuitt/features/groups/data/datasources/group_data.dart';
-/*
-void initState() {
-  super.initState();
-
-  bloc.state.listen((state) {
-    if (state is PageOneSelected) {
-      _navigateToPage2();
-    } else if (state is PageTwoSelected) {
-      _navigateToPage2();
-    }
-  });
-}
-*/
 
 class GetGroupData {
-  //load user data
-  void _getUser() async {}
-
-  //load user list
-  var userNameIndex;
   var value;
 
-  void _getUsers() async {
-    userNameIndex = 0;
+  List<UsageData> groupData = [];
 
-    var value = await firestoreInstance
+  Future<void> _getGroupsWithUser() async {
+    var firebaseUser = FirebaseAuth.instance.currentUser;
+
+    value = await firestoreInstance
         .collection("groups")
-        .doc(selection) //selection = group name and should be group ID
+        .where("members", arrayContains: firebaseUser.uid)
         .get()
-        .then((value) => userIDList = value.get("members"));
+        .then((value) {
+      value.docs.forEach((element) {
+        groupIDList.add(element.id);
+        groupNameList.add(element["group name"]);
 
-    userNameIndex = userIDList.length;
+        groupPlotTime = element["plot time"];
+        groupPlotTotal = element["plot total"];
+        if (groupPlotTime.isNotEmpty && groupPlotTotal.isNotEmpty) {
+          for (int i = 0; i < groupPlotTime.length; i++) {
+            groupData
+                .add(UsageData(groupPlotTime[i].toDate(), groupPlotTotal[i]));
+          }
+          groupPlots.add(groupData);
+        } else {
+          groupPlots.add(null);
+        }
+      });
+    });
+    //fill plots with 12 entries for charts
+    //TODO FIRST 12 add from left, afterwards add from right: get viewport to show without cutting off any bars
+    print("GROUP PLOTS" + groupPlots.toString());
+    for (int i = 0; i < groupPlots.length; i++) {
+      if (groupPlots[i].length < 12) {
+        var lastTime = groupPlots[i].last.time;
+        int adder = 0;
+        for (int a = groupPlots[i].length; a < 12; a++) {
+          adder++;
+          print("ADDER: " + adder.toString());
+          groupPlots[i].add(UsageData(lastTime.add(Duration(hours: adder)), 1));
+          print(lastTime.toString());
+        }
+      }
+    }
+    print("GROUP PLOTS" + groupPlots.toString());
   }
 
-  void _loadUserData() async {
-    userNameList.clear();
+  void _groupDataCalculations() {
+    double sum = 0;
+    int sumi = 0;
 
-    for (int i = 0; i < userNameIndex; i++) {
+    userSeconds.forEach((element) {
+      sum += element;
+    });
+    groupSeconds.add(sum);
+    sum = 0;
+
+    userAverage.forEach((element) {
+      sum += element;
+    });
+    groupAverage.add(sum);
+    sum = 0;
+
+    userAverageYest.forEach((element) {
+      sum += element;
+    });
+    groupAverageYest.add(sum);
+    sum = 0;
+
+    double change;
+    for (int i = 0; i < groupAverageYest.length; i++) {
+      change = groupSeconds[i] - groupAverageYest[i];
+      if (change > 0) {
+        groupChangeSymbol.add("+");
+      } else {
+        groupChangeSymbol.add("");
+      }
+      groupSecondsChange.add(change);
+    }
+
+    userDraws.forEach((element) {
+      sumi += element;
+    });
+    groupDraws.add(sumi);
+    sumi = 0;
+  }
+
+  Future<void> _loadGroupUsers() async {
+    for (int i = 0; i < groupIDList.length; i++) {
+      print(groupIDList[i].toString());
+      value = await firestoreInstance
+          .collection("groups")
+          .doc(groupIDList[i])
+          .get();
+      print(value.data());
+      userIDList = value["members"];
+      print("Users: " + userIDList.toString());
+      await _loadUserData();
+    }
+  }
+
+  Future<void> _loadUserData() async {
+    for (int i = 0; i < userIDList.length; i++) {
+      print(userIDList[i].toString());
       value = await firestoreInstance
           .collection("users")
           .doc(userIDList[i])
+          .collection("data")
+          .doc("stats")
           .get()
           .then((value) {
-        userNameList.insert(i, value.get("username"));
+        if (value.data() != null) {
+          userSeconds.clear();
+          userAverage.clear();
+          userAverageYest.clear();
+          userSecondsChange.clear();
+          userDraws.clear();
+
+          userSeconds.add(value["draw length total"]);
+          userDraws.add(value["draws"]);
+          userAverageYest.add(value["draw length average yesterday"]);
+          userAverage.add(value["draw length average"]);
+
+          _groupDataCalculations();
+
+          print(userIDList[i].toString());
+          print(userSeconds);
+          print(userDraws);
+          print(userAverage);
+          print(userAverageYest);
+          print("\n");
+
+          print("GROUPS DATA");
+          print(groupSeconds);
+          print(groupAverage);
+          print(groupAverageYest);
+          print(groupDraws);
+          print(groupSecondsChange);
+          print(groupChangeSymbol);
+          print(groupPlotTime);
+          print(groupPlotTotal);
+          print("\n");
+        }
       });
     }
   }
 
-  void groupSelection() async {
-    await _getUsers();
-    await _loadUserData();
-
-    if (userNameList.isEmpty) {
-      /*
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-        return UserListEmpty();
-      }));
-      */
-    } else {
-      /*
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-        return UserList();
-      }));
-       */
-    }
-  }
-
-  //load group list
-  void groups() async {
-    int arrayindex = 0;
-    var firebaseUser = await FirebaseAuth.instance.currentUser;
-    var value = await firestoreInstance
-        .collection("groups")
-        .where("members", arrayContains: firebaseUser.uid)
-        .get();
-
+  Future<void> groups() async {
+    print("CLEAR GROUP DATA");
     groupNameList.clear();
+    groupSeconds.clear();
+    groupSecondsYest.clear();
+    groupDraws.clear();
+    groupSecondsChange.clear();
+    groupChangeSymbol.clear();
+    groupAverage.clear();
+    groupAverageYest.clear();
     groupIDList.clear();
-    value.docs.forEach((element) {
-      groupNameList.insert(arrayindex, element.get("group name"));
-      groupIDList.insert(arrayindex, element.id);
-      arrayindex++;
-    });
-    if (groupNameList.isEmpty) {
-      /*
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-        return GroupListEmpty();
-      }));
-    } else {
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-        return GroupList();
-      }));
+    groupPlotTime.clear();
+    groupPlotTotal.clear();
+    groupPlots.clear();
+    groupData.clear();
 
-       */
-    }
+    await _getGroupsWithUser();
+    await _loadGroupUsers();
   }
+
+  GetGroupData();
 }
+
+GetGroupData getGroupData = GetGroupData();

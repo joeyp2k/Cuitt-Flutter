@@ -33,8 +33,9 @@ DateTime viewportDay =
 
 DateTime viewportMonth = DateTime(viewport.year, viewport.month).toLocal();
 
-DateTime viewportSelectionStart = viewportHour;
-DateTime viewportSelectionEnd = viewportHour.add(Duration(hours: 11));
+DateTime viewportSelectionStart = viewportHour.subtract(Duration(minutes: 30));
+DateTime viewportSelectionEnd =
+    viewportHour.add(Duration(hours: 11, minutes: 30));
 
 //Dashboard chart timeframe selection
 var dataSelection = dayData;

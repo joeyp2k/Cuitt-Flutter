@@ -155,6 +155,8 @@ class _GroupsListState extends State<GroupsList> {
           print(groupPlotTime);
           print(groupPlotTotal);
           print(groupPlots);
+          print(viewportSelectionEnd);
+          print(viewportSelectionStart);
         },
       ),
       bottomSheet: Row(
@@ -409,55 +411,54 @@ class _GroupsListState extends State<GroupsList> {
                               if (groupPlots[index] == null) {
                                 return Container();
                               } else {
+                                print("GROUP PLOTS" + groupPlots.toString());
+                                for (int i = 0; i < 12; i++) {
+                                  print(groupPlots[0][i].time);
+                                  print(groupPlots[0][i].seconds);
+                                }
                                 return Container(
-                                    height: 100,
-                                    width: double.infinity,
-                                    child: OverviewChart(
-                                      plots: groupPlots[index],
-                                    ));
+                                  height: 100,
+                                  width: double.infinity,
+                                  child: OverviewChart(
+                                    plots: groupPlots[index],
+                                  ),
+                                );
                               }
                             },
                           ),
-                          Padding(
-                            padding: spacer.top.xs,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  color: Green,
-                                  borderRadius: BorderRadius.vertical(
-                                      bottom: Radius.circular(20))
-                              ),
-                              child: Padding(
-                                padding: spacer.all.xs,
-                                child: Row(
-                                  children: [
-                                    RichText(
-                                      text: TextSpan(
-                                        text:
-                                        'Today\'s Total: ',
-                                        style: TileHeader,
-                                      ),
+                          Container(
+                            decoration: BoxDecoration(
+                                color: Green,
+                                borderRadius: BorderRadius.vertical(
+                                    bottom: Radius.circular(20))),
+                            child: Padding(
+                              padding: spacer.all.xs,
+                              child: Row(
+                                children: [
+                                  RichText(
+                                    text: TextSpan(
+                                      text: 'Today\'s Total: ',
+                                      style: TileHeader,
                                     ),
-                                    RichText(
-                                      text: TextSpan(
-                                        text:
-                                        '${groupSeconds[index].toStringAsFixed(
-                                            1)}' +
-                                            's',
-                                        style: TileHeader,
-                                      ),
+                                  ),
+                                  RichText(
+                                    text: TextSpan(
+                                      text:
+                                          '${groupSeconds[index].toStringAsFixed(1)}' +
+                                              's',
+                                      style: TileHeader,
                                     ),
-                                    RichText(
-                                      text: TextSpan(
-                                        text: ' (' +
-                                            '${groupChangeSymbol[index]}' +
-                                            '${groupSecondsChange[index]
-                                                .toStringAsFixed(1)}' +
-                                            ')',
-                                        style: TileHeader,
-                                      ),
+                                  ),
+                                  RichText(
+                                    text: TextSpan(
+                                      text: ' (' +
+                                          '${groupChangeSymbol[index]}' +
+                                          '${groupSecondsChange[index].toStringAsFixed(1)}' +
+                                          ')',
+                                      style: TileHeader,
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),

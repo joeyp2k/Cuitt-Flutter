@@ -1,11 +1,8 @@
-import 'dart:async';
 
 import 'package:cuitt/core/design_system/design_system.dart';
 import 'package:cuitt/core/routes/fade.dart';
 import 'package:cuitt/core/routes/slide.dart';
-import 'package:cuitt/features/dashboard/data/datasources/cloud.dart';
 import 'package:cuitt/features/dashboard/data/datasources/dash_tiles.dart';
-import 'package:cuitt/features/dashboard/data/datasources/my_chart_data.dart';
 import 'package:cuitt/features/dashboard/data/datasources/my_data.dart';
 import 'package:cuitt/features/dashboard/data/datasources/tile_buttons.dart';
 import 'package:cuitt/features/dashboard/presentation/bloc/dashboard_bloc.dart';
@@ -18,10 +15,10 @@ import 'package:cuitt/features/dashboard/presentation/widgets/dashboard_tile_lar
 import 'package:cuitt/features/dashboard/presentation/widgets/draws_tile.dart';
 import 'package:cuitt/features/dashboard/presentation/widgets/radial_chart.dart';
 import 'package:cuitt/features/groups/data/datasources/group_data.dart';
+import 'package:cuitt/features/groups/domain/usecases/get_group_data.dart';
 import 'package:cuitt/features/groups/presentation/pages/group_list.dart';
 import 'package:cuitt/features/groups/presentation/pages/group_list_empty.dart';
 import 'package:cuitt/features/settings/presentation/pages/settings_home.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -37,137 +34,7 @@ class Dashboardb extends StatefulWidget {
 
 class _DashboardbState extends State<Dashboardb> {
   @override
-  var value;
   bool update = false;
-  List<UsageData> groupData = [];
-
-  Future<void> _getGroupsWithUser() async {
-    var firebaseUser = FirebaseAuth.instance.currentUser;
-
-    value = await firestoreInstance
-        .collection("groups")
-        .where("members", arrayContains: firebaseUser.uid)
-        .get()
-        .then((value) {
-      value.docs.forEach((element) {
-        groupIDList.add(element.id);
-        groupNameList.add(element["group name"]);
-
-        groupPlotTime = element["plot time"];
-        groupPlotTotal = element["plot total"];
-        if (groupPlotTime.isNotEmpty && groupPlotTotal.isNotEmpty) {
-          for (int i = 0; i < groupPlotTime.length; i++) {
-            groupData
-                .add(UsageData(groupPlotTime[i].toDate(), groupPlotTotal[i]));
-          }
-          groupPlots.add(groupData);
-        } else {
-          groupPlots.add(null);
-        }
-      });
-    });
-    print("GROUP PLOTS" + groupPlots.toString());
-  }
-
-  void _groupDataCalculations() {
-    double sum = 0;
-    int sumi = 0;
-
-    userSeconds.forEach((element) {
-      sum += element;
-    });
-    groupSeconds.add(sum);
-    sum = 0;
-
-    userAverage.forEach((element) {
-      sum += element;
-    });
-    groupAverage.add(sum);
-    sum = 0;
-
-    userAverageYest.forEach((element) {
-      sum += element;
-    });
-    groupAverageYest.add(sum);
-    sum = 0;
-
-    double change;
-    for (int i = 0; i < groupAverageYest.length; i++) {
-      change = groupSeconds[i] - groupAverageYest[i];
-      if (change > 0) {
-        groupChangeSymbol.add("+");
-      } else {
-        groupChangeSymbol.add("");
-      }
-      groupSecondsChange.add(change);
-    }
-
-    userDraws.forEach((element) {
-      sumi += element;
-    });
-    groupDraws.add(sumi);
-    sumi = 0;
-  }
-
-  Future<void> _loadGroupUsers() async {
-    for (int i = 0; i < groupIDList.length; i++) {
-      print(groupIDList[i].toString());
-      value = await firestoreInstance
-          .collection("groups")
-          .doc(groupIDList[i])
-          .get();
-      print(value.data());
-      userIDList = value["members"];
-      print("Users: " + userIDList.toString());
-      await _loadUserData();
-    }
-  }
-
-  Future<void> _loadUserData() async {
-    for (int i = 0; i < userIDList.length; i++) {
-      print(userIDList[i].toString());
-      value = await firestoreInstance
-          .collection("users")
-          .doc(userIDList[i])
-          .collection("data")
-          .doc("stats")
-          .get()
-          .then((value) {
-        if (value.data() != null) {
-          userSeconds.clear();
-          userAverage.clear();
-          userAverageYest.clear();
-          userSecondsChange.clear();
-          userDraws.clear();
-
-          userSeconds.add(value["draw length total"]);
-          userDraws.add(value["draws"]);
-          userAverageYest.add(value["draw length average yesterday"]);
-          userAverage.add(value["draw length average"]);
-
-          _groupDataCalculations();
-
-          print(userIDList[i].toString());
-          print(userSeconds);
-          print(userDraws);
-          print(userAverage);
-          print(userAverageYest);
-          print("\n");
-
-          print("GROUPS DATA");
-          print(groupSeconds);
-          print(groupAverage);
-          print(groupAverageYest);
-          print(groupDraws);
-          print(groupSecondsChange);
-          print(groupChangeSymbol);
-          print(groupPlotTime);
-          print(groupPlotTotal);
-          print("\n");
-        }
-      });
-    }
-  }
 
   void _navigate() {
     print("GROUPS DATA FINAL");
@@ -190,27 +57,6 @@ class _DashboardbState extends State<Dashboardb> {
         return GroupsList();
       }));
     }
-  }
-
-  Future<void> groups() async {
-    print("CLEAR GROUP DATA");
-    groupNameList.clear();
-    groupSeconds.clear();
-    groupSecondsYest.clear();
-    groupDraws.clear();
-    groupSecondsChange.clear();
-    groupChangeSymbol.clear();
-    groupAverage.clear();
-    groupAverageYest.clear();
-    groupIDList.clear();
-    groupPlotTime.clear();
-    groupPlotTotal.clear();
-    groupPlots.clear();
-    groupData.clear();
-
-    await _getGroupsWithUser();
-    await _loadGroupUsers();
-    _navigate();
   }
 
   @override
@@ -272,7 +118,8 @@ class _DashboardbState extends State<Dashboardb> {
                               icon: Icons.list,
                               iconColor: White,
                               function: () async {
-                                await groups();
+                                await getGroupData.groups();
+                                _navigate();
                               },
                             ),
                           ),

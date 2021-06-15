@@ -59,9 +59,10 @@ class _DashboardChartState extends State<DashboardChart> {
                               labelInterval = DateTimeIntervalType.hours;
                               padValue = 0;
                               dataSelection = dayData;
-                              viewportSelectionStart = viewportHour;
-                              viewportSelectionEnd =
-                                  viewportHour.add(Duration(hours: 11));
+                              viewportSelectionStart =
+                                  viewportHour.subtract(Duration(minutes: 30));
+                              viewportSelectionEnd = viewportHour
+                                  .add(Duration(hours: 11, minutes: 30));
                             });
                           },
                         ),
@@ -83,12 +84,16 @@ class _DashboardChartState extends State<DashboardChart> {
                             tooltipFormat = 'EEEE';
                             dateFormat = DateFormat.EEEE();
                             labelInterval = DateTimeIntervalType.days;
-                            padValue = MediaQuery.of(context).size.width / 4 -
+                            padValue = MediaQuery
+                                .of(context)
+                                .size
+                                .width / 4 -
                                 gridSpacer;
                             dataSelection = weekData;
-                            viewportSelectionStart = viewportDay;
+                            viewportSelectionStart =
+                                viewportDay.subtract(Duration(hours: 12));
                             viewportSelectionEnd =
-                                viewportDay.add(Duration(days: 6));
+                                viewportDay.add(Duration(days: 6, hours: 12));
                             setState(() {});
                           },
                         ),
@@ -110,13 +115,17 @@ class _DashboardChartState extends State<DashboardChart> {
                             tooltipFormat = 'Md';
                             dateFormat = DateFormat.Md();
                             labelInterval = DateTimeIntervalType.days;
-                            padValue = (MediaQuery.of(context).size.width / 4 -
-                                    gridSpacer) *
+                            padValue = (MediaQuery
+                                .of(context)
+                                .size
+                                .width / 4 -
+                                gridSpacer) *
                                 2;
                             dataSelection = monthData;
-                            viewportSelectionStart = viewportDay;
+                            viewportSelectionStart =
+                                viewportDay.subtract(Duration(hours: 12));
                             viewportSelectionEnd =
-                                viewportDay.add(Duration(days: 29));
+                                viewportDay.add(Duration(days: 29, hours: 12));
                             setState(() {});
                           },
                         ),
