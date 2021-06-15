@@ -212,9 +212,9 @@ class UserList extends StatelessWidget {
                 itemCount: userNameList.length,
                 itemBuilder: (BuildContext context, int index) {
                   return Container(
-                    margin: spacer.y.xxs,
+                    margin: spacer.y.xs,
                     child: InkWell(
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
                       onTap: () {
                         username = '${userNameList[index]}';
                         user();
@@ -224,78 +224,155 @@ class UserList extends StatelessWidget {
                         }));
                       },
                       child: Container(
-                        padding: spacer.x.xs,
                         decoration: BoxDecoration(
                           color: TransWhitePlus,
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                          borderRadius: BorderRadius.all(Radius.circular(20)),
                         ),
                         child: Column(
                           children: [
                             Padding(
                               padding: spacer.x.xs + spacer.top.xs,
-                              child: Row(
-                                children: [
-                                  RichText(
-                                    text: TextSpan(
-                                      text: '${userNameList[index]}',
-                                      style: primaryList,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Builder(
-                              builder: (BuildContext context) {
-                                if (userPlots[index] == null) {
-                                  return Container();
-                                } else {
-                                  return Container(
-                                      height: 100,
-                                      width: double.infinity,
-                                      child: OverviewChart(
-                                        plots: userPlots[index],
-                                      ));
-                                }
-                              },
-                            ),
-                            Padding(
-                              padding: spacer.top.xs,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    color: Green,
-                                    borderRadius: BorderRadius.vertical(
-                                        bottom: Radius.circular(20))),
-                                child: Padding(
-                                  padding: spacer.all.xs,
-                                  child: Row(
+                              child: Builder(
+                                builder: (BuildContext context) {
+                                  //TODO index number of users and profile photos to create circles
+                                  return Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       RichText(
                                         text: TextSpan(
-                                          text: 'Today\'s Total: ',
-                                          style: TileHeader,
+                                          text: '${userNameList[index]}',
+                                          style: TileData,
                                         ),
                                       ),
-                                      RichText(
-                                        text: TextSpan(
-                                          text:
-                                              '${userSeconds[index].toStringAsFixed(1)}' +
-                                                  's',
-                                          style: TileHeader,
-                                        ),
-                                      ),
-                                      RichText(
-                                        text: TextSpan(
-                                          text: ' (' +
-                                              '${userChangeSymbol[index]}' +
-                                              '${userSecondsChange[index].toStringAsFixed(1)}' +
-                                              ')',
-                                          style: TileHeader,
-                                        ),
+                                      Stack(
+                                        children: [
+                                          Container(
+                                            margin: spacer.left.md,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: White,
+                                            ),
+                                            height: 50,
+                                            width: 50,
+                                          ),
+                                          Container(
+                                            margin: spacer.left.md,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: White,
+                                            ),
+                                            height: 50,
+                                            width: 50,
+                                          ),
+                                          Container(
+                                            margin: spacer.left.md * 2,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: White,
+                                            ),
+                                            height: 50,
+                                            width: 50,
+                                          ),
+                                          Container(
+                                            margin: spacer.left.md * 3,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: White,
+                                            ),
+                                            height: 50,
+                                            width: 50,
+                                          ),
+                                          Container(
+                                            margin: spacer.left.md * 4,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: White,
+                                            ),
+                                            height: 50,
+                                            width: 50,
+                                          ),
+                                        ],
                                       ),
                                     ],
+                                  );
+                                },
+                              ),
+                            ),
+                            Padding(
+                              padding: spacer.top.xxs * 0.75,
+                              child: Divider(
+                                color: TransWhitePlus,
+                                thickness: 1,
+                                indent: 15,
+                                endIndent: 15,
+                              ),
+                            ),
+                            Stack(
+                              alignment: Alignment.bottomCenter,
+                              children: [
+                                Padding(
+                                  padding: spacer.bottom.xl * 0.95,
+                                  child: Builder(
+                                    builder: (BuildContext context) {
+                                      if (userPlots[index] == null) {
+                                        return Container();
+                                      } else {
+                                        return Container(
+                                            height: 100,
+                                            width: double.infinity,
+                                            child: OverviewChart(
+                                              plots: userPlots[index],
+                                            ));
+                                      }
+                                    },
                                   ),
                                 ),
-                              ),
+                                Container(
+                                  decoration: BoxDecoration(
+                                      color: userSecondsChange[index] >= 0
+                                          ? Red
+                                          : Green,
+                                      borderRadius: BorderRadius.vertical(
+                                          bottom: Radius.circular(20))),
+                                  child: Padding(
+                                    padding: spacer.all.xs,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            RichText(
+                                              text: TextSpan(
+                                                text: 'Today\'s Total: ',
+                                                style: TileHeader,
+                                              ),
+                                            ),
+                                            RichText(
+                                              text: TextSpan(
+                                                text:
+                                                    '${userSeconds[index].toStringAsFixed(1)}' +
+                                                        's',
+                                                style: TileHeader,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        RichText(
+                                          text: TextSpan(
+                                            text: ' (' +
+                                                '${userChangeSymbol[index]}' +
+                                                '${userSecondsChange[index].toStringAsFixed(1)}' +
+                                                ')',
+                                            style: TileHeader,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),

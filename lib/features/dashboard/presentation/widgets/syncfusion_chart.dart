@@ -109,6 +109,7 @@ class _MyHomePageState extends State<_MyHomePage> {
   Widget build(BuildContext context) {
     var overviewData = <ChartSeries<UsageData, DateTime>>[
       ColumnSeries<UsageData, DateTime>(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(5)),
         dataSource: dataSelection,
         xValueMapper: (UsageData usage, _) => usage.time,
         yValueMapper: (UsageData usage, _) => usage.seconds,
@@ -118,6 +119,7 @@ class _MyHomePageState extends State<_MyHomePage> {
       ),
     ];
     return SfCartesianChart(
+      plotAreaBorderColor: TransWhitePlus,
       enableAxisAnimation: true,
       primaryXAxis: DateTimeAxis(
         labelStyle: TextStyle(
@@ -169,6 +171,7 @@ class _MyHomePageState extends State<_MyHomePage> {
         },
       ),
       primaryYAxis: NumericAxis(
+        majorGridLines: MajorGridLines(color: TransWhitePlus),
         maximumLabels: 3,
         labelStyle: TextStyle(
           color: White,

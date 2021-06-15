@@ -345,122 +345,154 @@ class _GroupsListState extends State<GroupsList> {
                         children: [
                           Padding(
                             padding: spacer.x.xs + spacer.top.xs,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                RichText(
-                                  text: TextSpan(
-                                    text: '${groupNameList[index]}',
-                                    style: TileHeader,
-                                  ),
-                                ),
-                                Stack(
+                            child: Builder(
+                              builder: (BuildContext context) {
+                                //TODO index number of users and profile photos to create circles
+                                return Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Container(
-                                      margin: spacer.left.md,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: White,
+                                    RichText(
+                                      text: TextSpan(
+                                        text: '${groupNameList[index]}',
+                                        style: TileData,
                                       ),
-                                      height: 50,
-                                      width: 50,
                                     ),
-                                    Container(
-                                      margin: spacer.left.md,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: White,
-                                      ),
-                                      height: 50,
-                                      width: 50,
-                                    ),
-                                    Container(
-                                      margin: spacer.left.md * 2,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: White,
-                                      ),
-                                      height: 50,
-                                      width: 50,
-                                    ),
-                                    Container(
-                                      margin: spacer.left.md * 3,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: White,
-                                      ),
-                                      height: 50,
-                                      width: 50,
-                                    ),
-                                    Container(
-                                      margin: spacer.left.md * 4,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: White,
-                                      ),
-                                      height: 50,
-                                      width: 50,
+                                    Stack(
+                                      children: [
+                                        Container(
+                                          margin: spacer.left.md,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: White,
+                                          ),
+                                          height: 50,
+                                          width: 50,
+                                        ),
+                                        Container(
+                                          margin: spacer.left.md,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: White,
+                                          ),
+                                          height: 50,
+                                          width: 50,
+                                        ),
+                                        Container(
+                                          margin: spacer.left.md * 2,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: White,
+                                          ),
+                                          height: 50,
+                                          width: 50,
+                                        ),
+                                        Container(
+                                          margin: spacer.left.md * 3,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: White,
+                                          ),
+                                          height: 50,
+                                          width: 50,
+                                        ),
+                                        Container(
+                                          margin: spacer.left.md * 4,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: White,
+                                          ),
+                                          height: 50,
+                                          width: 50,
+                                        ),
+                                      ],
                                     ),
                                   ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          Builder(
-                            builder: (BuildContext context) {
-                              if (groupPlots[index] == null) {
-                                return Container();
-                              } else {
-                                print("GROUP PLOTS" + groupPlots.toString());
-                                for (int i = 0; i < 12; i++) {
-                                  print(groupPlots[0][i].time);
-                                  print(groupPlots[0][i].seconds);
-                                }
-                                return Container(
-                                  height: 100,
-                                  width: double.infinity,
-                                  child: OverviewChart(
-                                    plots: groupPlots[index],
-                                  ),
                                 );
-                              }
-                            },
-                          ),
-                          Container(
-                            decoration: BoxDecoration(
-                                color: Green,
-                                borderRadius: BorderRadius.vertical(
-                                    bottom: Radius.circular(20))),
-                            child: Padding(
-                              padding: spacer.all.xs,
-                              child: Row(
-                                children: [
-                                  RichText(
-                                    text: TextSpan(
-                                      text: 'Today\'s Total: ',
-                                      style: TileHeader,
-                                    ),
-                                  ),
-                                  RichText(
-                                    text: TextSpan(
-                                      text:
-                                          '${groupSeconds[index].toStringAsFixed(1)}' +
-                                              's',
-                                      style: TileHeader,
-                                    ),
-                                  ),
-                                  RichText(
-                                    text: TextSpan(
-                                      text: ' (' +
-                                          '${groupChangeSymbol[index]}' +
-                                          '${groupSecondsChange[index].toStringAsFixed(1)}' +
-                                          ')',
-                                      style: TileHeader,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                              },
                             ),
+                          ),
+                          Padding(
+                            padding: spacer.top.xxs * 0.75,
+                            child: Divider(
+                              color: TransWhitePlus,
+                              thickness: 1,
+                              indent: 15,
+                              endIndent: 15,
+                            ),
+                          ),
+                          Stack(
+                            alignment: Alignment.bottomCenter,
+                            children: [
+                              Padding(
+                                padding: spacer.bottom.xl * 0.95,
+                                child: Builder(
+                                  builder: (BuildContext context) {
+                                    if (groupPlots[index] == null) {
+                                      return Container();
+                                    } else {
+                                      print("GROUP PLOTS" +
+                                          groupPlots.toString());
+                                      for (int i = 0; i < 12; i++) {
+                                        print(groupPlots[0][i].time);
+                                        print(groupPlots[0][i].seconds);
+                                      }
+                                      return Container(
+                                        height: 100,
+                                        width: double.infinity,
+                                        child: OverviewChart(
+                                          plots: groupPlots[index],
+                                        ),
+                                      );
+                                    }
+                                  },
+                                ),
+                              ),
+                              Container(
+                                decoration: BoxDecoration(
+                                    color: groupSecondsChange[index] >= 0
+                                        ? Red
+                                        : Green,
+                                    borderRadius: BorderRadius.vertical(
+                                        bottom: Radius.circular(20))),
+                                child: Padding(
+                                  padding: spacer.all.xs,
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          RichText(
+                                            text: TextSpan(
+                                              text: 'Today\'s Total: ',
+                                              style: TileHeader,
+                                            ),
+                                          ),
+                                          RichText(
+                                            text: TextSpan(
+                                              text:
+                                                  '${groupSeconds[index].toStringAsFixed(1)}' +
+                                                      's',
+                                              style: TileHeader,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      RichText(
+                                        text: TextSpan(
+                                          text: ' (' +
+                                              '${groupChangeSymbol[index]}' +
+                                              '${groupSecondsChange[index].toStringAsFixed(1)}' +
+                                              ')',
+                                          style: TileHeader,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),

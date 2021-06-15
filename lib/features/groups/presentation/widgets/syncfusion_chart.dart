@@ -111,6 +111,7 @@ class _OverviewChartState extends State<OverviewChart> {
     var overviewData = <ChartSeries<UsageData, DateTime>>[
       ColumnSeries<UsageData, DateTime>(
         dataSource: widget.plots,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(5)),
         xValueMapper: (UsageData usage, _) => usage.time,
         yValueMapper: (UsageData usage, _) => usage.seconds,
 // Enable data label
