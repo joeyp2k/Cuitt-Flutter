@@ -21,9 +21,11 @@ String tooltipFormat = 'j';
 int maximumLabel = 5;
 
 //Chart viewport selection
-DateTime viewport = DateTime.now();
 DateTime timeData;
 DateTimeIntervalType transitionLabel = DateTimeIntervalType.hours;
+
+DateTime viewport = DateTime.now();
+
 DateTime viewportHour =
     DateTime(viewport.year, viewport.month, viewport.day, viewport.hour)
         .toLocal();

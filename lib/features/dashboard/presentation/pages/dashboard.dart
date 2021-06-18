@@ -3,6 +3,7 @@ import 'package:cuitt/core/design_system/design_system.dart';
 import 'package:cuitt/core/routes/fade.dart';
 import 'package:cuitt/core/routes/slide.dart';
 import 'package:cuitt/features/dashboard/data/datasources/dash_tiles.dart';
+import 'package:cuitt/features/dashboard/data/datasources/my_chart_data.dart';
 import 'package:cuitt/features/dashboard/data/datasources/my_data.dart';
 import 'package:cuitt/features/dashboard/data/datasources/tile_buttons.dart';
 import 'package:cuitt/features/dashboard/presentation/bloc/dashboard_bloc.dart';
@@ -19,6 +20,7 @@ import 'package:cuitt/features/groups/domain/usecases/get_group_data.dart';
 import 'package:cuitt/features/groups/presentation/pages/group_list.dart';
 import 'package:cuitt/features/groups/presentation/pages/group_list_empty.dart';
 import 'package:cuitt/features/settings/presentation/pages/settings_home.dart';
+import 'package:cuitt/features/connect_device/presentation/pages/firmware_update.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -147,8 +149,21 @@ class _DashboardbState extends State<Dashboardb> {
             backgroundColor: Background,
             floatingActionButton: FloatingActionButton(
               onPressed: () {
-                print("BUFFER RESET");
-                buffer = 0;
+                print("Viewport Hour: " + viewportHour.toString());
+                print("START: " + viewportSelectionStart.toString());
+                print("END: " + viewportSelectionEnd.toString());
+                print("DAY DATA");
+
+                for (int i = 0; i < dayData.length; i++) {
+                  print(dayData[i].time);
+                  print(dayData[i].seconds);
+                }
+
+                print("MONTH DATA");
+                for (int i = 0; i < monthData.length; i++) {
+                  print(monthData[i].time);
+                  print(monthData[i].seconds);
+                }
               },
             ),
             appBar: AppBar(
@@ -210,7 +225,42 @@ class _DashboardbState extends State<Dashboardb> {
                                 ],
                               ),
                             ),
-                          ]
+                          ]),
+                        ),
+                        Padding(
+                          padding: spacer.bottom.xs,
+                          child: Builder(
+                            builder: (BuildContext context) {
+                              var firmwareUpdate = true; //received from BLE
+                              if (firmwareUpdate) {
+                                return Material(
+                                  color: LightBlue,
+                                  borderRadius: BorderRadius.circular(30),
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(30),
+                                    onTap: () {
+                                      Navigator.of(context).push(SlideRoute(
+                                        enterPage: FirmwareUpdate(),
+                                        exitPage: Dashboardb(),
+                                      ));
+                                    },
+                                    child: Padding(
+                                      padding: spacer.y.md,
+                                      child: Center(
+                                        child: RichText(
+                                          text: TextSpan(
+                                            text: "Firmware Update Available",
+                                            style: TileHeader,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                return Container();
+                              }
+                            },
                           ),
                         ),
                         Row(

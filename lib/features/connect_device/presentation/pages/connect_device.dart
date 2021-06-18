@@ -1,9 +1,13 @@
+import 'dart:async';
 import 'package:cuitt/core/design_system/design_system.dart';
 import 'package:cuitt/core/routes/fade.dart';
+import 'package:flutter_blue/flutter_blue.dart';
+import 'package:cuitt/features/connect_device/domain/usecases/connect_device.dart';
 import 'package:cuitt/features/connect_device/presentation/bloc/connect_bloc.dart';
 import 'package:cuitt/features/connect_device/presentation/bloc/connect_event.dart';
 import 'package:cuitt/features/connect_device/presentation/bloc/connect_state.dart';
 import 'package:cuitt/features/dashboard/presentation/pages/dashboard.dart';
+import 'package:cuitt/features/connect_device/presentation/pages/firmware_update.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -47,8 +51,41 @@ class _ConnectPageState extends State<ConnectPage> {
         builder: (context, state) {
           connectBlocSink = BlocProvider.of<ConnectBloc>(context);
           return Scaffold(
-            floatingActionButtonLocation:
-                FloatingActionButtonLocation.centerFloat,
+            floatingActionButton: Row(
+              children: [
+                FloatingActionButton(
+                    onPressed: () async {
+                      var cuitt;
+                      connectBLE.flutterBlue.startScan();
+                      connectBLE.flutterBlue.scanResults.listen((
+                          List<ScanResult> results) async {
+                        for (ScanResult result in results) {
+                          if (result.device.name == "Nordic_Buttonless") {
+                            print("CUITT FOUND");
+                            cuitt = result.device;
+                            connectBLE.flutterBlue.stopScan();
+                            break;
+                          }
+                        }
+                        try {
+                          await cuitt.connect();
+                        } catch (e) {
+                          print(e.toString());
+                        }
+                      });
+                    }
+                ),
+                FloatingActionButton(
+                    backgroundColor: Green,
+                    onPressed: () async {
+                      await connectBLE.flutterBlue.connectedDevices.then((
+                          value) {
+                        print("CONNECTED DEVICES: " + value.toString());
+                      });
+                    }
+                ),
+              ],
+            ),
             backgroundColor: Background,
             body: SafeArea(
               child: Center(
@@ -86,6 +123,10 @@ class _ConnectPageState extends State<ConnectPage> {
                         highlightColor: TransWhite,
                         onTap: () {
                           print("tap");
+                          Navigator.of(context).push(FadeRoute(
+                            exitPage: ConnectPage(),
+                            enterPage: FirmwareUpdate(),
+                          ));
                         },
                         borderRadius: BorderRadius.circular(30),
                         child: Padding(

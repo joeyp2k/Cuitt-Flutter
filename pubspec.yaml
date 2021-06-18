@@ -94,6 +94,7 @@ flutter:
     - lib/core/graphics/cuitt_logo.svg
     - lib/core/graphics/location.svg
     - lib/core/graphics/partner_mode.svg
+    - lib/core/dfu/app_dfu_package2.zip
 
   fonts:
     - family: Montserrat

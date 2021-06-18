@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:connectivity/connectivity.dart';
 import 'package:convert/convert.dart';
 import 'package:cuitt/features/connect_device/presentation/bloc/connect_bloc.dart';
@@ -523,12 +524,17 @@ class ConnectBLE {
   }
 
   bool _getLEDChar(List<BluetoothService> services) {
+    print("GETTING SERVICES");
     for (BluetoothService s in services) {
       if (s.uuid.toString() == _myService) {
+        print("SERVICE FOUND: " + s.uuid.toString());
         var characteristics = s.characteristics;
+        print("GETTING CHARACTERISTICS");
         for (BluetoothCharacteristic c in characteristics) {
           if (c.uuid.toString() == _myChar) {
+            print("CHARACTERISTIC FOUND: " + c.uuid.toString());
             _ledChar = c;
+            print("ATTEMPTING LISTENER");
             _listener();
             return true;
           }
@@ -543,13 +549,19 @@ class ConnectBLE {
     flutterBlue.stopScan();
     try {
       await device.connect();
+      print("PAIR PROMPT OPENING");
+      print(device.name);
+      //List<BluetoothService> services = await device.discoverServices();
+      //AWAIT PAIRING FOR 7 SECONDS THEN FAIL
+      //await Future.delayed(const Duration(seconds: 7));
     } catch (e) {
+      print("ERROR: " + e.toString());
       if (e.code != 'already_connected') {
         throw e;
       }
     } finally {
-      List<BluetoothService> services = await device.discoverServices();
-      _success = _getLEDChar(services);
+      _success = true;
+      //_success = _getLEDChar(services); //for ble blinky
     }
     if (_success) {
       print("PAIRING");
@@ -569,8 +581,7 @@ class ConnectBLE {
         print("NO CUITT CONNECTED: SCANNING");
         flutterBlue.scanResults.listen((List<ScanResult> results) {
           for (ScanResult result in results) {
-            print("BLE: " + result.toString());
-            if (result.device.name == "Cuitt") {
+            if (result.device.name == "Nordic_Buttonless") {
               print("CUITT FOUND: " + result.device.toString());
               //disconnect to any device already connected when you attempt a new connection
               //result.device.disconnect();
@@ -588,9 +599,9 @@ class ConnectBLE {
               var characteristics = s.characteristics;
               for (BluetoothCharacteristic c in characteristics) {
                 if (c.uuid.toString() == _myChar) {
-                  _ledChar = c;
+                  //_ledChar = c;
                   print("LISTENER INITIALIZED");
-                  _listener();
+                  //_listener();
                 }
               }
             }
@@ -603,8 +614,7 @@ class ConnectBLE {
             print("NO CUITT CONNECTED: SCANNING");
             flutterBlue.scanResults.listen((List<ScanResult> results) {
               for (ScanResult result in results) {
-                print("BLE: " + result.toString());
-                if (result.device.name == "Cuitt") {
+                if (result.device.name == "Nordic_Buttonless") {
                   print("CUITT FOUND: " + result.device.toString());
                   //disconnect to any device already connected when you attempt a new connection
                   //result.device.disconnect();

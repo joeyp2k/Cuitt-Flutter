@@ -34,64 +34,10 @@ class _MyHomePageState extends State<_MyHomePage> {
   double drawLengthLast = 0.0;
   Timer timer;
 
-  void _timeUpdate() {
-    timeData = DateTime.now();
-
-    viewportHour =
-        DateTime(timeData.year, timeData.month, timeData.day, timeData.hour)
-            .toLocal();
-    viewportDay =
-        DateTime(timeData.year, timeData.month, timeData.day).toLocal();
-    viewportMonth = DateTime(timeData.year, timeData.month).toLocal();
-
-    timeData =
-        DateTime(timeData.year, timeData.month, timeData.day, timeData.hour)
-            .toLocal();
-  }
-
-  void _ifNoData() {
-    if (time.isEmpty) {
-      time.add(timeData);
-      timeDay
-          .add(DateTime(timeData.year, timeData.month, timeData.day).toLocal());
-    }
-
-    if (sec.isEmpty) {
-      sec.add(0);
-    }
-  }
-
-  void _update() {
-    sec[graphIndex] += drawLength;
-    dayData[graphIndex] = UsageData(time[graphIndex], sec[graphIndex]);
-    weekData[graphIndex] = UsageData(timeDay[graphIndex], sec[graphIndex]);
-    monthData[graphIndex] = UsageData(timeDay[graphIndex], sec[graphIndex]);
-    //monthData using current month, not i
-  }
-
-  void _add() {
-    graphIndex++;
-    if (dayData.length <= graphIndex) {
-      sec.add(drawLength);
-      time.add(timeData);
-      dayData.add(UsageData(time[graphIndex], sec[graphIndex]));
-      weekData.add(UsageData(timeDay[graphIndex], sec[graphIndex]));
-      monthData.add(UsageData(timeDay[graphIndex], sec[graphIndex]));
-    } else {
-      sec.add(drawLength);
-      time.add(timeData);
-      timeDay
-          .add(DateTime(timeData.year, timeData.month, timeData.day).toLocal());
-      dayData[graphIndex] = UsageData(time[graphIndex], sec[graphIndex]);
-      weekData[graphIndex] = UsageData(timeDay[graphIndex], sec[graphIndex]);
-      monthData[graphIndex] = UsageData(timeDay[graphIndex], sec[graphIndex]);
-    }
-    drawLengthLast = drawLength;
-  }
-
   void initState() {
     super.initState();
     timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
+      //TODO NOT GOOD FOR IDENTICAL HITS
       if (drawLength != drawLengthLast) {
         setState(() {});
       }
