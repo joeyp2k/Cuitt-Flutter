@@ -87,7 +87,7 @@ class _FirmwareUpdateState extends State<FirmwareUpdate> {
                         var characteristics;
                         await devices.connectedDevices.then((value) async {
                           for (int i = 0; i < value.length; i++) {
-                            if (value[i].name == "Nordic_Buttonless") {
+                            if (value[i].id.toString() == "EA:AE:28:55:CC:33") {
                               print("CUITT FOUND");
                               services = await value[i].discoverServices();
                               break;
@@ -95,50 +95,61 @@ class _FirmwareUpdateState extends State<FirmwareUpdate> {
                           }
                           print("Finding Secure DFU Service");
                           for (BluetoothService s in services) {
-                            characteristics = s.characteristics;
-                            for (BluetoothCharacteristic c in characteristics) {
-                              //print(c.read());
-                              if (c.uuid.toString() ==
-                                  "568a0003-2131-4f2d-bb64-66b30c7c48bf") {
-                                //var char = await c.read();
-                                print("CHARACTERISTIC FOUND");
-                                //TODO MIGRATE BLE BLINK TO BUTTONLESS DFU
-                                //enter bootloader
-                                print("ENTER BOOTLOADER");
-                                //c.setNotifyValue(true);
-                                await c.write([0x01], withoutResponse: false);
+                            if (s.uuid.toString() ==
+                                "0000fe59-0000-1000-8000-00805f9b34fb") {
+                              characteristics = s.characteristics;
+                              for (BluetoothCharacteristic c
+                                  in characteristics) {
+                                //print(c.read());
+                                if (c.uuid.toString() ==
+                                    "568a0003-2131-4f2d-bb64-66b30c7c48bf") {
+                                  //var char = await c.read();
+                                  print("CHARACTERISTIC FOUND");
+                                  //TODO MIGRATE BLE BLINK TO BUTTONLESS DFU
+                                  //enter bootloader
+                                  print("ENTER BOOTLOADER");
+                                  //enable notifications for Buttonless DFU UUID 0x2902 and write characteristic to enter bootloader
+                                  await c.setNotifyValue(true);
+                                  await c.write([0x01], withoutResponse: false);
+                                }
                               }
                             }
                           }
                         });
                         //scan for dfu device
-                        /*
+
                         connectBLE.flutterBlue.startScan();
                         connectBLE.flutterBlue.scanResults.listen((List<ScanResult> results) async {
                           for (ScanResult result in results) {
                             //print("BLE: " + result.toString());
-                            if (result.device.name == "DfuTarg") {
-                              print("CUITT FOUND: " + result.device.toString());
+                            if (result.device.id.toString() ==
+                                "EA:AE:28:55:CC:34") {
+                              print(
+                                  "DfuTarg FOUND: " + result.device.toString());
                               connectBLE.flutterBlue.stopScan();
                               await result.device.connect();
-                            }
-                          }
-                        });
-                        await devices.connectedDevices.then((value) async {
-                          for(int i = 0; i < value.length; i++){
-                            //if dfu device found
-                            if(value[i].name == "Nordic_Buttonless"){
-                              print("DFU SERVICE FOUND: INITIATING DFU");
-                              await FlutterNordicDfu.startDfu(
-                                'EA:AE:28:55:CC:34', 'lib/core/dfu/app_dfu_package2.zip',
-                                fileInAsset: true,
-                                progressListener: ProgressListenerListener(),
-                              );
+                              await devices.connectedDevices
+                                  .then((value) async {
+                                print("CONNECTED DEVICES: " + value.toString());
+                                for (int i = 0; i < value.length; i++) {
+                                  //if dfu device found
+                                  if (value[i].id.toString() ==
+                                      "EA:AE:28:55:CC:34") {
+                                    print("DFU SERVICE FOUND: INITIATING DFU");
+                                    await FlutterNordicDfu.startDfu(
+                                      'EA:AE:28:55:CC:34',
+                                      'lib/core/dfu/app_dfu_package2.zip',
+                                      fileInAsset: true,
+                                      progressListener:
+                                          ProgressListenerListener(),
+                                    );
+                                  }
+                                }
+                              });
                             }
                           }
                         });
 
-                         */
                       } catch (e) {
                         print(e.toString());
                       }

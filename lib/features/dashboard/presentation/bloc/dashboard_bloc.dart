@@ -34,6 +34,26 @@ class DashBloc extends Bloc<DashBlocEvent, DashBlocState> {
       yield DrawerOpen();
     } else if (event is CloseDrawerEvent) {
       yield DrawerClosed();
+    } else if (event is DashReEntryEvent) {
+      int newDrawCountValue = drawCount;
+      int newSeshCountValue = seshCount;
+      double newDrawLengthValue = drawLength;
+      int newDrawLengthTotalValue = drawLengthTotal.round();
+      int newAverageDrawLengthValue = drawLengthAverage.round();
+      int newDrawLengthTotalAverageValue = drawLengthTotalAverage.round();
+      int newAverageDrawLengthTotalYestValue =
+          drawLengthTotalAverageYest.round();
+      int newAverageWaitPeriodValue;
+      yield DataState(
+        newDrawCountValue: newDrawCountValue,
+        newSeshCountValue: newSeshCountValue,
+        newDrawLengthValue: newDrawLengthValue,
+        newDrawLengthTotalValue: newDrawLengthTotalValue,
+        newAverageDrawLengthValue: newAverageDrawLengthValue,
+        newAverageDrawLengthTotalValue: newDrawLengthTotalAverageValue,
+        newAverageDrawLengthTotalYestValue: newAverageDrawLengthTotalYestValue,
+        newAverageWaitPeriodValue: newAverageWaitPeriodValue,
+      );
     } else if (event is UpdateDataEvent) {
       //Applying business Logic
 
@@ -46,7 +66,9 @@ class DashBloc extends Bloc<DashBlocEvent, DashBlocState> {
       int newAverageDrawLengthTotalYestValue =
           drawLengthTotalAverageYest.round();
       int newAverageWaitPeriodValue;
-      updateChart.updateChart();
+      updateChart.updateChart(); //dashboard chart
+      updateChart.updateDial();
+      print("UPDATE DATA EVENT");
 
       //Adding new state to the Stream, yield is used to add state to the stream
 

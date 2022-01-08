@@ -38,8 +38,10 @@ class _MyHomePageState extends State<_MyHomePage> {
     super.initState();
     timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
       //TODO NOT GOOD FOR IDENTICAL HITS
-      if (drawLength != drawLengthLast) {
-        setState(() {});
+      if (newDraw) {
+        setState(() {
+          chartSet = true;
+        });
       }
     });
   }

@@ -1,3 +1,5 @@
+import 'package:cuitt/features/dashboard/presentation/bloc/dashboard_bloc.dart';
+
 abstract class DashBlocEvent {}
 
 class UpdateDataEvent extends DashBlocEvent {
@@ -26,6 +28,14 @@ class OpenDrawerEvent extends DashBlocEvent {
 
 class CloseDrawerEvent extends DashBlocEvent {
 //overide this method when class extends equatable
+
+  @override
+  // TODO: implement props
+  List<Object> get props => [];
+}
+
+class DashReEntryEvent extends DashBlocEvent {
+  //overide this method when class extends equatable
 
   @override
   // TODO: implement props

@@ -1,7 +1,8 @@
 import 'dart:async';
-
+import 'package:cuitt/features/dashboard/data/datasources/my_dial_data.dart';
 import 'package:cuitt/features/dashboard/data/datasources/my_chart_data.dart';
 import 'package:cuitt/features/dashboard/data/datasources/my_data.dart';
+import 'package:cuitt/core/design_system/colors.dart';
 
 class UpdateChart {
   Timer timer;
@@ -76,5 +77,18 @@ class UpdateChart {
     } else {
       _add();
     }
+  }
+
+  void updateDial() {
+    if (fill > drawLengthTotalAverageYest) {
+      over += drawLength;
+    } else {
+      fill += drawLength;
+    }
+    data[0] = DialData("fill", fill, Green);
+    data[1] = DialData("over", over, Red);
+    drawLengthLast = drawLength;
+    chartSet = false;
+    newDraw = true;
   }
 }

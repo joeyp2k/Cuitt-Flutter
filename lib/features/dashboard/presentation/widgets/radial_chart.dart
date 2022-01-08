@@ -13,22 +13,15 @@ class RadialChart extends StatefulWidget {
 
 class _RadialChartState extends State<RadialChart> {
   Timer timer;
-  double drawLengthLast = 0;
 
   void initState() {
     super.initState();
     timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
-      if (drawLengthLast != drawLength) {
-        setState(() {
-          if (fill > drawLengthTotalAverageYest) {
-            over += drawLength;
-          } else {
-            fill += drawLength;
-          }
-          data[0] = DialData("fill", fill, Green);
-          data[1] = DialData("over", over, Red);
-          drawLengthLast = drawLength;
-        });
+      if (newDraw) {
+        setState(() {});
+        if (chartSet) {
+          newDraw = false;
+        }
       }
     });
   }

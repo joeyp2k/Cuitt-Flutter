@@ -43,6 +43,7 @@ class _DashboardTileLargeState extends State<DashboardTileLarge> {
   }
 
   void dispose() {
+    //refreshTimer.cancel();
     super.dispose();
   }
 

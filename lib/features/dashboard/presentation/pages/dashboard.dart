@@ -7,6 +7,7 @@ import 'package:cuitt/features/dashboard/data/datasources/my_chart_data.dart';
 import 'package:cuitt/features/dashboard/data/datasources/my_data.dart';
 import 'package:cuitt/features/dashboard/data/datasources/tile_buttons.dart';
 import 'package:cuitt/features/dashboard/presentation/bloc/dashboard_bloc.dart';
+import 'package:cuitt/features/dashboard/presentation/bloc/dashboard_event.dart';
 import 'package:cuitt/features/dashboard/presentation/bloc/dashboard_state.dart';
 import 'package:cuitt/features/dashboard/presentation/pages/drawer.dart';
 import 'package:cuitt/features/dashboard/presentation/widgets/average_waitperiod_tile.dart';
@@ -37,6 +38,7 @@ class Dashboardb extends StatefulWidget {
 class _DashboardbState extends State<Dashboardb> {
   @override
   bool update = false;
+  bool reEntry = true;
 
   void _navigate() {
     print("GROUPS DATA FINAL");
@@ -87,6 +89,10 @@ class _DashboardbState extends State<Dashboardb> {
         },
         builder: (context, state) {
           counterBlocSink = BlocProvider.of<DashBloc>(context);
+          if (reEntry) {
+            counterBlocSink.add(DashReEntryEvent());
+            reEntry = false;
+          }
           return Scaffold(
             drawer: SafeArea(
               child: Drawer(
