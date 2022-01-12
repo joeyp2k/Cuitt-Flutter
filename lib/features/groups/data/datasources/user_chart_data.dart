@@ -35,8 +35,11 @@ DateTime viewportDay =
 
 DateTime viewportMonth = DateTime(viewport.year, viewport.month).toLocal();
 
-DateTime viewportSelectionStart = viewportHour;
-DateTime viewportSelectionEnd = viewportHour.add(Duration(hours: 11));
+DateTime viewportSelectionEnd = viewportHour.add(Duration(minutes: 30));
+DateTime viewportSelectionStart =
+    viewportHour.subtract(Duration(hours: 11, minutes: 30));
+
+var graphIndex = 0;
 
 //Dashboard chart timeframe selection
 var dataSelection = dayData;
@@ -48,62 +51,62 @@ var userOverview = [];
 var dayData = [
   //data by hour
   UsageData(viewportHour, 0),
-  UsageData(viewportHour.add(Duration(hours: 1)), 0),
-  UsageData(viewportHour.add(Duration(hours: 2)), 0),
-  UsageData(viewportHour.add(Duration(hours: 3)), 0),
-  UsageData(viewportHour.add(Duration(hours: 4)), 0),
-  UsageData(viewportHour.add(Duration(hours: 5)), 0),
-  UsageData(viewportHour.add(Duration(hours: 6)), 0),
-  UsageData(viewportHour.add(Duration(hours: 7)), 0),
-  UsageData(viewportHour.add(Duration(hours: 8)), 0),
-  UsageData(viewportHour.add(Duration(hours: 9)), 0),
-  UsageData(viewportHour.add(Duration(hours: 10)), 0),
-  UsageData(viewportHour.add(Duration(hours: 11)), 0),
+  UsageData(viewportHour.subtract(Duration(hours: 1)), 0),
+  UsageData(viewportHour.subtract(Duration(hours: 2)), 0),
+  UsageData(viewportHour.subtract(Duration(hours: 3)), 0),
+  UsageData(viewportHour.subtract(Duration(hours: 4)), 0),
+  UsageData(viewportHour.subtract(Duration(hours: 5)), 0),
+  UsageData(viewportHour.subtract(Duration(hours: 6)), 0),
+  UsageData(viewportHour.subtract(Duration(hours: 7)), 0),
+  UsageData(viewportHour.subtract(Duration(hours: 8)), 0),
+  UsageData(viewportHour.subtract(Duration(hours: 9)), 0),
+  UsageData(viewportHour.subtract(Duration(hours: 10)), 0),
+  UsageData(viewportHour.subtract(Duration(hours: 11)), 0),
 ];
 
 var weekData = [
   //data by day
   UsageData(viewportDay, 0),
-  UsageData(viewportDay.add(Duration(days: 1)), 0),
-  UsageData(viewportDay.add(Duration(days: 2)), 0),
-  UsageData(viewportDay.add(Duration(days: 3)), 0),
-  UsageData(viewportDay.add(Duration(days: 4)), 0),
-  UsageData(viewportDay.add(Duration(days: 5)), 0),
-  UsageData(viewportDay.add(Duration(days: 6)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 1)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 2)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 3)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 4)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 5)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 6)), 0),
 ];
 
 var monthData = [
   //data by day
   UsageData(viewportDay, 0),
-  UsageData(viewportDay.add(Duration(days: 1)), 0),
-  UsageData(viewportDay.add(Duration(days: 2)), 0),
-  UsageData(viewportDay.add(Duration(days: 3)), 0),
-  UsageData(viewportDay.add(Duration(days: 4)), 0),
-  UsageData(viewportDay.add(Duration(days: 5)), 0),
-  UsageData(viewportDay.add(Duration(days: 6)), 0),
-  UsageData(viewportDay.add(Duration(days: 7)), 0),
-  UsageData(viewportDay.add(Duration(days: 8)), 0),
-  UsageData(viewportDay.add(Duration(days: 9)), 0),
-  UsageData(viewportDay.add(Duration(days: 10)), 0),
-  UsageData(viewportDay.add(Duration(days: 11)), 0),
-  UsageData(viewportDay.add(Duration(days: 12)), 0),
-  UsageData(viewportDay.add(Duration(days: 13)), 0),
-  UsageData(viewportDay.add(Duration(days: 14)), 0),
-  UsageData(viewportDay.add(Duration(days: 15)), 0),
-  UsageData(viewportDay.add(Duration(days: 16)), 0),
-  UsageData(viewportDay.add(Duration(days: 17)), 0),
-  UsageData(viewportDay.add(Duration(days: 18)), 0),
-  UsageData(viewportDay.add(Duration(days: 19)), 0),
-  UsageData(viewportDay.add(Duration(days: 20)), 0),
-  UsageData(viewportDay.add(Duration(days: 21)), 0),
-  UsageData(viewportDay.add(Duration(days: 22)), 0),
-  UsageData(viewportDay.add(Duration(days: 23)), 0),
-  UsageData(viewportDay.add(Duration(days: 24)), 0),
-  UsageData(viewportDay.add(Duration(days: 25)), 0),
-  UsageData(viewportDay.add(Duration(days: 26)), 0),
-  UsageData(viewportDay.add(Duration(days: 27)), 0),
-  UsageData(viewportDay.add(Duration(days: 28)), 0),
-  UsageData(viewportDay.add(Duration(days: 29)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 1)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 2)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 3)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 4)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 5)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 6)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 7)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 8)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 9)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 10)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 11)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 12)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 13)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 14)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 15)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 16)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 17)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 18)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 19)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 20)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 21)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 22)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 23)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 24)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 25)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 26)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 27)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 28)), 0),
+  UsageData(viewportDay.subtract(Duration(days: 29)), 0),
 ];
 
 var yearData = [

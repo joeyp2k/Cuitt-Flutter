@@ -1,6 +1,6 @@
 import 'package:cuitt/features/dashboard/data/datasources/cloud.dart';
-import 'package:cuitt/features/dashboard/data/datasources/my_chart_data.dart';
 import 'package:cuitt/features/groups/data/datasources/group_data.dart';
+import 'package:cuitt/features/groups/data/datasources/user_chart_data.dart';
 
 class GetGroupData {
   var value;
@@ -18,13 +18,14 @@ class GetGroupData {
       value.docs.forEach((element) {
         groupIDList.add(element.id);
         groupNameList.add(element["group name"]);
-
         groupPlotTime = element["plot time"];
         groupPlotTotal = element["plot total"];
+
         if (groupPlotTime.isNotEmpty && groupPlotTotal.isNotEmpty) {
+          groupData.clear();
           for (int i = 0; i < groupPlotTime.length; i++) {
-            groupData
-                .add(UsageData(groupPlotTime[i].toDate(), groupPlotTotal[i]));
+            groupData.add(UsageData(
+                groupPlotTime[i].toDate(), groupPlotTotal[i].toDouble()));
           }
           groupPlots.add(groupData);
         } else {
@@ -33,21 +34,21 @@ class GetGroupData {
       });
     });
     //fill plots with 12 entries for charts
-    //TODO FIRST 12 add from left, afterwards add from right: get viewport to show without cutting off any bars
-    print("GROUP PLOTS" + groupPlots.toString());
-    for (int i = 0; i < groupPlots.length; i++) {
-      if (groupPlots[i].length < 12) {
-        var lastTime = groupPlots[i].last.time;
-        int adder = 0;
-        for (int a = groupPlots[i].length; a < 12; a++) {
-          adder++;
-          print("ADDER: " + adder.toString());
-          groupPlots[i].add(UsageData(lastTime.add(Duration(hours: adder)), 1));
-          print(lastTime.toString());
-        }
-      }
-    }
-    print("GROUP PLOTS" + groupPlots.toString());
+    //TODO fill from right to left
+    // for (int i = 0; i < groupPlots.length; i++) {
+    //   if(groupPlots[i] != null){
+    //     if (groupPlots[i].length == 12) {
+    //       var lastTime = groupPlots[i].last.time;
+    //       int adder = 0;
+    //       for (int a = groupPlots[i].length; a < 12; a++) {
+    //         adder++;
+    //         print("ADDER: " + adder.toString());
+    //         groupPlots[i].add(UsageData(lastTime.add(Duration(hours: adder)), 1));
+    //         print(lastTime.toString());
+    //       }
+    //     }
+    //   }
+    // }
   }
 
   void _groupDataCalculations() {
@@ -127,24 +128,6 @@ class GetGroupData {
           userAverage.add(value["draw length average"]);
 
           _groupDataCalculations();
-
-          print(userIDList[i].toString());
-          print(userSeconds);
-          print(userDraws);
-          print(userAverage);
-          print(userAverageYest);
-          print("\n");
-
-          print("GROUPS DATA");
-          print(groupSeconds);
-          print(groupAverage);
-          print(groupAverageYest);
-          print(groupDraws);
-          print(groupSecondsChange);
-          print(groupChangeSymbol);
-          print(groupPlotTime);
-          print(groupPlotTotal);
-          print("\n");
         }
       });
     }

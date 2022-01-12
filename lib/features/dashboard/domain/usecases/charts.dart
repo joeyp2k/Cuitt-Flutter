@@ -1,11 +1,13 @@
 import 'dart:async';
-import 'package:cuitt/features/dashboard/data/datasources/my_dial_data.dart';
+
+import 'package:cuitt/core/design_system/colors.dart';
 import 'package:cuitt/features/dashboard/data/datasources/my_chart_data.dart';
 import 'package:cuitt/features/dashboard/data/datasources/my_data.dart';
-import 'package:cuitt/core/design_system/colors.dart';
+import 'package:cuitt/features/dashboard/data/datasources/my_dial_data.dart';
 
 class UpdateChart {
   Timer timer;
+
   //get current time
   void _timeUpdate() {
     timeData = DateTime.now();
@@ -85,8 +87,8 @@ class UpdateChart {
     } else {
       fill += drawLength;
     }
-    data[0] = DialData("fill", fill, Green);
-    data[1] = DialData("over", over, Red);
+    data[1] = DialData("fill", fill, Green);
+    data[0] = DialData("over", over, Red);
     drawLengthLast = drawLength;
     chartSet = false;
     newDraw = true;

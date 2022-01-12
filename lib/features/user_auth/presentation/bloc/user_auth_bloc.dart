@@ -26,10 +26,8 @@ class UserAuthBloc extends Bloc<UserAuthEvent, UserAuthState> {
         yield CreateAccountState();
       }
     } else if (event is NavSignInEvent) {
-      print("navsignin");
       yield SignInState();
     } else if (event is NavCreateEvent) {
-      print("navcreateaccount");
       yield CreateAccountState();
     } else if (event is SignInEvent) {
       yield LoadingState();

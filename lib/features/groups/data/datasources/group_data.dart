@@ -1,3 +1,5 @@
+import 'user_chart_data.dart';
+
 var userList = [];
 var userIDList = [];
 var userNameList = [];
@@ -8,11 +10,17 @@ var userChangeSymbol = [];
 var userDraws = [];
 var userAverage = [];
 var userAverageYest = [];
-var userPlotTime = [];
-var userPlotTotal = [];
-var userPlots = [];
+var userDayPlotTime = [];
+var userDayPlotTotal = [];
+var userMonthPlotTime = [];
+var userMonthPlotTotal = [];
+var userDayPlots = [];
+var userMonthPlots = [];
 var username;
-//TODO FIX GROUIP DATA AND PLOTS
+var userSelection;
+var userDataSelection;
+List<UsageData> userData = [];
+//TODO FIX GROUP DATA AND PLOTS
 var groupPlots = [];
 List<String> groupIDList = [];
 var groupNameList = [];

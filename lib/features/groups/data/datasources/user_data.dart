@@ -1,13 +1,3 @@
-class User {
-  String id;
-  String firstName;
-  String lastName;
-  String numSec;
-  String seconds = "seconds";
-  String today = "today";
-  String difference;
-}
-
 List<double> hitLengthArray = [];
 List<int> timestampArray = [];
 var drawCountIndex = 0;
@@ -24,7 +14,7 @@ var timeBetweenAverage = 0.0;
 var drawCountAverage;
 double drawLengthTotal = 0;
 double drawLengthTotalYest = 0;
-double drawLengthTotalAverageYest = 73.0;
+double drawLengthTotalAverageYest = 75.0; //FOR TESTING
 double drawLengthTotalAverage = 0;
 double drawLengthAverage = 0;
 double drawLengthAverageYest = 0;

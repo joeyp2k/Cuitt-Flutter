@@ -24,6 +24,9 @@ var currentTime = 0;
 int waitPeriod;
 int timeBetween = 0;
 var timeBetweenAverage = 0.0;
+int avgWaitTileSecs = 0;
+int avgWaitTileMinutes = 0;
+int avgWaitTileHours = 0;
 var drawCountAverage;
 double drawLengthTotal = 0;
 double drawLengthTotalYest = 0;
@@ -42,3 +45,6 @@ double overUsage = 0;
 
 int buffer = 0;
 int transmitPointer = 0;
+int statTableID;
+int dayTableID;
+int monthTableID;

@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 bool firstRun;
 int timeUntilLast = 0;
 Duration timeUntil = Duration(seconds: 0);
-Timer refreshTimer;
 
 class DashboardTileLarge extends StatefulWidget {
   final String header;
@@ -24,9 +23,11 @@ class DashboardTileLarge extends StatefulWidget {
 }
 
 class _DashboardTileLargeState extends State<DashboardTileLarge> {
-  //DS3231Time + 946684800 = UnixTime
+  Timer refreshTimer;
+
   @override
   void initState() {
+    super.initState();
     refreshTimer = Timer.periodic(Duration(seconds: 1), (Timer t) {
       if (timeUntilNext == timeUntilLast) {
         if (timeUntilNext != 0) {
@@ -39,11 +40,12 @@ class _DashboardTileLargeState extends State<DashboardTileLarge> {
         timeUntilLast = timeUntilNext;
       }
     });
-    super.initState();
   }
 
+  @override
   void dispose() {
-    //refreshTimer.cancel();
+    print("disposing dash tile");
+    refreshTimer.cancel();
     super.dispose();
   }
 

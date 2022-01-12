@@ -73,14 +73,14 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                     listener: (context, state) {
                       if (state is NavigationState) {
                         if (state.navigate) {
-                          Navigator.of(context).pushReplacement(
-                        FadeRoute(
-                          enterPage: ConnectPage(),
-                          exitPage: Login(),
-                        ),
-                      );
+                      Navigator.of(context).pushAndRemoveUntil(
+                          FadeRoute(
+                            enterPage: ConnectPage(),
+                            exitPage: Login(),
+                          ),
+                          (route) => false);
                     }
-                      } else if (state is CreateAccountState) {
+                  } else if (state is CreateAccountState) {
                         Navigator.of(context).pop();
                       }
                     },

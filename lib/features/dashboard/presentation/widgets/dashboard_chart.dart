@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 double padValue = 0;
+int selection = 0;
 
 class DashboardChart extends StatefulWidget {
   @override
@@ -58,11 +59,12 @@ class _DashboardChartState extends State<DashboardChart> {
                               dateFormat = DateFormat.j();
                               labelInterval = DateTimeIntervalType.hours;
                               padValue = 0;
+                              selection = 0;
                               dataSelection = dayData;
-                              viewportSelectionStart =
-                                  viewportHour.subtract(Duration(minutes: 30));
-                              viewportSelectionEnd = viewportHour
-                                  .add(Duration(hours: 11, minutes: 30));
+                              viewportSelectionEnd =
+                                  viewportHour.add(Duration(minutes: 30));
+                              viewportSelectionStart = viewportHour
+                                  .subtract(Duration(hours: 11, minutes: 30));
                             });
                           },
                         ),
@@ -84,16 +86,14 @@ class _DashboardChartState extends State<DashboardChart> {
                             tooltipFormat = 'EEEE';
                             dateFormat = DateFormat.EEEE();
                             labelInterval = DateTimeIntervalType.days;
-                            padValue = MediaQuery
-                                .of(context)
-                                .size
-                                .width / 4 -
+                            padValue = MediaQuery.of(context).size.width / 4 -
                                 gridSpacer;
-                            dataSelection = weekData;
-                            viewportSelectionStart =
-                                viewportDay.subtract(Duration(hours: 12));
+                            selection = 1;
+                            dataSelection = monthData;
                             viewportSelectionEnd =
-                                viewportDay.add(Duration(days: 6, hours: 12));
+                                viewportDay.add(Duration(hours: 12));
+                            viewportSelectionStart = viewportDay
+                                .subtract(Duration(days: 6, hours: 12));
                             setState(() {});
                           },
                         ),
@@ -115,17 +115,15 @@ class _DashboardChartState extends State<DashboardChart> {
                             tooltipFormat = 'Md';
                             dateFormat = DateFormat.Md();
                             labelInterval = DateTimeIntervalType.days;
-                            padValue = (MediaQuery
-                                .of(context)
-                                .size
-                                .width / 4 -
-                                gridSpacer) *
+                            padValue = (MediaQuery.of(context).size.width / 4 -
+                                    gridSpacer) *
                                 2;
+                            selection = 3;
                             dataSelection = monthData;
-                            viewportSelectionStart =
-                                viewportDay.subtract(Duration(hours: 12));
                             viewportSelectionEnd =
-                                viewportDay.add(Duration(days: 29, hours: 12));
+                                viewportDay.add(Duration(hours: 12));
+                            viewportSelectionStart = viewportDay
+                                .subtract(Duration(days: 29, hours: 12));
                             setState(() {});
                           },
                         ),
@@ -164,7 +162,21 @@ class _DashboardChartState extends State<DashboardChart> {
               ],
             ),
           ),
-          SizedBox(height: gridSpacer * 30, child: ChartApp()),
+          SizedBox(
+              height: gridSpacer * 30,
+              child: Builder(
+                builder: (BuildContext context) {
+                  if (selection == 0) {
+                    return ChartApp();
+                  } else if (selection == 1) {
+                    return WeekChart();
+                  } else if (selection == 2) {
+                    return MonthChart();
+                  } else {
+                    return YearChart();
+                  }
+                },
+              )),
         ],
       ),
     );

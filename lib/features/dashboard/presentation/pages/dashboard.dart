@@ -6,6 +6,7 @@ import 'package:cuitt/features/dashboard/data/datasources/dash_tiles.dart';
 import 'package:cuitt/features/dashboard/data/datasources/my_chart_data.dart';
 import 'package:cuitt/features/dashboard/data/datasources/my_data.dart';
 import 'package:cuitt/features/dashboard/data/datasources/tile_buttons.dart';
+import 'package:cuitt/features/connect_device/presentation/bloc/connect_bloc.dart';
 import 'package:cuitt/features/dashboard/presentation/bloc/dashboard_bloc.dart';
 import 'package:cuitt/features/dashboard/presentation/bloc/dashboard_event.dart';
 import 'package:cuitt/features/dashboard/presentation/bloc/dashboard_state.dart';
@@ -65,6 +66,8 @@ class _DashboardbState extends State<Dashboardb> {
 
   @override
   Widget build(BuildContext context) {
+    //get local data
+    //connectBLE.getLocalData();
     return BlocProvider<DashBloc>(
       create: (BuildContext context) => DashBloc(),
       child: BlocConsumer<DashBloc, DashBlocState>(
@@ -81,7 +84,7 @@ class _DashboardbState extends State<Dashboardb> {
               ),
             );
           } else if (state is DrawerClosed) {
-            Navigator.pop;
+            Navigator.pop(context);
           } else if (state is DataState) {
             print("UPDATE DATA");
             update = true;
@@ -153,25 +156,6 @@ class _DashboardbState extends State<Dashboardb> {
               ),
             ),
             backgroundColor: Background,
-            floatingActionButton: FloatingActionButton(
-              onPressed: () {
-                print("Viewport Hour: " + viewportHour.toString());
-                print("START: " + viewportSelectionStart.toString());
-                print("END: " + viewportSelectionEnd.toString());
-                print("DAY DATA");
-
-                for (int i = 0; i < dayData.length; i++) {
-                  print(dayData[i].time);
-                  print(dayData[i].seconds);
-                }
-
-                print("MONTH DATA");
-                for (int i = 0; i < monthData.length; i++) {
-                  print(monthData[i].time);
-                  print(monthData[i].seconds);
-                }
-              },
-            ),
             appBar: AppBar(
               backgroundColor: Background,
               centerTitle: true,
@@ -206,7 +190,7 @@ class _DashboardbState extends State<Dashboardb> {
                                   RichText(
                                     text: TextSpan(
                                       style: Radial,
-                                      text: "Goal",
+                                      text: "Limit",
                                     ),
                                   ),
                                   RichText(

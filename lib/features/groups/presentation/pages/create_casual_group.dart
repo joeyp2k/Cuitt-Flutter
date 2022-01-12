@@ -256,8 +256,7 @@ class _CreateCasualPageState extends State<CreateCasualPage> {
                                 paddingStart: spacer.x.xl,
                                 paddingEnd: spacer.x.xxl * 2.58,
                                 text: "Create Casual Group",
-                                function: () async {
-                                  print("tap");
+                                function: () {
                                   groupBlocSink.add(CreateCasualEvent());
                                 },
                               ),

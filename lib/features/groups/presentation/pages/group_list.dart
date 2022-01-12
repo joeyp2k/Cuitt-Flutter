@@ -1,10 +1,10 @@
 import 'package:cuitt/core/design_system/design_system.dart';
 import 'package:cuitt/core/routes/fade.dart';
 import 'package:cuitt/core/routes/slide.dart';
-import 'package:cuitt/features/dashboard/data/datasources/my_chart_data.dart';
 import 'package:cuitt/features/dashboard/data/datasources/tile_buttons.dart';
 import 'package:cuitt/features/dashboard/presentation/pages/dashboard.dart';
 import 'package:cuitt/features/groups/data/datasources/group_data.dart';
+import 'package:cuitt/features/groups/data/datasources/user_chart_data.dart';
 import 'package:cuitt/features/groups/presentation/pages/create_group.dart';
 import 'package:cuitt/features/groups/presentation/pages/join_group.dart';
 import 'package:cuitt/features/groups/presentation/widgets/dashboard_button.dart';
@@ -23,14 +23,13 @@ class GroupsList extends StatefulWidget {
 class _GroupsListState extends State<GroupsList> {
   var userNameIndex;
   var value;
-  List<UsageData> userData = [];
 
   Future<void> _getUsers() async {
     userNameIndex = 0;
 
     value = await firestoreInstance
         .collection("groups")
-        .doc(selection) //selection = group name and should be group ID
+        .doc(selection)
         .get()
         .then((value) {
       userIDList = value["members"];
@@ -39,9 +38,8 @@ class _GroupsListState extends State<GroupsList> {
   }
 
   Future<void> _loadUserData() async {
-    //TODO reformat code for if the user's data is empty
-
     for (int i = 0; i < userNameIndex; i++) {
+      print(userIDList[i]);
       //get usernames in group
       //value = user document
       value = await firestoreInstance
@@ -74,7 +72,7 @@ class _GroupsListState extends State<GroupsList> {
           userAverage.add(0);
         }
       });
-
+      //prepare user plots
       value = await firestoreInstance
           .collection("users")
           .doc(userIDList[i])
@@ -82,17 +80,23 @@ class _GroupsListState extends State<GroupsList> {
           .doc("day data")
           .get()
           .then((value) {
-        userPlotTime = value["time"];
-        userPlotTotal = value["draw length"];
-        if (userPlotTime.isNotEmpty && userPlotTotal.isNotEmpty) {
-          for (int i = 0; i < userPlotTime.length; i++) {
-            userData.add(UsageData(userPlotTime[i].toDate(), userPlotTotal[i]));
+        userDayPlotTime = value["time"];
+        userDayPlotTotal = value["draw length"];
+        print(userDayPlotTime);
+        print(userDayPlotTotal);
+        userData.clear();
+        if (userDayPlotTime.isNotEmpty && userDayPlotTotal.isNotEmpty) {
+          for (int i = 0; i < userDayPlotTime.length; i++) {
+            userData.add(UsageData(
+                userDayPlotTime[i].toDate(), userDayPlotTotal[i].toDouble()));
           }
-          userPlots.add(userData);
+          userDayPlots.add(userData);
         } else {
           print("No user data -> adding null to plots");
-          userPlots.add(null);
+          userDayPlots.add(null);
         }
+        print(userDayPlots.length);
+        print(userDayPlots[userDayPlots.length - 1][0].seconds);
       });
     }
   }
@@ -118,9 +122,9 @@ class _GroupsListState extends State<GroupsList> {
     userSecondsChange.clear();
     userChangeSymbol.clear();
     userDraws.clear();
-    userPlotTime.clear();
-    userPlotTotal.clear();
-    userPlots.clear();
+    userDayPlotTime.clear();
+    userDayPlotTotal.clear();
+    userDayPlots.clear();
     userData.clear();
     await _getUsers();
     await _loadUserData();
@@ -143,22 +147,6 @@ class _GroupsListState extends State<GroupsList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          print(groupNameList);
-          print(groupSeconds);
-          print(groupAverage);
-          print(groupAverageYest);
-          print(groupDraws);
-          print(groupSecondsChange);
-          print(groupChangeSymbol);
-          print(groupPlotTime);
-          print(groupPlotTotal);
-          print(groupPlots);
-          print(viewportSelectionEnd);
-          print(viewportSelectionStart);
-        },
-      ),
       bottomSheet: Row(
         children: [
           Expanded(
@@ -271,12 +259,11 @@ class _GroupsListState extends State<GroupsList> {
                         iconColor: White,
                         function: () async {
                           Navigator.of(context).pushAndRemoveUntil(
-                            FadeRoute(
-                              exitPage: CreateGroupPage(),
-                              enterPage: Dashboardb(),
-                            ),
-                                (Route<dynamic> route) => false,
-                          );
+                              FadeRoute(
+                                enterPage: Dashboardb(),
+                                exitPage: GroupsList(),
+                              ),
+                              (route) => false);
                         },
                       ),
                     ),

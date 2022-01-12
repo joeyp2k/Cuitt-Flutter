@@ -59,17 +59,11 @@ class _AverageWaitPeriodTile extends State<AverageTimeBetweenTile> {
                 text: TextSpan(
                   style: TileData,
                   text:
-                      Duration(seconds: timeBetweenAverage.round())
-                              .inHours
-                              .toString() +
+                      avgWaitTileHours.toString() +
                           ' hrs ' +
-                          Duration(seconds: timeBetweenAverage.round())
-                              .inMinutes
-                              .toString() +
+                          avgWaitTileMinutes.toString() +
                           ' min ' +
-                          Duration(seconds: timeBetweenAverage.round())
-                              .inSeconds
-                              .toString() +
+                          avgWaitTileSecs.toString() +
                           ' secs',
                 ),
               ),

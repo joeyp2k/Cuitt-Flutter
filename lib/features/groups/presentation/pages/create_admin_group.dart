@@ -301,7 +301,7 @@ class _CreateAdminPageState extends State<CreateAdminPage> {
                               paddingEnd: spacer.x.xxl * 2.86,
                               success: _success,
                               text: "Create Administrative Group",
-                              function: () async {
+                              function: () {
                                 groupBlocSink.add(CreateAdminEvent());
                               },
                             ),

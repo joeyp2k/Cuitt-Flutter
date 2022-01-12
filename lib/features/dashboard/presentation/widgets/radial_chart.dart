@@ -26,6 +26,12 @@ class _RadialChartState extends State<RadialChart> {
     });
   }
 
+  void dispose() {
+    print("disposing radial chart");
+    timer.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(

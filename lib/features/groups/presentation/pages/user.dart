@@ -1,18 +1,18 @@
 import 'package:cuitt/core/design_system/design_system.dart';
+import 'package:cuitt/core/routes/fade.dart';
 import 'package:cuitt/core/routes/slide.dart';
 import 'package:cuitt/features/dashboard/data/datasources/dash_tiles.dart';
-import 'package:cuitt/features/dashboard/data/datasources/my_data.dart';
 import 'package:cuitt/features/dashboard/data/datasources/tile_buttons.dart';
 import 'package:cuitt/features/dashboard/presentation/bloc/dashboard_bloc.dart';
 import 'package:cuitt/features/dashboard/presentation/bloc/dashboard_state.dart';
+import 'package:cuitt/features/dashboard/presentation/pages/dashboard.dart';
 import 'package:cuitt/features/dashboard/presentation/pages/drawer.dart';
 import 'package:cuitt/features/dashboard/presentation/widgets/average_waitperiod_tile.dart';
 import 'package:cuitt/features/dashboard/presentation/widgets/dashboard_button.dart';
 import 'package:cuitt/features/dashboard/presentation/widgets/draws_tile.dart';
-import 'package:cuitt/features/dashboard/presentation/widgets/radial_chart.dart';
 import 'package:cuitt/features/groups/data/datasources/group_data.dart';
 import 'package:cuitt/features/groups/presentation/widgets/dashboard_chart.dart';
-import 'package:cuitt/features/groups/presentation/widgets/dashboard_tile_large.dart';
+import 'package:cuitt/features/groups/presentation/widgets/radial_chart.dart';
 import 'package:cuitt/features/settings/presentation/pages/settings_home.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -63,12 +63,16 @@ class _UserDashboardState extends State<UserDashboard> {
                           Expanded(
                             child: DashboardButton(
                               color: groupsTile.color,
-                              text: groupsTile.header,
-                              icon: Icons.list,
+                              text: dashTile.header,
+                              icon: dashTile.icon,
                               iconColor: White,
                               function: () async {
-                                //await getGroupData.groups();
-                                //_navigate();
+                                Navigator.of(context).pushAndRemoveUntil(
+                                    FadeRoute(
+                                      enterPage: Dashboardb(),
+                                      exitPage: UserDashboard(),
+                                    ),
+                                    (route) => false);
                               },
                             ),
                           ),
@@ -93,15 +97,9 @@ class _UserDashboardState extends State<UserDashboard> {
                 ),
               ),
             ),
-            backgroundColor: Background,
-            floatingActionButton: FloatingActionButton(
-              onPressed: () {
-                print("BUFFER RESET");
-                buffer = 0;
-              },
-            ),
+            backgroundColor: DarkBlue,
             appBar: AppBar(
-              backgroundColor: Background,
+              backgroundColor: DarkBlue,
               centerTitle: true,
               title: RichText(
                 text: TextSpan(style: TileHeader, text: username),
@@ -134,14 +132,14 @@ class _UserDashboardState extends State<UserDashboard> {
                                   RichText(
                                     text: TextSpan(
                                       style: Radial,
-                                      text: "Goal",
+                                      text: "Limit",
                                     ),
                                   ),
                                   RichText(
                                     text: TextSpan(
                                       style: RadialLarge,
-                                      text: (state as DataState)
-                                              .newAverageDrawLengthTotalYestValue
+                                      text: userAverageYest[userSelection]
+                                              .round()
                                               .toString() +
                                           's',
                                     ),
@@ -150,8 +148,8 @@ class _UserDashboardState extends State<UserDashboard> {
                                     text: TextSpan(
                                       style: Radial,
                                       text: "Current: " +
-                                          (state as DataState)
-                                              .newDrawLengthTotalValue
+                                          userSeconds[userSelection]
+                                              .round()
                                               .toString() +
                                           's',
                                     ),
@@ -161,16 +159,6 @@ class _UserDashboardState extends State<UserDashboard> {
                             ),
                           ]),
                         ),
-                        Row(
-                          children: [
-                            DashboardTileLarge(
-                              header: timeUntilTile.header,
-                              textData: timeUntilTile.textData,
-                              color: Red,
-                              timeUntilNext: timeUntilNext,
-                            ),
-                          ],
-                        ),
                         DashboardChart(),
                         Row(
                           children: [
@@ -178,13 +166,11 @@ class _UserDashboardState extends State<UserDashboard> {
                               color: TransWhite,
                               header: avgDrawTile.header,
                               header2: drawTile.header,
-                              textData: (state as DataState)
-                                      .newAverageDrawLengthValue
+                              textData: userAverage[userSelection]
+                                      .round()
                                       .toString() +
                                   ' seconds',
-                              textData2: (state as DataState)
-                                  .newDrawCountValue
-                                  .toString(),
+                              textData2: userDraws[userSelection].toString(),
                             ),
                           ],
                         ),

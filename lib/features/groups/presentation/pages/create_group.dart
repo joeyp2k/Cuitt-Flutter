@@ -56,12 +56,11 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                         iconColor: White,
                         function: () async {
                           Navigator.of(context).pushAndRemoveUntil(
-                            FadeRoute(
-                              exitPage: CreateGroupPage(),
-                              enterPage: Dashboardb(),
-                            ),
-                            (Route<dynamic> route) => false,
-                          );
+                              FadeRoute(
+                                enterPage: Dashboardb(),
+                                exitPage: CreateGroupPage(),
+                              ),
+                              (route) => false);
                         },
                       ),
                     ),

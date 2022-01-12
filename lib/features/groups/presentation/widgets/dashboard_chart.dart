@@ -1,11 +1,13 @@
 import 'package:cuitt/core/design_system/design_system.dart';
-import 'package:cuitt/features/dashboard/data/datasources/my_chart_data.dart';
-import 'package:cuitt/features/dashboard/presentation/widgets/syncfusion_chart.dart';
+import 'package:cuitt/features/groups/data/datasources/group_data.dart';
+import 'package:cuitt/features/groups/data/datasources/user_chart_data.dart';
+import 'package:cuitt/features/groups/presentation/widgets/syncfusion_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 double padValue = 0;
+int selection = 0;
 
 class DashboardChart extends StatefulWidget {
   @override
@@ -58,10 +60,12 @@ class _DashboardChartState extends State<DashboardChart> {
                               dateFormat = DateFormat.j();
                               labelInterval = DateTimeIntervalType.hours;
                               padValue = 0;
-                              dataSelection = dayData;
-                              viewportSelectionStart = viewportHour;
+                              selection = 0;
+                              userDataSelection = userDayPlots[userSelection];
                               viewportSelectionEnd =
-                                  viewportHour.add(Duration(hours: 11));
+                                  viewportHour.add(Duration(minutes: 30));
+                              viewportSelectionStart = viewportHour
+                                  .subtract(Duration(hours: 11, minutes: 30));
                             });
                           },
                         ),
@@ -85,10 +89,12 @@ class _DashboardChartState extends State<DashboardChart> {
                             labelInterval = DateTimeIntervalType.days;
                             padValue = MediaQuery.of(context).size.width / 4 -
                                 gridSpacer;
-                            dataSelection = weekData;
-                            viewportSelectionStart = viewportDay;
+                            selection = 1;
+                            userDataSelection = userMonthPlots[userSelection];
                             viewportSelectionEnd =
-                                viewportDay.add(Duration(days: 6));
+                                viewportDay.add(Duration(hours: 12));
+                            viewportSelectionStart = viewportDay
+                                .subtract(Duration(days: 6, hours: 12));
                             setState(() {});
                           },
                         ),
@@ -113,10 +119,12 @@ class _DashboardChartState extends State<DashboardChart> {
                             padValue = (MediaQuery.of(context).size.width / 4 -
                                     gridSpacer) *
                                 2;
-                            dataSelection = monthData;
-                            viewportSelectionStart = viewportDay;
+                            selection = 3;
+                            userDataSelection = userMonthPlots[userSelection];
                             viewportSelectionEnd =
-                                viewportDay.add(Duration(days: 29));
+                                viewportDay.add(Duration(hours: 12));
+                            viewportSelectionStart = viewportDay
+                                .subtract(Duration(days: 29, hours: 12));
                             setState(() {});
                           },
                         ),
@@ -155,7 +163,21 @@ class _DashboardChartState extends State<DashboardChart> {
               ],
             ),
           ),
-          SizedBox(height: gridSpacer * 30, child: ChartApp()),
+          SizedBox(
+              height: gridSpacer * 30,
+              child: Builder(
+                builder: (BuildContext context) {
+                  if (selection == 0) {
+                    return UserChartApp();
+                  } else if (selection == 1) {
+                    return UserWeekChart();
+                  } else if (selection == 2) {
+                    return UserMonthChart();
+                  } else {
+                    return UserYearChart();
+                  }
+                },
+              )),
         ],
       ),
     );

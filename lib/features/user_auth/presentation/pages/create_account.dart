@@ -121,12 +121,12 @@ class _CreateAccountState extends State<CreateAccount>
                     listener: (context, state) {
                       if (state is NavigationState) {
                         if (state.navigate) {
-                      Navigator.of(context).pushReplacement(
-                        FadeRoute(
-                          enterPage: ConnectPage(),
-                          exitPage: CreateAccount(),
-                        ),
-                      );
+                      Navigator.of(context).pushAndRemoveUntil(
+                          FadeRoute(
+                            enterPage: ConnectPage(),
+                            exitPage: CreateAccount(),
+                          ),
+                          (route) => false);
                     } else {
                           _success = false;
                         }
