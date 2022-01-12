@@ -55,8 +55,8 @@ class DayPlotData {
   Map<String, dynamic> toMap() {
     return {
       "id": id,
-      "dayTotal": plotTotal,
-      "dayTime": plotTime,
+      "plotTotal": plotTotal,
+      "plotTime": plotTime,
     };
   }
 }
@@ -75,8 +75,8 @@ class MonthPlotData {
   Map<String, dynamic> toMap() {
     return {
       "id": id,
-      "monthTotal": plotTotal,
-      "monthTime": plotTime,
+      "plotTotal": plotTotal,
+      "plotTime": plotTime,
     };
   }
 }

@@ -1,12 +1,11 @@
-
 import 'package:cuitt/core/design_system/design_system.dart';
 import 'package:cuitt/core/routes/fade.dart';
 import 'package:cuitt/core/routes/slide.dart';
+import 'package:cuitt/features/connect_device/presentation/bloc/connect_bloc.dart';
+import 'package:cuitt/features/connect_device/presentation/pages/firmware_update.dart';
 import 'package:cuitt/features/dashboard/data/datasources/dash_tiles.dart';
-import 'package:cuitt/features/dashboard/data/datasources/my_chart_data.dart';
 import 'package:cuitt/features/dashboard/data/datasources/my_data.dart';
 import 'package:cuitt/features/dashboard/data/datasources/tile_buttons.dart';
-import 'package:cuitt/features/connect_device/presentation/bloc/connect_bloc.dart';
 import 'package:cuitt/features/dashboard/presentation/bloc/dashboard_bloc.dart';
 import 'package:cuitt/features/dashboard/presentation/bloc/dashboard_event.dart';
 import 'package:cuitt/features/dashboard/presentation/bloc/dashboard_state.dart';
@@ -22,7 +21,6 @@ import 'package:cuitt/features/groups/domain/usecases/get_group_data.dart';
 import 'package:cuitt/features/groups/presentation/pages/group_list.dart';
 import 'package:cuitt/features/groups/presentation/pages/group_list_empty.dart';
 import 'package:cuitt/features/settings/presentation/pages/settings_home.dart';
-import 'package:cuitt/features/connect_device/presentation/pages/firmware_update.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -67,7 +65,8 @@ class _DashboardbState extends State<Dashboardb> {
   @override
   Widget build(BuildContext context) {
     //get local data
-    //connectBLE.getLocalData();
+    connectBLE
+        .initializeData(); //TODO PLACE SO ONLY RUN ONCE WHEN OPENING DASH FOR FIRST TIME
     return BlocProvider<DashBloc>(
       create: (BuildContext context) => DashBloc(),
       child: BlocConsumer<DashBloc, DashBlocState>(
