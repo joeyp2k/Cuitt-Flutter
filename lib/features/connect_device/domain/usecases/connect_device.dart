@@ -103,7 +103,7 @@ class ConnectBLE {
     return List.generate(maps.length, (i) {
       return DayPlotData(
         id: maps[i]['id'],
-        plotTotal: maps[i]["plotTotal"].toDouble(),
+        plotTotal: maps[i]["plotTotal"],
         plotTime: maps[i]["plotTime"],
       );
     });
@@ -120,7 +120,7 @@ class ConnectBLE {
     return List.generate(maps.length, (i) {
       return MonthPlotData(
         id: maps[i]['id'],
-        plotTotal: maps[i]["plotTotal"].toDouble(),
+        plotTotal: maps[i]["plotTotal"],
         plotTime: maps[i]["plotTime"],
       );
     });
@@ -168,7 +168,7 @@ class ConnectBLE {
           .collection("data")
           .doc('stats')
           .get();
-      if (value != null) {
+      if (value.exists) {
         //get remote data
         print("Remote data exists");
         drawLengthAverageYest = value["draw length average yesterday"];
@@ -176,7 +176,7 @@ class ConnectBLE {
         drawLengthAverage = value["draw length average"];
         drawCount = value["draws"];
       } else {
-        print("Remote data does not exist, initializing");
+        print("Remote data does not exist, initializing local and remote data");
         //initialize remote data
         await firestoreInstance
             .collection("users")
@@ -190,7 +190,12 @@ class ConnectBLE {
           "draw length average yesterday": drawLengthTotalAverageYest,
         });
       }
-      //TODO initialize local data
+      var userData = UserData(
+          drawCount: drawCount,
+          drawLengthAverage: drawLengthAverage,
+          drawLengthTotal: drawLengthTotal,
+          drawLengthTotalAverageYest: drawLengthTotalAverageYest);
+      insertUserData(userData);
     }
     //replace current plots with local storage
     //TODO FIX DATA ERROR "FIRST RUN CAUSES INDEX SHIFTING DUE TO 0 INDEXES NOT BEING THE SAME VALUE"
@@ -199,8 +204,7 @@ class ConnectBLE {
       //store data in display layer
       print("Getting local day data");
       dayData.clear();
-      for (int i = day.length - 1; i > 0; i--) {
-        //TODO ensure functionality
+      for (int i = day.length - 1; i >= 0; i--) {
         var time = DateTime.fromMillisecondsSinceEpoch(day[i].plotTime);
         var seconds = day[i].plotTotal;
         var insert = UsageData(time, seconds);
@@ -216,7 +220,7 @@ class ConnectBLE {
           .doc('day data')
           .get();
 
-      if (value != null) {
+      if (value.exists) {
         print("Remote data exists");
         var currentTime =
             DateTime(viewport.year, viewport.month, viewport.day, viewport.hour)
@@ -259,21 +263,39 @@ class ConnectBLE {
             dayData[i].time.toString() +
             " A: " +
             a.toString());
-        //TODO initialize local data
+        for (int i = 0; i < dayData.length; i++) {
+          var userData = DayPlotData(
+              plotTime: dayData[i].time.toUtc().millisecondsSinceEpoch,
+              plotTotal: dayData[i].seconds);
+          insertDayData(userData);
+        }
       } else {
         //initialize remote data
-        var plotTime;
-        var plotTotal;
-        //TODO Itterate over data to transmit
+        //initialize remote data with display layer data
+        var plotTime = [];
+        var plotTotal = [];
+
+        for (int i = 0; i < dayData.length; i++) {
+          plotTime.add(dayData[i].time);
+          plotTotal.add(dayData[i].seconds);
+        }
+
         await firestoreInstance
             .collection("users")
             .doc(firebaseUser.uid)
             .collection("data")
             .doc('day data')
             .set({
-          "plot time": plotTime,
-          "plot total": plotTotal,
+          "time": plotTime,
+          "draw length": plotTotal,
         });
+        //initialize local data
+        for (int i = plotTime.length - 1; i >= 0; i--) {
+          var userData = DayPlotData(
+              plotTime: plotTime[i].toUtc().millisecondsSinceEpoch,
+              plotTotal: plotTotal[i]);
+          insertDayData(userData);
+        }
       }
     }
 
@@ -281,9 +303,8 @@ class ConnectBLE {
     if (month.isNotEmpty) {
       //store data in display layer
       print("Getting local month data");
-      //TODO ensure functionality
       monthData.clear();
-      for (int i = month.length - 1; i > 0; i--) {
+      for (int i = month.length - 1; i >= 0; i--) {
         var time = DateTime.fromMillisecondsSinceEpoch(month[i].plotTime);
         var seconds = month[i].plotTotal;
         var insert = UsageData(time, seconds);
@@ -298,11 +319,12 @@ class ConnectBLE {
           .collection("data")
           .doc('month data')
           .get();
-      if (value != null) {
+      if (value.exists) {
         print("Remote data exists");
         var currentTime =
             DateTime(viewport.year, viewport.month, viewport.day, viewport.hour)
                 .toLocal();
+        print(value["time"]);
         if (value["time"].last.toDate().isAfter(currentTime)) {
           //extend data range to current time
           print("extending data range");
@@ -311,6 +333,13 @@ class ConnectBLE {
             monthData.add(UsageData(zero, 0));
           }
         }
+
+        try {
+          assert(monthData.last.time == value["time"].last.toDate());
+        } catch (e) {
+          print(e.toString());
+        }
+
         //populate values
         int i = monthData.length - 1;
         int a = value["time"].length - 1;
@@ -330,7 +359,6 @@ class ConnectBLE {
               " I: " +
               i.toString());
           if (i == 0) {
-            print(drawLengthTotal);
             monthData.insert(0,
                 UsageData(value["time"][a].toDate(), value["draw length"][a]));
             a--;
@@ -357,26 +385,43 @@ class ConnectBLE {
         print(monthData[2].time.toString());
         print(monthData[1].time.toString());
         print(monthData[0].time.toString());
-        //TODO initialize local data
+        //initialize local data with remote data received
+        for (int i = monthData.length - 1; i >= 0; i--) {
+          var userData = MonthPlotData(
+              plotTime: monthData[i].time.toUtc().millisecondsSinceEpoch,
+              plotTotal: monthData[i].seconds);
+          insertMonthData(userData);
+        }
       } else {
-        //initialize remote data
-        var plotTime;
-        var plotTotal;
-        //TODO Itterate over data to transmit
+        //initialize remote data with display layer data
+        var plotTime = [];
+        var plotTotal = [];
+
+        for (int i = 0; i < monthData.length; i++) {
+          plotTime.add(monthData[i].time);
+          plotTotal.add(monthData[i].seconds);
+        }
+
         await firestoreInstance
             .collection("users")
             .doc(firebaseUser.uid)
             .collection("data")
             .doc('month data')
             .set({
-          "plot time": plotTime,
-          "plot total": plotTotal,
+          "time": plotTime,
+          "draw length": plotTotal,
         });
+        //initializing local data
+        for (int i = plotTime.length - 1; i >= 0; i--) {
+          var userData = MonthPlotData(
+              plotTime: plotTime[i].toUtc().millisecondsSinceEpoch,
+              plotTotal: plotTotal[i]);
+          insertMonthData(userData);
+        }
       }
     }
-    printAllData();
     //check whether local and remote data match
-    //TODO update local data if remote data that is more up to date exists (user reinstalls application)
+    //TODO update local data if remote data that is more up to date exists (user reinstalls application)->will data be consistent?
     print("DATA INITIALIZATION COMPLETE");
   }
 
@@ -404,6 +449,7 @@ class ConnectBLE {
     print(plotTime.last);
     print(plotTotal.first);
     print(plotTotal.last);
+    print(plotTotal);
 
     plotTime.clear();
     plotTotal.clear();
@@ -418,43 +464,49 @@ class ConnectBLE {
     print(plotTime.last);
     print(plotTotal.first);
     print(plotTotal.last);
+    print(plotTotal);
 
     print("-----REMOTE-----");
-    value = await firestoreInstance
+    await firestoreInstance
         .collection("users")
         .doc(firebaseUser.uid)
         .collection("data")
         .doc('stats')
-        .get();
-
-    print(value["draws"]);
-    print(value["draw length total"]);
-    print(value["draw length average"]);
-    print(value["draw length average yesterday"]);
+        .get()
+        .then((value) {
+      print(value["draws"]);
+      print(value["draw length total"]);
+      print(value["draw length average"]);
+      print(value["draw length average yesterday"]);
+    });
 
     value = await firestoreInstance
         .collection("users")
         .doc(firebaseUser.uid)
         .collection("data")
         .doc('day data')
-        .get();
-    print("--DAY--");
-    print(value["time"].first.toDate());
-    print(value["time"].last.toDate());
-    print(value["draw length"].first);
-    print(value["draw length"].last);
+        .get()
+        .then((value) {
+      print("--DAY--");
+      print(value["time"].first.toDate());
+      print(value["time"].last.toDate());
+      print(value["draw length"].first);
+      print(value["draw length"].last);
+    });
 
     value = await firestoreInstance
         .collection("users")
         .doc(firebaseUser.uid)
         .collection("data")
         .doc('month data')
-        .get();
-    print("--MONTH--");
-    print(value["time"].first.toDate());
-    print(value["time"].last.toDate());
-    print(value["draw length"].first);
-    print(value["draw length"].last);
+        .get()
+        .then((value) {
+      print("--MONTH--");
+      print(value["time"].first.toDate());
+      print(value["time"].last.toDate());
+      print(value["draw length"].first);
+      print(value["draw length"].last);
+    });
 
     print("----DISPLAY----");
 
@@ -488,74 +540,85 @@ class ConnectBLE {
     print(plotTotal.last);
   }
 
+  Future<void> updateDayData(DayPlotData data) async {
+    // Get a reference to the database.
+    final db = await userDatabase;
+    final List<Map<String, dynamic>> query = await db.query(
+      'daydata',
+    );
+    var id = query.first["id"];
+    // Update the given Dog.
+    await db.update(
+      'daydata',
+      data.toMap(),
+      // Ensure that the Dog has a matching id.
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<void> updateMonthData(MonthPlotData data) async {
+    // Get a reference to the database.
+    final db = await userDatabase;
+    final List<Map<String, dynamic>> query = await db.query(
+      'monthdata',
+    );
+    var id = query.first["id"];
+    // Update the given Dog.
+    await db.update(
+      'monthdata',
+      data.toMap(),
+      // Ensure that the Dog has a matching id.
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
   Future<void> storeDrawData() async {
-    //if no table ID, initialize database with first data
-    if (statTableID == null) {
-      print("initialize local data");
-      statTableID = 0;
-      var data = UserData(
-        id: statTableID,
-        drawCount: drawCount,
-        drawLengthTotal: drawLengthTotal,
-        drawLengthTotalAverage: drawLengthTotalAverage,
-        drawLengthTotalAverageYest: drawLengthTotalAverageYest,
-        drawLengthTotalYest: drawLengthTotalYest,
-        drawLengthAverageYest: drawLengthAverageYest,
-        drawLengthAverage: drawLengthAverage,
-      );
-
-      await insertUserData(data);
-
-      dayTableID = 0;
-      for (int i = 0; i < dayData.length; i++) {
-        var data = DayPlotData(
-          id: dayTableID,
-          plotTime: dayData[i].time.toUtc().millisecondsSinceEpoch,
-          plotTotal: dayData[i].seconds,
-        );
-        await insertDayData(data);
-        dayTableID++;
-      }
-      monthTableID = 0;
-      for (int i = 0; i < monthData.length; i++) {
-        var data = MonthPlotData(
-          id: monthTableID,
-          plotTime: monthData[i].time.toUtc().millisecondsSinceEpoch,
-          plotTotal: monthData[i].seconds,
-        );
-        await insertMonthData(data);
-        monthTableID++;
-      }
+    //update with new data
+    var statInsertion = UserData(
+      id: 0,
+      drawCount: drawCount,
+      drawLengthTotal: drawLengthTotal,
+      drawLengthTotalAverage: drawLengthTotalAverage,
+      drawLengthTotalAverageYest: drawLengthTotalAverageYest,
+      drawLengthTotalYest: drawLengthTotalYest,
+      drawLengthAverageYest: drawLengthAverageYest,
+      drawLengthAverage: drawLengthAverage,
+    );
+    await insertUserData(statInsertion);
+    var localDayData = await _getDayData();
+    if (DateTime.fromMillisecondsSinceEpoch(localDayData.first.plotTime) ==
+        dayData.first.time) {
+      print("UPDATE: " + dayData.first.seconds.toString());
+      var data = DayPlotData(
+          plotTime: dayData.first.time.toUtc().millisecondsSinceEpoch,
+          plotTotal: dayData.first.seconds);
+      await updateDayData(data);
     } else {
-      //update with new data
-      var statInsertion = UserData(
-        id: statTableID,
-        drawCount: drawCount,
-        drawLengthTotal: drawLengthTotal,
-        drawLengthTotalAverage: drawLengthTotalAverage,
-        drawLengthTotalAverageYest: drawLengthTotalAverageYest,
-        drawLengthTotalYest: drawLengthTotalYest,
-        drawLengthAverageYest: drawLengthAverageYest,
-        drawLengthAverage: drawLengthAverage,
-      );
-
-      await insertUserData(statInsertion);
-
+      print("INSERT");
       var dayInsertion = DayPlotData(
-        id: dayTableID,
-        plotTime: dayData.last.time.toUtc().millisecondsSinceEpoch,
-        plotTotal: dayData.last.seconds,
+        plotTime: dayData.first.time.toUtc().millisecondsSinceEpoch,
+        plotTotal: dayData.first.seconds,
       );
       await insertDayData(dayInsertion);
-      dayTableID++;
+    }
 
+    var localMonthData = await _getMonthData();
+    if (DateTime.fromMillisecondsSinceEpoch(localMonthData.first.plotTime) ==
+        monthData.first.time) {
+      print("UPDATE: " + monthData.first.seconds.toString());
+      var data = MonthPlotData(
+          plotTime: monthData.first.time.toUtc().microsecondsSinceEpoch,
+          plotTotal: monthData.first.seconds);
+      await updateMonthData(data);
+    } else {
+      print("INSERT");
       var monthInsertion = MonthPlotData(
-        id: monthTableID,
-        plotTime: monthData.last.time.toUtc().millisecondsSinceEpoch,
-        plotTotal: monthData.last.seconds,
+        plotTime: monthData.first.time.toUtc().millisecondsSinceEpoch,
+        plotTotal: monthData.first.seconds,
       );
       await insertMonthData(monthInsertion);
-      monthTableID++;
     }
   }
 
@@ -572,6 +635,15 @@ class ConnectBLE {
   }
 
   void _calculateA() {
+    //currentTime only holds seconds, minutes, hours, and days
+    print(DateTime.fromMillisecondsSinceEpoch(currentTime * 1000));
+    print(DateTime.now());
+
+    if (DateTime.fromMillisecondsSinceEpoch(currentTime * 1000) !=
+        DateTime.now()) {
+      //TODO calibrate time using calibration characteristic
+    }
+
     //print('Draw Length Total (CALC A) pre calculation: ' +
     //drawLengthTotal.toString());
     drawLengthTotal += drawLength;
@@ -1069,7 +1141,6 @@ class ConnectBLE {
           _lastval = _readval;
           _sendData();
           await storeDrawData();
-          printAllData();
 
           refresh = true;
         }

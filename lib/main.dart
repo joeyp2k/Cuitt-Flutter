@@ -54,11 +54,11 @@ void main() async {
       );
 
       await db.execute(
-        'CREATE TABLE daydata(id INTEGER PRIMARY KEY, plotTotal INTEGER, plotTime INTEGER)',
+        'CREATE TABLE daydata(id INTEGER PRIMARY KEY, plotTotal DOUBLE, plotTime INTEGER)',
       );
 
       return db.execute(
-        'CREATE TABLE monthdata(id INTEGER PRIMARY KEY, plotTotal INTEGER, plotTime INTEGER)',
+        'CREATE TABLE monthdata(id INTEGER PRIMARY KEY, plotTotal DOUBLE, plotTime INTEGER)',
       );
     },
     // Set the version. This executes the onCreate function and provides a

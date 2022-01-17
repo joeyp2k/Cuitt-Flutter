@@ -148,8 +148,10 @@ class WriteGroupData {
             .get();
         var drawLengthPlots = group["plot total"];
         var timePlots = group["plot time"];
-
-        //if the first data in remote plots was created after the first new user's plots, extend the time range of the group data
+        print("BEFORE");
+        print(drawLengthPlots);
+        print(timePlots);
+        //if the first data in remote plots was created after the first new user's plots, extend the time range of the group data backward
         if (timePlots.first.toDate().isAfter(dayData.first.time)) {
           int i = 0;
           while (timePlots.first.toDate() != dayData.first.time) {
@@ -159,29 +161,32 @@ class WriteGroupData {
           }
         }
 
-        //if the last data in remote plots was created before the last new user's plots, extend the time range of the group data
+        //if the last data in remote plots was created before the last new user's plots, extend the time range of the group data forward
         if (timePlots.last.toDate().isBefore(dayData.last.time)) {
           int i = dayData.length;
-          while (timePlots.last.toDate() != dayData.last) {
+          while (timePlots.last.toDate() != dayData.last.time) {
             timePlots.insert(timePlots.length, dayData[i].time);
-            drawLengthPlots.insert(timePlots.length, dayData[i].seconds);
+            drawLengthPlots.insert(drawLengthPlots.length, dayData[i].seconds);
             i--;
           }
         }
+
         //add user draw history to group data
         int a = timePlots.length - 1;
         int i = dayData.length - 1;
-        print(a);
-        print(i);
+
+        assert(a == i);
 
         for (int i = dayData.length - 1; i > 0; i--) {
-          print(timePlots[a].toDate().toString() +
+          print(timePlots[i].toDate().toString() +
               "||||" +
               dayData[i].time.toString());
-          a--;
-          //drawLengthPlots[timePlots.length - i] += dayData[i].seconds;
+          drawLengthPlots[i] += dayData[i].seconds;
         }
 
+        print("AFTER");
+        print(timePlots);
+        print(drawLengthPlots);
         // firestoreInstance.collection("groups").doc(groupIDController.text).set({
         //   "plot total": drawLengthPlots,
         //   "plot time": timePlots,
@@ -190,7 +195,7 @@ class WriteGroupData {
         _success = true;
         return _success;
       } catch (e) {
-        print("ERROR");
+        print("ERROR: " + e.toString());
         return _success;
       }
     } else {

@@ -45,6 +45,3 @@ double overUsage = 0;
 
 int buffer = 0;
 int transmitPointer = 0;
-int statTableID;
-int dayTableID;
-int monthTableID;

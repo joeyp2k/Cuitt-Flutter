@@ -40,17 +40,6 @@ class _DashboardbState extends State<Dashboardb> {
   bool reEntry = true;
 
   void _navigate() {
-    print("GROUPS DATA FINAL");
-    print(groupIDList);
-    print(groupSeconds);
-    print(groupAverage);
-    print(groupAverageYest);
-    print(groupDraws);
-    print(groupSecondsChange);
-    print(groupChangeSymbol);
-    print(groupPlotTime);
-    print(groupPlotTotal);
-
     if (groupIDList.isEmpty) {
       Navigator.of(context).push(MaterialPageRoute(builder: (context) {
         return GroupListEmpty();
@@ -64,9 +53,6 @@ class _DashboardbState extends State<Dashboardb> {
 
   @override
   Widget build(BuildContext context) {
-    //get local data
-    connectBLE
-        .initializeData(); //TODO PLACE SO ONLY RUN ONCE WHEN OPENING DASH FOR FIRST TIME
     return BlocProvider<DashBloc>(
       create: (BuildContext context) => DashBloc(),
       child: BlocConsumer<DashBloc, DashBlocState>(
@@ -96,6 +82,11 @@ class _DashboardbState extends State<Dashboardb> {
             reEntry = false;
           }
           return Scaffold(
+            floatingActionButton: FloatingActionButton(
+              onPressed: () {
+                connectBLE.printAllData();
+              },
+            ),
             drawer: SafeArea(
               child: Drawer(
                 child: Column(
