@@ -4,7 +4,7 @@ import 'package:cuitt/core/routes/slide.dart';
 import 'package:cuitt/features/dashboard/data/datasources/tile_buttons.dart';
 import 'package:cuitt/features/dashboard/presentation/pages/dashboard.dart';
 import 'package:cuitt/features/groups/data/datasources/group_data.dart';
-import 'package:cuitt/features/groups/data/datasources/user_chart_data.dart';
+import 'package:cuitt/features/groups/domain/usecases/get_group_data.dart';
 import 'package:cuitt/features/groups/presentation/pages/create_group.dart';
 import 'package:cuitt/features/groups/presentation/pages/join_group.dart';
 import 'package:cuitt/features/groups/presentation/widgets/dashboard_button.dart';
@@ -21,129 +21,6 @@ class GroupsList extends StatefulWidget {
 }
 
 class _GroupsListState extends State<GroupsList> {
-  var userNameIndex;
-  var value;
-
-  Future<void> _getUsers() async {
-    userNameIndex = 0;
-
-    value = await firestoreInstance
-        .collection("groups")
-        .doc(selection)
-        .get()
-        .then((value) {
-      userIDList = value["members"];
-    });
-    userNameIndex = userIDList.length;
-  }
-
-  Future<void> _loadUserData() async {
-    for (int i = 0; i < userNameIndex; i++) {
-      print(userIDList[i]);
-      //get usernames in group
-      //value = user document
-      value = await firestoreInstance
-          .collection("users")
-          .doc(userIDList[i])
-          .get()
-          .then((value) {
-        userNameList.add(value["username"]);
-      });
-
-      //get user data from user doc
-      value = await firestoreInstance
-          .collection("users")
-          .doc(userIDList[i])
-          .collection("data")
-          .doc("stats")
-          .get()
-          .then((value) {
-        if (value.data() != null) {
-          userSeconds.add(value["draw length total"]);
-          userDraws.add(value["draws"]);
-          userAverageYest.add(value["draw length average yesterday"]);
-          userAverage.add(value["draw length average"]);
-        } else {
-          //user data empty
-          print("User Data Empty: adding zeros");
-          userSeconds.add(0);
-          userDraws.add(0);
-          userAverageYest.add(0);
-          userAverage.add(0);
-        }
-      });
-      //prepare user plots
-      value = await firestoreInstance
-          .collection("users")
-          .doc(userIDList[i])
-          .collection("data")
-          .doc("day data")
-          .get()
-          .then((value) {
-        userDayPlotTime = value["time"];
-        userDayPlotTotal = value["draw length"];
-        print(userDayPlotTime);
-        print(userDayPlotTotal);
-        userData.clear();
-        if (userDayPlotTime.isNotEmpty && userDayPlotTotal.isNotEmpty) {
-          for (int i = 0; i < userDayPlotTime.length; i++) {
-            userData.add(UsageData(
-                userDayPlotTime[i].toDate(), userDayPlotTotal[i].toDouble()));
-          }
-          userDayPlots.add(userData);
-        } else {
-          print("No user data -> adding null to plots");
-          userDayPlots.add(null);
-        }
-        print(userDayPlots.length);
-        print(userDayPlots[userDayPlots.length - 1][0].seconds);
-      });
-    }
-  }
-
-  Future<void> _userDataCalculation() {
-    double change;
-    for (int i = 0; i < userAverageYest.length; i++) {
-      change = userSeconds[i] - userAverageYest[i];
-      if (change > 0) {
-        userChangeSymbol.add("+");
-      } else {
-        userChangeSymbol.add("");
-      }
-      userSecondsChange.add(change);
-    }
-  }
-
-  void groupSelection() async {
-    userNameList.clear();
-    userSeconds.clear();
-    userAverage.clear();
-    userAverageYest.clear();
-    userSecondsChange.clear();
-    userChangeSymbol.clear();
-    userDraws.clear();
-    userDayPlotTime.clear();
-    userDayPlotTotal.clear();
-    userDayPlots.clear();
-    userData.clear();
-    await _getUsers();
-    await _loadUserData();
-    await _userDataCalculation();
-
-    print("USERNAME LIST: " + userNameList.toString());
-    if (userNameList.isEmpty) {
-      Navigator.of(context).push(FadeRoute(
-        enterPage: UserListEmpty(),
-        exitPage: GroupsList(),
-      ));
-    } else {
-      Navigator.of(context).push(FadeRoute(
-        enterPage: UserList(),
-        exitPage: GroupsList(),
-      ));
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -317,11 +194,22 @@ class _GroupsListState extends State<GroupsList> {
                   margin: spacer.top.xs,
                   child: InkWell(
                     borderRadius: BorderRadius.all(Radius.circular(20)),
-                    onTap: () {
-                      print("tap");
+                    onTap: () async {
                       selection = '${groupIDList[index]}';
                       groupName = '${groupNameList[index]}';
-                      groupSelection();
+                      //groupSelection();
+                      await getGroupData.loadUsersInGroup();
+                      if (userNameList.isEmpty) {
+                        Navigator.of(context).push(FadeRoute(
+                          enterPage: UserListEmpty(),
+                          exitPage: GroupsList(),
+                        ));
+                      } else {
+                        Navigator.of(context).push(FadeRoute(
+                          enterPage: UserList(),
+                          exitPage: GroupsList(),
+                        ));
+                      }
                     },
                     child: Container(
                       decoration: BoxDecoration(
@@ -418,12 +306,6 @@ class _GroupsListState extends State<GroupsList> {
                                     if (groupPlots[index] == null) {
                                       return Container();
                                     } else {
-                                      print("GROUP PLOTS" +
-                                          groupPlots.toString());
-                                      for (int i = 0; i < 12; i++) {
-                                        print(groupPlots[0][i].time);
-                                        print(groupPlots[0][i].seconds);
-                                      }
                                       return Container(
                                         height: 100,
                                         width: double.infinity,

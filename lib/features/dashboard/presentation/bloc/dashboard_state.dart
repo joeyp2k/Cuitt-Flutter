@@ -27,7 +27,6 @@ class DrawerClosed extends DashBlocState {
 
 class DataState extends DashBlocState {
   final int newDrawCountValue;
-  final int newSeshCountValue;
   final double newDrawLengthValue;
   final int newDrawLengthTotalValue;
   final int newAverageDrawLengthValue;
@@ -38,7 +37,6 @@ class DataState extends DashBlocState {
 
   DataState({
     this.newDrawCountValue,
-    this.newSeshCountValue,
     this.newDrawLengthValue,
     this.newDrawLengthTotalValue,
     this.newAverageDrawLengthValue,

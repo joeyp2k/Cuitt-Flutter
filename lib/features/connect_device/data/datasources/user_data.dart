@@ -1,7 +1,8 @@
 var userDatabase;
 
 class UserData {
-  final int id;
+  int id;
+  final String userid;
   final int drawCount;
   final double drawLengthTotal;
   final double drawLengthTotalYest;
@@ -9,11 +10,10 @@ class UserData {
   final double drawLengthTotalAverage;
   final double drawLengthAverage;
   final double drawLengthAverageYest;
-  final List<double> plotTotal;
-  final List<DateTime> plotTime;
 
   UserData({
     this.id,
+    this.userid,
     this.drawCount,
     this.drawLengthTotal,
     this.drawLengthTotalAverage,
@@ -21,8 +21,6 @@ class UserData {
     this.drawLengthTotalYest,
     this.drawLengthAverageYest,
     this.drawLengthAverage,
-    this.plotTotal,
-    this.plotTime,
   });
 
   // Convert a Dog into a Map. The keys must correspond to the names of the
@@ -42,12 +40,14 @@ class UserData {
 }
 
 class DayPlotData {
-  final int id;
+  int id;
+  final String userid;
   final double plotTotal;
   final int plotTime;
 
   DayPlotData({
     this.id,
+    this.userid,
     this.plotTotal,
     this.plotTime,
   });
@@ -77,6 +77,120 @@ class MonthPlotData {
       "id": id,
       "plotTotal": plotTotal,
       "plotTime": plotTime,
+    };
+  }
+}
+
+/////////////
+
+class StatInsert {
+  int id;
+  final String userid;
+  final int drawCount;
+  final double drawLengthTotal;
+  final double drawLengthTotalYest;
+  final double drawLengthTotalAverageYest;
+  final double drawLengthTotalAverage;
+  final double drawLengthAverage;
+  final double drawLengthAverageYest;
+  final double timeBetweenAverage;
+
+  StatInsert({
+    this.id,
+    this.userid,
+    this.drawCount,
+    this.drawLengthTotal,
+    this.drawLengthTotalAverage,
+    this.drawLengthTotalAverageYest,
+    this.drawLengthTotalYest,
+    this.drawLengthAverageYest,
+    this.drawLengthAverage,
+    this.timeBetweenAverage,
+  });
+
+  // Convert a Dog into a Map. The keys must correspond to the names of the
+  // columns in the database.
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'count': drawCount,
+      'userid': userid,
+      'drawLengthTotal': drawLengthTotal,
+      'drawLengthTotalAverage': drawLengthTotalAverage,
+      'drawLengthTotalAverageYest': drawLengthTotalAverageYest,
+      'drawLengthTotalYest': drawLengthTotalYest,
+      'drawLengthAverageYest': drawLengthAverageYest,
+      'drawLengthAverage': drawLengthAverage,
+      'timeBetweenAverage': timeBetweenAverage,
+    };
+  }
+}
+
+class HourInsert {
+  int id;
+  final String userid;
+  double drawLength;
+  final int hour;
+
+  HourInsert({
+    this.id,
+    this.userid,
+    this.drawLength,
+    this.hour,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      "id": id,
+      'userid': userid,
+      "drawLength": drawLength,
+      "hour": hour,
+    };
+  }
+}
+
+class DayInsert {
+  int id;
+  final String userid;
+  double drawLength;
+  final int day;
+
+  DayInsert({
+    this.id,
+    this.userid,
+    this.drawLength,
+    this.day,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      "id": id,
+      'userid': userid,
+      "drawLength": drawLength,
+      "day": day,
+    };
+  }
+}
+
+class MonthInsert {
+  int id;
+  final String userid;
+  double drawLength;
+  final int month;
+
+  MonthInsert({
+    this.id,
+    this.userid,
+    this.drawLength,
+    this.month,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      "id": id,
+      'userid': userid,
+      "drawLength": drawLength,
+      "month": month,
     };
   }
 }

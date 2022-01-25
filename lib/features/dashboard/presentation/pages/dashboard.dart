@@ -82,11 +82,6 @@ class _DashboardbState extends State<Dashboardb> {
             reEntry = false;
           }
           return Scaffold(
-            floatingActionButton: FloatingActionButton(
-              onPressed: () {
-                connectBLE.printAllData();
-              },
-            ),
             drawer: SafeArea(
               child: Drawer(
                 child: Column(

@@ -7,10 +7,10 @@ import 'package:cuitt/features/dashboard/presentation/bloc/dashboard_bloc.dart';
 import 'package:cuitt/features/dashboard/presentation/bloc/dashboard_state.dart';
 import 'package:cuitt/features/dashboard/presentation/pages/dashboard.dart';
 import 'package:cuitt/features/dashboard/presentation/pages/drawer.dart';
-import 'package:cuitt/features/dashboard/presentation/widgets/average_waitperiod_tile.dart';
 import 'package:cuitt/features/dashboard/presentation/widgets/dashboard_button.dart';
 import 'package:cuitt/features/dashboard/presentation/widgets/draws_tile.dart';
 import 'package:cuitt/features/groups/data/datasources/group_data.dart';
+import 'package:cuitt/features/groups/presentation/widgets/average_waitperiod_tile.dart';
 import 'package:cuitt/features/groups/presentation/widgets/dashboard_chart.dart';
 import 'package:cuitt/features/groups/presentation/widgets/radial_chart.dart';
 import 'package:cuitt/features/settings/presentation/pages/settings_home.dart';
@@ -166,7 +166,8 @@ class _UserDashboardState extends State<UserDashboard> {
                               color: TransWhite,
                               header: avgDrawTile.header,
                               header2: drawTile.header,
-                              textData: userAverage[userSelection]
+                              textData: (userAverage[userSelection] /
+                                          userDraws[userSelection])
                                       .round()
                                       .toString() +
                                   ' seconds',

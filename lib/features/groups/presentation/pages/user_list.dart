@@ -5,8 +5,7 @@ import 'package:cuitt/core/routes/slide.dart';
 import 'package:cuitt/features/dashboard/data/datasources/tile_buttons.dart';
 import 'package:cuitt/features/dashboard/presentation/pages/dashboard.dart';
 import 'package:cuitt/features/groups/data/datasources/group_data.dart';
-import 'package:cuitt/features/groups/data/datasources/user_chart_data.dart';
-import 'package:cuitt/features/groups/data/datasources/user_dial_data.dart';
+import 'package:cuitt/features/groups/domain/usecases/get_group_data.dart';
 import 'package:cuitt/features/groups/presentation/pages/create_group.dart';
 import 'package:cuitt/features/groups/presentation/pages/group_list.dart';
 import 'package:cuitt/features/groups/presentation/pages/join_group.dart';
@@ -20,71 +19,6 @@ import 'user.dart';
 final firestoreInstance = FirebaseFirestore.instance;
 
 class UserList extends StatelessWidget {
-  List<UsageData> userData = [];
-
-  Future<void> user() async {
-    await firestoreInstance
-        .collection("users")
-        .doc(userIDList[userSelection])
-        .collection("data")
-        .doc("day data")
-        .get()
-        .then((value) {
-      userDayPlotTime = value["time"];
-      userDayPlotTotal = value["draw length"];
-      print(userDayPlotTime);
-      print(userDayPlotTotal);
-      userData.clear();
-      if (userDayPlotTime.isNotEmpty && userDayPlotTotal.isNotEmpty) {
-        for (int i = 0; i < userDayPlotTime.length; i++) {
-          userData.add(UsageData(
-              userDayPlotTime[i].toDate(), userDayPlotTotal[i].toDouble()));
-        }
-        userDayPlots.add(userData);
-      } else {
-        print("No user data -> adding null to plots");
-        userDayPlots.add(null);
-      }
-      print(userDayPlots.length);
-      print(userDayPlots[userDayPlots.length - 1][0].seconds);
-    });
-
-    await firestoreInstance
-        .collection("users")
-        .doc(userIDList[userSelection])
-        .collection("data")
-        .doc("month data")
-        .get()
-        .then((value) {
-      userMonthPlotTime = value["time"];
-      userMonthPlotTotal = value["draw length"];
-      print(userMonthPlotTime);
-      print(userMonthPlotTotal);
-
-      userData.clear();
-      if (userMonthPlotTime.isNotEmpty && userMonthPlotTotal.isNotEmpty) {
-        for (int i = 0; i < userMonthPlotTime.length; i++) {
-          userData.add(UsageData(
-              userMonthPlotTime[i].toDate(), userMonthPlotTotal[i].toDouble()));
-        }
-        userMonthPlots.add(userData);
-      } else {
-        print("No user data -> adding null to plots");
-        userMonthPlots.add(null);
-      }
-    });
-    userDataSelection = userDayPlots[userSelection];
-    fill = userSeconds[userSelection];
-    over = userSeconds[userSelection] - userAverageYest[userSelection];
-    if (over < 0) {
-      over = 0;
-    }
-    data = [
-      DialData('Over', over, Red),
-      DialData('Fill', fill, Green),
-    ];
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -268,8 +202,8 @@ class UserList extends StatelessWidget {
                       onTap: () async {
                         username = '${userNameList[index]}';
                         userSelection = index;
-                        await user();
-                        print(fill.toString() + " NAVIGATING");
+                        //await user();
+                        await getGroupData.prepareUserDashboard();
                         Navigator.of(context)
                             .push(MaterialPageRoute(builder: (context) {
                           return UserDashboard();
@@ -367,14 +301,14 @@ class UserList extends StatelessWidget {
                                   padding: spacer.bottom.xl * 0.95,
                                   child: Builder(
                                     builder: (BuildContext context) {
-                                      if (userDayPlots[index] == null) {
+                                      if (userHourPlots[index] == null) {
                                         return Container();
                                       } else {
                                         return Container(
                                             height: 100,
                                             width: double.infinity,
                                             child: OverviewChart(
-                                              plots: userDayPlots[index],
+                                              plots: userHourPlots[index],
                                             ));
                                       }
                                     },

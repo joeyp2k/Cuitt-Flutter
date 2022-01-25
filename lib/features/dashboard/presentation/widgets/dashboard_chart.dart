@@ -60,7 +60,7 @@ class _DashboardChartState extends State<DashboardChart> {
                               labelInterval = DateTimeIntervalType.hours;
                               padValue = 0;
                               selection = 0;
-                              dataSelection = dayData;
+                              dataSelection = hourData;
                               viewportSelectionEnd =
                                   viewportHour.add(Duration(minutes: 30));
                               viewportSelectionStart = viewportHour
@@ -89,7 +89,7 @@ class _DashboardChartState extends State<DashboardChart> {
                             padValue = MediaQuery.of(context).size.width / 4 -
                                 gridSpacer;
                             selection = 1;
-                            dataSelection = monthData;
+                            dataSelection = dayData;
                             viewportSelectionEnd =
                                 viewportDay.add(Duration(hours: 12));
                             viewportSelectionStart = viewportDay
@@ -118,8 +118,8 @@ class _DashboardChartState extends State<DashboardChart> {
                             padValue = (MediaQuery.of(context).size.width / 4 -
                                     gridSpacer) *
                                 2;
-                            selection = 3;
-                            dataSelection = monthData;
+                            selection = 2;
+                            dataSelection = dayData;
                             viewportSelectionEnd =
                                 viewportDay.add(Duration(hours: 12));
                             viewportSelectionStart = viewportDay
@@ -142,12 +142,20 @@ class _DashboardChartState extends State<DashboardChart> {
                             ),
                           ),
                           onTap: () {
-                            setState(() {
-                              padValue =
-                                  (MediaQuery.of(context).size.width / 4 -
-                                          gridSpacer) *
-                                      3;
-                            });
+                            tooltipFormat = 'MMM';
+                            dateFormat = DateFormat.MMM();
+                            labelInterval = DateTimeIntervalType.months;
+                            padValue = (MediaQuery.of(context).size.width / 4 -
+                                    gridSpacer) *
+                                3;
+                            selection = 3;
+                            dataSelection = monthData;
+                            viewportSelectionEnd = DateTime(
+                                    viewportMonth.year, viewportMonth.month)
+                                .add(Duration(days: 14));
+                            viewportSelectionStart = DateTime(
+                                viewportMonth.year, viewportMonth.month - 11);
+                            setState(() {});
                           },
                         ),
                       ),

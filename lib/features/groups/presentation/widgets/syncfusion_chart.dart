@@ -60,28 +60,25 @@ class _OverviewChartState extends State<OverviewChart> {
 
   void _update() {
     sec[graphIndex] += drawLength;
-    dayData[graphIndex] = UsageData(time[graphIndex], sec[graphIndex]);
-    weekData[graphIndex] = UsageData(timeDay[graphIndex], sec[graphIndex]);
-    monthData[graphIndex] = UsageData(timeDay[graphIndex], sec[graphIndex]);
-    //monthData using current month, not i
+    hourData[graphIndex] = UsageData(time[graphIndex], sec[graphIndex]);
+    dayData[graphIndex] = UsageData(timeDay[graphIndex], sec[graphIndex]);
+    //dayData using current month, not i
   }
 
   void _add() {
     graphIndex++;
-    if (dayData.length <= graphIndex) {
+    if (hourData.length <= graphIndex) {
       sec.add(drawLength);
       time.add(timeData);
-      dayData.add(UsageData(time[graphIndex], sec[graphIndex]));
-      weekData.add(UsageData(timeDay[graphIndex], sec[graphIndex]));
-      monthData.add(UsageData(timeDay[graphIndex], sec[graphIndex]));
+      hourData.add(UsageData(time[graphIndex], sec[graphIndex]));
+      dayData.add(UsageData(timeDay[graphIndex], sec[graphIndex]));
     } else {
       sec.add(drawLength);
       time.add(timeData);
       timeDay
           .add(DateTime(timeData.year, timeData.month, timeData.day).toLocal());
-      dayData[graphIndex] = UsageData(time[graphIndex], sec[graphIndex]);
-      weekData[graphIndex] = UsageData(timeDay[graphIndex], sec[graphIndex]);
-      monthData[graphIndex] = UsageData(timeDay[graphIndex], sec[graphIndex]);
+      hourData[graphIndex] = UsageData(time[graphIndex], sec[graphIndex]);
+      dayData[graphIndex] = UsageData(timeDay[graphIndex], sec[graphIndex]);
     }
   }
 

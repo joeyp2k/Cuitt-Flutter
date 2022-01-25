@@ -24,6 +24,7 @@ class UserAuth {
         password: passwordController.text,
       ))
           .user;
+      print(user);
       if (user == null) {
         return _success;
       } else {

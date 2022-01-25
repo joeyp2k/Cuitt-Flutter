@@ -8,8 +8,9 @@ class User {
   String difference;
 }
 
-List<double> hitLengthArray = [];
-List<int> timestampArray = [];
+List<int> countWindow = List.generate(1, (index) => 0, growable: true);
+List<double> totalWindow = List.generate(1, (index) => 0.0, growable: true);
+var daysPassed = 0;
 var drawCountIndex = 0;
 int hitTimeNow = 0;
 var hitTimeThen;
@@ -35,13 +36,8 @@ double drawLengthTotalAverage = 0;
 double drawLengthAverage = 0;
 double drawLengthAverageYest = 0;
 var drawCount = 0;
-var seshCount = 0;
-var seshCountAverage;
 var drawCountYest = 0;
-var seshCountYest = 0;
 var suggestion;
-double usage = 0;
-double overUsage = 0;
 
-int buffer = 0;
+var buffer = [];
 int transmitPointer = 0;

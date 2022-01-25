@@ -42,13 +42,13 @@ DateTime viewportSelectionStart =
 var graphIndex = 0;
 
 //Dashboard chart timeframe selection
-var dataSelection = dayData;
+var dataSelection = hourData;
 
 //Data for user overview charts
 var overviewData = [];
 var userOverview = [];
 
-var dayData = [
+var hourData = [
   //data by hour
   UsageData(viewportHour, 0),
   UsageData(viewportHour.subtract(Duration(hours: 1)), 0),
@@ -64,18 +64,7 @@ var dayData = [
   UsageData(viewportHour.subtract(Duration(hours: 11)), 0),
 ];
 
-var weekData = [
-  //data by day
-  UsageData(viewportDay, 0),
-  UsageData(viewportDay.subtract(Duration(days: 1)), 0),
-  UsageData(viewportDay.subtract(Duration(days: 2)), 0),
-  UsageData(viewportDay.subtract(Duration(days: 3)), 0),
-  UsageData(viewportDay.subtract(Duration(days: 4)), 0),
-  UsageData(viewportDay.subtract(Duration(days: 5)), 0),
-  UsageData(viewportDay.subtract(Duration(days: 6)), 0),
-];
-
-var monthData = [
+var dayData = [
   //data by day
   UsageData(viewportDay, 0),
   UsageData(viewportDay.subtract(Duration(days: 1)), 0),
@@ -109,18 +98,18 @@ var monthData = [
   UsageData(viewportDay.subtract(Duration(days: 29)), 0),
 ];
 
-var yearData = [
+var monthData = [
   //data by month
-  UsageData(DateTime(viewport.year, 1), 0),
-  UsageData(DateTime(viewport.year, 2), 0),
-  UsageData(DateTime(viewport.year, 3), 0),
-  UsageData(DateTime(viewport.year, 4), 0),
-  UsageData(DateTime(viewport.year, 5), 0),
-  UsageData(DateTime(viewport.year, 6), 0),
-  UsageData(DateTime(viewport.year, 7), 0),
-  UsageData(DateTime(viewport.year, 8), 0),
-  UsageData(DateTime(viewport.year, 9), 0),
-  UsageData(DateTime(viewport.year, 10), 0),
-  UsageData(DateTime(viewport.year, 11), 0),
-  UsageData(DateTime(viewport.year, 12), 0),
+  UsageData(viewportMonth, 0),
+  UsageData(DateTime(viewportMonth.year, viewportMonth.month - 1), 0),
+  UsageData(DateTime(viewportMonth.year, viewportMonth.month - 2), 0),
+  UsageData(DateTime(viewportMonth.year, viewportMonth.month - 3), 0),
+  UsageData(DateTime(viewportMonth.year, viewportMonth.month - 4), 0),
+  UsageData(DateTime(viewportMonth.year, viewportMonth.month - 5), 0),
+  UsageData(DateTime(viewportMonth.year, viewportMonth.month - 6), 0),
+  UsageData(DateTime(viewportMonth.year, viewportMonth.month - 7), 0),
+  UsageData(DateTime(viewportMonth.year, viewportMonth.month - 8), 0),
+  UsageData(DateTime(viewportMonth.year, viewportMonth.month - 9), 0),
+  UsageData(DateTime(viewportMonth.year, viewportMonth.month - 10), 0),
+  UsageData(DateTime(viewportMonth.year, viewportMonth.month - 11), 0),
 ];

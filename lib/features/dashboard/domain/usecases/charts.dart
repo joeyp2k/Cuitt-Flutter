@@ -38,6 +38,7 @@ class UpdateChart {
       time.add(timeData);
       timeDay
           .add(DateTime(timeData.year, timeData.month, timeData.day).toLocal());
+      timeMonth.add(DateTime(timeData.year, timeData.month).toLocal());
     }
 
     if (sec.isEmpty) {
@@ -48,26 +49,30 @@ class UpdateChart {
   //increment the current seconds index and update dayData and monthData
   void _update() {
     sec[graphIndex] += drawLength;
-    dayData[graphIndex] = UsageData(time[graphIndex], sec[graphIndex]);
-    monthData[graphIndex] = UsageData(timeDay[graphIndex], sec[graphIndex]);
+    hourData[graphIndex] = UsageData(time[graphIndex], sec[graphIndex]);
+    dayData[graphIndex] = UsageData(timeDay[graphIndex], sec[graphIndex]);
+    monthData[graphIndex] = UsageData(timeMonth[graphIndex], sec[graphIndex]);
     //monthData using current month, not i
   }
   void _add() {
     graphIndex++;
     //add new index to seconds and time array and update dayData and monthData if condition is true
-    if (dayData.length <= graphIndex) {
+    if (hourData.length <= graphIndex) {
       sec.add(drawLength);
       time.add(timeData);
-      dayData.add(UsageData(time[graphIndex], sec[graphIndex]));
-      monthData.add(UsageData(timeDay[graphIndex], sec[graphIndex]));
+      hourData.add(UsageData(time[graphIndex], sec[graphIndex]));
+      dayData.add(UsageData(timeDay[graphIndex], sec[graphIndex]));
+      monthData.add(UsageData(timeMonth[graphIndex], sec[graphIndex]));
     } else {
       //otherwise add new index to seconds, time, and day array, and update dayData and monthData
       sec.add(drawLength);
       time.add(timeData);
       timeDay
           .add(DateTime(timeData.year, timeData.month, timeData.day).toLocal());
-      dayData[graphIndex] = UsageData(time[graphIndex], sec[graphIndex]);
-      monthData[graphIndex] = UsageData(timeDay[graphIndex], sec[graphIndex]);
+      timeMonth.add(DateTime(timeData.year, timeData.month).toLocal());
+      hourData[graphIndex] = UsageData(time[graphIndex], sec[graphIndex]);
+      dayData[graphIndex] = UsageData(timeDay[graphIndex], sec[graphIndex]);
+      monthData[graphIndex] = UsageData(timeMonth[graphIndex], sec[graphIndex]);
     }
   }
 

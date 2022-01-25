@@ -10,6 +10,7 @@ class UsageData {
 
 var time = [];
 var timeDay = [];
+var timeMonth = [];
 List<double> sec = [];
 var graphIndex = 0;
 int firstRun = 1;
@@ -40,13 +41,13 @@ DateTime viewportSelectionStart =
     viewportHour.subtract(Duration(hours: 11, minutes: 30));
 
 //Dashboard chart timeframe selection
-var dataSelection = dayData;
+var dataSelection = hourData;
 
 //Data for user overview charts
 var overviewData = [];
 var userOverview = [];
 
-var dayData = [
+var hourData = [
   //data by hour
   UsageData(viewportHour, 0),
   UsageData(viewportHour.subtract(Duration(hours: 1)), 0),
@@ -62,18 +63,23 @@ var dayData = [
   UsageData(viewportHour.subtract(Duration(hours: 11)), 0),
 ];
 
-var weekData = [
-  //data by day
-  UsageData(viewportDay, 0),
-  UsageData(viewportDay.subtract(Duration(days: 1)), 0),
-  UsageData(viewportDay.subtract(Duration(days: 2)), 0),
-  UsageData(viewportDay.subtract(Duration(days: 3)), 0),
-  UsageData(viewportDay.subtract(Duration(days: 4)), 0),
-  UsageData(viewportDay.subtract(Duration(days: 5)), 0),
-  UsageData(viewportDay.subtract(Duration(days: 6)), 0),
+var monthData = [
+  //data by month
+  UsageData(viewportMonth, 0),
+  UsageData(DateTime(viewportMonth.year, viewportMonth.month - 1), 0),
+  UsageData(DateTime(viewportMonth.year, viewportMonth.month - 2), 0),
+  UsageData(DateTime(viewportMonth.year, viewportMonth.month - 3), 0),
+  UsageData(DateTime(viewportMonth.year, viewportMonth.month - 4), 0),
+  UsageData(DateTime(viewportMonth.year, viewportMonth.month - 5), 0),
+  UsageData(DateTime(viewportMonth.year, viewportMonth.month - 6), 0),
+  UsageData(DateTime(viewportMonth.year, viewportMonth.month - 7), 0),
+  UsageData(DateTime(viewportMonth.year, viewportMonth.month - 8), 0),
+  UsageData(DateTime(viewportMonth.year, viewportMonth.month - 9), 0),
+  UsageData(DateTime(viewportMonth.year, viewportMonth.month - 10), 0),
+  UsageData(DateTime(viewportMonth.year, viewportMonth.month - 11), 0),
 ];
 
-var monthData = [
+var dayData = [
   //data by day
   UsageData(viewportDay, 0),
   UsageData(viewportDay.subtract(Duration(days: 1)), 0),

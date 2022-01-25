@@ -18,7 +18,6 @@ class DashBloc extends Bloc<DashBlocEvent, DashBlocState> {
   DashBloc()
       : super(DataState(
           newDrawCountValue: 0,
-          newSeshCountValue: 0,
           newDrawLengthValue: 0,
           newDrawLengthTotalValue: 0,
           newAverageDrawLengthValue: 0,
@@ -36,7 +35,6 @@ class DashBloc extends Bloc<DashBlocEvent, DashBlocState> {
       yield DrawerClosed();
     } else if (event is DashReEntryEvent) {
       int newDrawCountValue = drawCount;
-      int newSeshCountValue = seshCount;
       double newDrawLengthValue = drawLength;
       int newDrawLengthTotalValue = drawLengthTotal.round();
       int newAverageDrawLengthValue = drawLengthAverage.round();
@@ -46,7 +44,6 @@ class DashBloc extends Bloc<DashBlocEvent, DashBlocState> {
       int newAverageWaitPeriodValue;
       yield DataState(
         newDrawCountValue: newDrawCountValue,
-        newSeshCountValue: newSeshCountValue,
         newDrawLengthValue: newDrawLengthValue,
         newDrawLengthTotalValue: newDrawLengthTotalValue,
         newAverageDrawLengthValue: newAverageDrawLengthValue,
@@ -58,7 +55,6 @@ class DashBloc extends Bloc<DashBlocEvent, DashBlocState> {
       //Applying business Logic
 
       int newDrawCountValue = drawCount;
-      int newSeshCountValue = seshCount;
       double newDrawLengthValue = drawLength;
       int newDrawLengthTotalValue = drawLengthTotal.round();
       int newAverageDrawLengthValue = drawLengthAverage.round();
@@ -74,7 +70,6 @@ class DashBloc extends Bloc<DashBlocEvent, DashBlocState> {
 
       yield DataState(
         newDrawCountValue: newDrawCountValue,
-        newSeshCountValue: newSeshCountValue,
         newDrawLengthValue: newDrawLengthValue,
         newDrawLengthTotalValue: newDrawLengthTotalValue,
         newAverageDrawLengthValue: newAverageDrawLengthValue,

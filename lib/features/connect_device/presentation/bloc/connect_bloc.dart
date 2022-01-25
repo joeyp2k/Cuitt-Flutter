@@ -24,8 +24,7 @@ class ConnectBloc extends Bloc<ConnectEvent, ConnectState> {
     } else if (event is Disconnect) {
       yield Idle();
     } else if (event is Pair) {
-      //initialize data
-      await connectBLE.initializeData();
+      await connectBLE.initializeUserData();
       yield Success();
     } else if (event is Failed) {
       yield Fail();
